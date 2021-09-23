@@ -1,0 +1,32 @@
+apiVersion: 1
+datasources:
+  - name: ElasticSearch (Metrics)
+    type: elasticsearch
+    access: proxy
+    url: http://elasticsearch:9200
+    database: "[metrics-]YYYY.MM.DD"
+    jsonData:
+      interval: Daily
+      timeField: "@timestamp"
+      esVersion: 70
+
+  - name: ElasticSearch (Logs)
+    type: elasticsearch
+    access: proxy
+    url: http://elasticsearch:9200
+    database: "[logs-]YYYY.MM.DD"
+    jsonData:
+      interval: Daily
+      timeField: "@timestamp"
+      esVersion: 70
+
+  - name: InfluxDB
+    type: influxdb
+    access: proxy
+    database: ${INFLUXDB_DB}
+    user: ${INFLUXDB_ADMIN_USER}
+    url: http://influxdb:8086
+    isDefault: true
+    editable: true
+    secureJsonData:
+      password: ${INFLUDB_ADMIN_PASSWORD}
