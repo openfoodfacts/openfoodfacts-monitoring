@@ -7,3 +7,5 @@ volumes:
     external: true
   elasticsearch-data:
     external: true
+  prometheus-data:
+    external: true
