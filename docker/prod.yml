@@ -1,0 +1,11 @@
+version: '3.7'
+
+volumes:
+  influxdb-data:
+    external: true
+  grafana-data:
+    external: true
+  elasticsearch-data:
+    external: true
+  prometheus-data:
+    external: true
