@@ -3,7 +3,7 @@ datasources:
   - name: ElasticSearch (Metrics)
     type: elasticsearch
     access: proxy
-    url: http://elasticsearch:9200
+    url: http://localhost:9200
     database: "[metrics-]YYYY.MM.DD"
     jsonData:
       interval: Daily
@@ -13,7 +13,7 @@ datasources:
   - name: ElasticSearch (Logs)
     type: elasticsearch
     access: proxy
-    url: http://elasticsearch:9200
+    url: http://localhost:9200
     database: "[logs-]YYYY.MM.DD"
     jsonData:
       interval: Daily
@@ -25,7 +25,7 @@ datasources:
     access: proxy
     database: ${INFLUXDB_DB}
     user: ${INFLUXDB_ADMIN_USER}
-    url: http://influxdb:8086
+    url: http://localhost:8086
     isDefault: true
     editable: true
     secureJsonData:
