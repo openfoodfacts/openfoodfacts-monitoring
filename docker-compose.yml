@@ -15,8 +15,6 @@ services:
     ports:
       - 8086:8086
     mem_limit: 5g
-    networks:
-      - monitoring
 
   grafana:
     restart: always
@@ -33,8 +31,6 @@ services:
       - ./configs/grafana/:/etc/grafana/provisioning
     ports:
       - 3000:3000
-    networks:
-      - monitoring
 
   # elasticsearch-datagen:
   #   image: oliver006/es-test-data
@@ -65,8 +61,6 @@ services:
     ports:
       - 9200:9200
       - 9300:9300
-    networks:
-      - monitoring
 
   alertmanager:
     restart: always
@@ -75,8 +69,6 @@ services:
       - 9093:9093
     volumes:
       - ./configs/alertmanager/:/etc/alertmanager/
-    networks:
-      - monitoring
     command:
       - '--config.file=/etc/alertmanager/config.yml'
       - '--storage.path=/alertmanager'
@@ -94,11 +86,6 @@ services:
       - '--web.console.templates=/usr/share/prometheus/consoles'
     ports:
       - 9090:9090
-    networks:
-      - monitoring
-
-networks:
-  monitoring:
 
 volumes:
   influxdb-data:
