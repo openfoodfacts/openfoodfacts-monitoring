@@ -11,13 +11,13 @@ alerting:
   - scheme: http
     static_configs:
     - targets:
-      - "localhost:9093"
+      - "alertmanager:9093"
 
 scrape_configs:
   - job_name: prometheus
     scrape_interval: 5s
     static_configs:
-    - targets: ['localhost:9090']
+    - targets: ['prometheus:9090']
 
   - job_name: off-net
     scrape_interval: 5s
