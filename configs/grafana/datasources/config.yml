@@ -1,5 +1,14 @@
 apiVersion: 1
 datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    orgId: 1
+    url: http://prometheus:9090
+    isDefault: true
+    version: 1
+    editable: false
+
   - name: ElasticSearch (Metrics)
     type: elasticsearch
     access: proxy
@@ -26,16 +35,6 @@ datasources:
     database: ${INFLUXDB_DB}
     user: ${INFLUXDB_ADMIN_USER}
     url: http://influxdb:8086
-    isDefault: true
     editable: true
     secureJsonData:
       password: ${INFLUDB_ADMIN_PASSWORD}
-
-  - name: Prometheus
-    type: prometheus
-    access: proxy
-    orgId: 1
-    url: http://prometheus:9090
-    isDefault: true
-    version: 1
-    editable: false
