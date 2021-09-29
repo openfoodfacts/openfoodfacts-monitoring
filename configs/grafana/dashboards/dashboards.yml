@@ -1,0 +1,16 @@
+apiVersion: 1
+providers:
+- name: Apache
+  folder: ''
+  type: file
+  disableDeletion: false
+  editable: false
+  options:
+    path: /etc/grafana/provisioning/dashboards/apache-exporter.json
+- name: NGINX
+  folder: ''
+  type: file
+  disableDeletion: false
+  editable: false
+  options:
+    path: /etc/grafana/provisioning/dashboards/nginx-exporter.json

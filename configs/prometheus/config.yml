@@ -26,6 +26,7 @@ scrape_configs:
       - 10.1.0.110:9113 # NGINX
       - 10.1.0.110:9117 # Apache
       labels:
+        app: "off"
         env: net
 
   # - job_name: 'cadvisor'
