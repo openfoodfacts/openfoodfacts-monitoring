@@ -33,8 +33,9 @@ datasources:
     type: influxdb
     access: proxy
     database: ${INFLUXDB_DB}
-    user: ${INFLUXDB_ADMIN_USER}
     url: http://influxdb:8086
     editable: true
+    basicAuth: true
+    basicAuthUser: ${INFLUXDB_ADMIN_USER}
     secureJsonData:
-      password: ${INFLUDB_ADMIN_PASSWORD}
+      basicAuthPassword: ${INFLUXDB_ADMIN_PASSWORD}
