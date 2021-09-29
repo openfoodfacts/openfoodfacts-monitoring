@@ -18,7 +18,7 @@
   "iteration": 1562682051068,
   "links": [],
   "panels": [{
-      "datasource": "prometheus",
+      "datasource": "Prometheus",
       "collapsed": false,
       "gridPos": {
         "h": 1,
@@ -32,7 +32,7 @@
       "type": "row"
     },
     {
-      "datasource": "prometheus",
+      "datasource": "Prometheus",
       "cacheTimeout": null,
       "colorBackground": true,
       "colorPostfix": false,
@@ -121,7 +121,7 @@
       "valueName": "current"
     },
     {
-      "datasource": "prometheus",
+      "datasource": "Prometheus",
       "collapsed": false,
       "gridPos": {
         "h": 1,
@@ -135,7 +135,7 @@
       "type": "row"
     },
     {
-      "datasource": "prometheus",
+      "datasource": "Prometheus",
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -234,7 +234,7 @@
       }
     },
     {
-      "datasource": "prometheus",
+      "datasource": "Prometheus",
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -343,7 +343,7 @@
       }
     },
     {
-      "datasource": "prometheus",
+      "datasource": "Prometheus",
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -431,7 +431,7 @@
   "style": "dark",
   "tags": [
     "nginx",
-    "prometheus",
+    "Prometheus",
     "nginx prometheus exporter"
   ],
   "templating": {
@@ -448,7 +448,7 @@
         "multi": false,
         "name": "DS_PROMETHEUS",
         "options": [],
-        "query": "prometheus",
+        "query": "Prometheus",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -457,7 +457,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": "prometheus",
+        "datasource": "Prometheus",
         "definition": "label_values(nginx_up, instance)",
         "hide": 0,
         "includeAll": true,
