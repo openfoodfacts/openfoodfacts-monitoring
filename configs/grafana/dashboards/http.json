@@ -23,7 +23,7 @@
     "links": [],
     "panels": [{
             "datasource": null,
-            "description": "Probes of OpenFoodFacts services",
+            "description": "HTTP Probes of OpenFoodFacts services",
             "fieldConfig": {
                 "defaults": {
                     "color": {
@@ -82,7 +82,7 @@
             }],
             "timeFrom": null,
             "timeShift": null,
-            "title": "Probes (instant)",
+            "title": "HTTP Probes (instant)",
             "type": "gauge"
         },
         {
@@ -169,7 +169,7 @@
             }],
             "timeFrom": null,
             "timeShift": null,
-            "title": "Probes (history)",
+            "title": "HTTP Probes (history)",
             "type": "timeseries"
         },
         {
@@ -350,7 +350,10 @@
     "refresh": false,
     "schemaVersion": 30,
     "style": "dark",
-    "tags": [],
+    "tags": [
+        "http",
+        "probes"
+    ],
     "templating": {
         "list": []
     },
@@ -360,7 +363,7 @@
     },
     "timepicker": {},
     "timezone": "",
-    "title": "Probes",
+    "title": "HTTP Probes",
     "uid": "PoOXcRvnz",
     "version": 7
 }
