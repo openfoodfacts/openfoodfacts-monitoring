@@ -68,6 +68,16 @@ services:
     networks:
       - monitoring
 
+  elasticsearch_exporter:
+    restart: always
+    image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
+    command:
+     - '--es.uri=http://elasticsearch:9200'
+    ports:
+    - 9114:9114
+    networks:
+      - monitoring
+
   alertmanager:
     restart: always
     image: prom/alertmanager:v0.23.0
@@ -94,6 +104,18 @@ services:
       - '--web.console.templates=/usr/share/prometheus/consoles'
     ports:
       - 9090:9090
+    networks:
+      - monitoring
+
+  blackbox_exporter:
+    restart: always
+    image: prom/blackbox-exporter:v0.19.0
+    command: --config.file=/config/config.yml
+    dns: 8.8.8.8
+    volumes:
+      - "./configs/blackbox_exporter:/config"
+    ports:
+      - 9115:9115
     networks:
       - monitoring
 

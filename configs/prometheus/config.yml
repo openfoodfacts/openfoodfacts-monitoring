@@ -11,12 +11,22 @@ alerting:
   - scheme: http
     static_configs:
     - targets:
-      - "alertmanager:9093"
+      - alertmanager:9093
 
 scrape_configs:
-  - job_name: prometheus
+  - job_name: monitoring
     static_configs:
-    - targets: ['prometheus:9090']
+    - targets:
+      - influxdb:8086
+      - grafana:3000
+      - prometheus:9090
+      - alertmanager:9093
+      - elasticsearch_exporter:9114
+      - blackbox_exporter:9115
+      labels:
+        container: monitoring
+        app: monitoring
+        env: org
 
   - job_name: off-net
     static_configs:
@@ -24,6 +34,7 @@ scrape_configs:
       - 10.1.0.110:9113 # NGINX
       - 10.1.0.110:9117 # Apache
       labels:
+        container: off-net
         app: "off"
         env: net
 
@@ -32,8 +43,28 @@ scrape_configs:
     - targets: 
       - 10.1.0.119:9102 # StatsD Gunicorn
       labels:
+        container: robotoff-net
         app: robotoff
         env: net
+
+  - job_name: blackbox
+    metrics_path: /probe
+    params:
+      module: [http_probe] 
+    static_configs:
+      - targets:
+        - https://monitoring.openfoodfacts.org
+        - https://world.openfoodfacts.net
+        - https://world.openfoodfacts.org
+        - https://robotoff.openfoodfacts.net/api/v1/insights
+        - https://robotoff.openfoodfacts.org/api/v1/insights
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox_exporter:9115  # The blackbox exporter's real hostname:port.
 
   # - job_name: 'cadvisor'
   #   scrape_interval: 5s
