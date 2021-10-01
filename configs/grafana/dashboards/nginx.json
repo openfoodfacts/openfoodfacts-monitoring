@@ -430,9 +430,7 @@
   "schemaVersion": 18,
   "style": "dark",
   "tags": [
-    "nginx",
-    "Prometheus",
-    "nginx prometheus exporter"
+    "nginx"
   ],
   "templating": {
     "list": [{
@@ -508,7 +506,7 @@
     ]
   },
   "timezone": "",
-  "title": "NGINX exporter",
+  "title": "NGINX metrics",
   "uid": "MsjffzSZz",
   "version": 1
 }
