@@ -9,6 +9,11 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+    - name: Test SSH
+      run: |
+        TEMP=$(mktemp)
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > $TEMP
+        ssh -o 'StrictHostKeyChecking no' -i $TEMP myuser@mysite.com 'echo "test"'
     - name: Checkout git repository
       uses: appleboy/ssh-action@master
       with:
