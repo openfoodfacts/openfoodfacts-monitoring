@@ -10,7 +10,7 @@ DOCKER_COMPOSE=docker-compose --env-file=${ENV_FILE}
 #----------------#
 up:
 	@echo "🥫 Building and starting containers …"
-	${DOCKER_COMPOSE} up -d --remove-orphans --build 2>&1
+	${DOCKER_COMPOSE} up -d --build 2>&1
 
 down:
 	@echo "🥫 Bringing down containers …"
@@ -30,9 +30,23 @@ status:
 	@echo "🥫 Getting container status …"
 	${DOCKER_COMPOSE} ps
 
+livecheck:
+	@echo "🥫 Running livecheck …"
+	docker/docker-livecheck.sh
+
 log:
 	@echo "🥫 Reading logs (docker-compose) …"
 	${DOCKER_COMPOSE} logs -f
+
+#------------#
+# Production #
+#------------#
+create_external_volumes:
+	docker volume create influxdb-data
+	docker volume create grafana-data
+	docker volume create elasticsearch-data
+	docker volume create prometheus-data
+	docker volume create alertmanager-data
 
 #---------#
 # Cleanup #

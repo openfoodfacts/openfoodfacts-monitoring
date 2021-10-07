@@ -21,10 +21,10 @@ jobs:
         script_stop: false
         script: |
           # Clone Git repository if not already there
-          [ ! -d '${{ github.event.repository.name }}' ] && git clone --depth 1 https://github.com/${{ github.repository }} --no-single-branch 2>&1
+          [ ! -d '${{ github.event.repository.name }}' ] && git clone --depth 1 https://github.com/${{ github.repository }} monitoring --no-single-branch 2>&1
 
           # Go to repository directory
-          cd ${{ github.event.repository.name }}/
+          cd monitoring/
 
           # Fetch newest commits (in case it wasn't freshly cloned)
           git fetch --depth 1
@@ -44,7 +44,7 @@ jobs:
         script_stop: false
         script: |
           # Go to repository directory
-          cd ${{ github.event.repository.name }}/
+          cd monitoring/
 
           # Set Docker Compose variables
           echo "DOCKER_CLIENT_TIMEOUT=120" > .env
@@ -74,7 +74,7 @@ jobs:
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
         script: |
-          cd ${{ github.event.repository.name }}/
+          cd monitoring/
           docker volume create influxdb-data
           docker volume create grafana-data
           docker volume create elasticsearch-data
@@ -91,8 +91,8 @@ jobs:
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
         script: |
-          cd ${{ github.event.repository.name }}/
-          docker-compose up -d --remove-orphans 2>&1
+          cd monitoring/
+          make up
 
     - name: Check services are up
       uses: appleboy/ssh-action@master
@@ -106,17 +106,8 @@ jobs:
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
         script: |
-          cd ${{ github.event.repository.name }}/
-          exit_code=0
-          for service in `docker-compose config  --service | tr '\n' ' '`; do 
-            if [ -z `docker-compose ps -q $service` ] || [ -z `docker ps -q --no-trunc | grep $(docker-compose ${{ env.compose_args }} ps -q $service)` ]; then
-              echo "$service: DOWN"
-              exit_code=1
-            else
-              echo "$service: UP"
-            fi
-          done;
-          exit $exit_code;
+          cd monitoring/
+          make livecheck
 
     - name: Cleanup obsolete Docker objects
       uses: appleboy/ssh-action@master
@@ -130,5 +121,5 @@ jobs:
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
         script: |
-          cd ${{ github.event.repository.name }}/
-          docker system prune -af
+          cd monitoring/
+          make prune
