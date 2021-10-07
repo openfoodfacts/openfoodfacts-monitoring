@@ -21,7 +21,7 @@ jobs:
         script_stop: false
         script: |
           # Clone Git repository if not already there
-          [ ! -d '${{ github.event.repository.name }}' ] && git clone --depth 1 https://github.com/${{ github.repository }} monitoring --no-single-branch 2>&1
+          [ ! -d 'monitoring' ] && git clone --depth 1 https://github.com/${{ github.repository }} monitoring --no-single-branch 2>&1
 
           # Go to repository directory
           cd monitoring/
@@ -89,7 +89,6 @@ jobs:
         script_stop: false
         script: |
           cd monitoring/
-          make hdown
           make up
 
     - name: Check services are up
