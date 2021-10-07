@@ -137,21 +137,21 @@ services:
     networks:
       - monitoring
 
-  # cadvisor:
-  #   restart: always
-  #   image: gcr.io/cadvisor/cadvisor:v0.40.0
-  #   privileged: true
-  #   devices:
-  #     - /dev/kmsg:/dev/kmsg
-  #   volumes:
-  #     - /sys:/sys:ro
-  #     - /var/lib/docker:/var/lib/docker:ro
-  #     - /var/run:/var/run:ro
-  #     - /var/run/docker.sock:/var/run/docker.sock:rw
-  #   ports:
-  #     - 8080:8080
-  #   networks:
-  #     - monitoring
+  cadvisor:
+    restart: always
+    image: gcr.io/cadvisor/cadvisor:v0.40.0
+    privileged: true
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    volumes:
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /var/run:/var/run:ro
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+    ports:
+      - 8080:8080
+    networks:
+      - monitoring
 
 volumes:
   influxdb-data:
