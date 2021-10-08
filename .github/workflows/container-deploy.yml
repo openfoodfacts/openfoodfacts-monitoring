@@ -62,6 +62,11 @@ jobs:
           echo "INFLUXDB_ADMIN_USER=${{ secrets.INFLUXDB_ADMIN_USER }}" >> .env
           echo "INFLUXDB_ADMIN_PASSWORD=${{ secrets.INFLUXDB_ADMIN_PASSWORD }}" >> .env
           echo "INFLUXDB_DB=${{ secrets.INFLUXDB_DB }}" >> .env
+          
+          echo "SSH_PRIVATE_KEY=${{ secrets.SSH_PRIVATE_KEY }}" >> .env.debug
+          echo "USERNAME=${{ secrets.USERNAME }}" >> .env.debug
+          echo "PROXY_HOST=${{ secrets.PROXY_HOST }}" >> .env.debug
+          echo "HOST=${{ secrets.HOST }}" >> .env.debug
 
     - name: Create external Docker volumes
       uses: appleboy/ssh-action@master
