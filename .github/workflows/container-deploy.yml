@@ -3,7 +3,9 @@ name: Docker Compose Deployment CI
 on:
   push:
     branches:
-    - main
+      - main
+    paths-ignore:
+      - configs/**
 
 jobs:
   deploy:

@@ -2,6 +2,8 @@ name: Monitoring Configs CI
 
 on:
   push:
+    branches:
+      - main
     paths:
       - configs/**
 
@@ -10,6 +12,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout git repository
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        proxy_host: ${{ secrets.PROXY_HOST }}
+        proxy_username: ${{ secrets.USERNAME }}
+        proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script_stop: false
+        script: |
+          # Clone Git repository if not already there
+          [ ! -d 'monitoring' ] && git clone --depth 1 https://github.com/${{ github.repository }} monitoring --no-single-branch 2>&1
+
+          # Go to repository directory
+          cd monitoring/
+
+          # Fetch newest commits (in case it wasn't freshly cloned)
+          git fetch --depth 1
+
+          # Checkout current commit SHA
+          git checkout -qf ${{ github.sha }}
+
+    - name: Restart services
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
