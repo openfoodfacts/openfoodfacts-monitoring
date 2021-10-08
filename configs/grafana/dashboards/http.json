@@ -19,7 +19,7 @@
     "editable": true,
     "gnetId": null,
     "graphTooltip": 0,
-    "id": 5,
+    "iteration": 1633700671022,
     "links": [],
     "panels": [{
             "datasource": null,
@@ -30,6 +30,8 @@
                         "mode": "thresholds"
                     },
                     "mappings": [],
+                    "max": 1,
+                    "min": 0,
                     "thresholds": {
                         "mode": "absolute",
                         "steps": [{
@@ -67,7 +69,7 @@
                     "titleSize": 14
                 }
             },
-            "pluginVersion": "8.1.5",
+            "pluginVersion": "8.1.7",
             "repeat": "instance",
             "repeatDirection": "h",
             "targets": [{
@@ -358,14 +360,17 @@
         "list": [{
             "allValue": null,
             "current": {
-                "options": [{
-                    "selected": true,
-                    "text": "org",
-                    "value": "org"
-                }]
+                "selected": false,
+                "text": [
+                    "org"
+                ],
+                "value": [
+                    "org"
+                ]
             },
             "datasource": "Prometheus",
             "definition": "",
+            "description": null,
             "error": null,
             "hide": 0,
             "includeAll": false,
@@ -373,7 +378,10 @@
             "multi": true,
             "name": "env",
             "options": [],
-            "query": "label_values(probe_success, env)",
+            "query": {
+                "query": "label_values(probe_success, env)",
+                "refId": "Prometheus-env-Variable-Query"
+            },
             "refresh": 1,
             "regex": "",
             "skipUrlSync": false,
@@ -393,5 +401,5 @@
     "timezone": "",
     "title": "HTTP Probes",
     "uid": "PoOXcRvnz",
-    "version": 7
+    "version": 5
 }
