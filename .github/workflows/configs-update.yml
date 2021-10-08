@@ -1,0 +1,24 @@
+name: Monitoring Configs CI
+
+on:
+  push:
+    paths:
+      - configs/**
+
+jobs:
+  restart:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout git repository
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        proxy_host: ${{ secrets.PROXY_HOST }}
+        proxy_username: ${{ secrets.USERNAME }}
+        proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script_stop: false
+        script: |
+          cd monitoring
+          make restart
