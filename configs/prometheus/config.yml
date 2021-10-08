@@ -55,11 +55,11 @@ scrape_configs:
       module: [http_probe] 
     static_configs:
       - targets:
-        - https://monitoring.openfoodfacts.org
         - https://world.openfoodfacts.net
         - https://world.openfoodfacts.org
         - https://robotoff.openfoodfacts.net/api/v1/insights
         - https://robotoff.openfoodfacts.org/api/v1/insights
+        - https://monitoring.openfoodfacts.org/api/health
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
