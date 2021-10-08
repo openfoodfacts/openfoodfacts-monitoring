@@ -363,7 +363,7 @@
             "error": null,
             "hide": 0,
             "includeAll": false,
-            "label": "Env",
+            "label": "env",
             "multi": true,
             "name": "env",
             "options": [],
