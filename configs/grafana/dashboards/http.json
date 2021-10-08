@@ -72,7 +72,7 @@
             "repeatDirection": "h",
             "targets": [{
                 "exemplar": false,
-                "expr": "probe_success",
+                "expr": "probe_success{env=\"$env\"}",
                 "format": "time_series",
                 "instant": false,
                 "interval": "",
@@ -357,7 +357,13 @@
     "templating": {
         "list": [{
             "allValue": null,
-            "current": {},
+            "current": {
+                "options": [{
+                    "selected": true,
+                    "text": "org",
+                    "value": "org"
+                }]
+            },
             "datasource": "Prometheus",
             "definition": "",
             "error": null,
