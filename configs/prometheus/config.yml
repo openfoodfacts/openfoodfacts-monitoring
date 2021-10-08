@@ -49,17 +49,38 @@ scrape_configs:
         app: robotoff
         env: net
 
-  - job_name: blackbox
+  - job_name: blackbox-net
     metrics_path: /probe
     params:
       module: [http_probe] 
     static_configs:
       - targets:
         - https://world.openfoodfacts.net
-        - https://world.openfoodfacts.org
         - https://robotoff.openfoodfacts.net/api/v1/insights
+        labels:
+          env: net
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox_exporter:9115
+
+  - job_name: blackbox-org
+    metrics_path: /probe
+    params:
+      module: [http_probe] 
+    static_configs:
+      - targets:
+        - https://world.openfoodfacts.org
+        - https://world.openbeautyfacts.org
+        - https://world.openpetfoodfacts.org
+        - https://world.openproductsfacts.org
         - https://robotoff.openfoodfacts.org/api/v1/insights
         - https://monitoring.openfoodfacts.org/api/health
+        labels:
+          env: org
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
