@@ -159,7 +159,7 @@
             "repeatDirection": "h",
             "targets": [{
                 "exemplar": false,
-                "expr": "probe_success",
+                "expr": "probe_success{env=\"$env\"}",
                 "format": "time_series",
                 "instant": false,
                 "interval": "",
@@ -246,7 +246,7 @@
             "repeatDirection": "h",
             "targets": [{
                 "exemplar": false,
-                "expr": "probe_http_status_code",
+                "expr": "probe_http_status_code{env=\"$env\"}",
                 "format": "time_series",
                 "instant": false,
                 "interval": "",
@@ -333,7 +333,7 @@
             "repeatDirection": "h",
             "targets": [{
                 "exemplar": false,
-                "expr": "sum by(instance)(probe_http_duration_seconds)",
+                "expr": "sum by(instance)(probe_http_duration_seconds{env=\"$env\"})",
                 "format": "time_series",
                 "instant": false,
                 "interval": "",
