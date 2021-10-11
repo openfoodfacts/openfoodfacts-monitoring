@@ -1,3 +1,11 @@
 groups:
 - name: example
   rules:
+  - alert: Memory usage is too high
+    expr: ((sum(container_memory_usage_bytes{instance=~"cadvisor:8080",image!=""}) by (instance) - sum(container_memory_cache{instance=~"cadvisor:8080",image!=""}) by (instance)) / sum(machine_memory_bytes{instance=~"cadvisor:8080"}) by (instance)) * 100 > 75
+    for: 15m
+    labels:
+      severity: page
+    annotations:
+      summary: "High memory usage on instance 'dockers'"
+      description: "Memory usage on instance 'dockers' is at {{ $value }}%"
