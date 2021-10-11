@@ -1,10 +1,12 @@
+global:
+  resolve_timeout: 1m
+  slack_api_url: 'https://hooks.slack.com/services/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'
+
 route:
-  receiver: slack
+  receiver: 'slack-notifications'
 
 receivers:
-  - name: slack
-    # slack_configs:
-    #     - send_resolved: true
-    #       username: '<username>'
-    #       channel: '#<channel-name>'
-    #       api_url: '<incomming-webhook-url>'
+- name: 'slack-notifications'
+  slack_configs:
+  - channel: '#infrastructure-alerts'
+    send_resolved: true
