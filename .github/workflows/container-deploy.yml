@@ -65,11 +65,10 @@ jobs:
           echo "INFLUXDB_ADMIN_PASSWORD=${{ secrets.INFLUXDB_ADMIN_PASSWORD }}" >> .env
           echo "INFLUXDB_DB=${{ secrets.INFLUXDB_DB }}" >> .env
 
-          # Slack
-          echo "SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0=${{ secrets.SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0}}" >> .env
-          
     - name: Run envsubst on Prometheus configs
       uses: appleboy/ssh-action@master
+      env:
+        SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0: "${{ secrets.SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0}}"
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
@@ -78,6 +77,7 @@ jobs:
         proxy_username: ${{ secrets.USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
+        envs: SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0
         script: |
           cd monitoring/
           source .env
