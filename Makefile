@@ -1,13 +1,19 @@
 #!/usr/bin/make
 
+include .env
+export $(shell sed 's/=.*//' .env)
+
+SHELL := /bin/bash
 ENV_FILE ?= .env
 DOCKER_COMPOSE=docker-compose --env-file=${ENV_FILE}
 
-.DEFAULT_GOAL := up
+.DEFAULT_GOAL := dev
 
 #----------------#
 # Docker Compose #
 #----------------#
+dev: replace_env up
+
 up:
 	@echo "🥫 Building and starting containers …"
 	${DOCKER_COMPOSE} up -d --build 2>&1
@@ -47,6 +53,9 @@ create_external_volumes:
 	docker volume create elasticsearch-data
 	docker volume create prometheus-data
 	docker volume create alertmanager-data
+
+replace_env:
+	. .env && envsubst '$${SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0}' < configs/alertmanager/config.tpl.yml > configs/alertmanager/config.yml
 
 #---------#
 # Cleanup #
