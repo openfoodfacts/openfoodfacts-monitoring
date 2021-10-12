@@ -25,11 +25,14 @@ services:
       - GF_SERVER_ROUTER_LOGGING
       - GF_SECURITY_ADMIN_USER
       - GF_SECURITY_ADMIN_PASSWORD
+      - GOOGLE_OAUTH2_CLIENT_ID
+      - GOOGLE_OAUTH2_CLIENT_SECRET
       - INFLUXDB_DB
       - INFLUXDB_ADMIN_USER
       - INFLUXDB_ADMIN_PASSWORD
     volumes:
       - ./configs/grafana/:/etc/grafana/provisioning
+      - ./configs/grafana/config.ini/:/usr/share/grafana/conf/defaults.ini
       - grafana-data:/var/lib/grafana
     ports:
       - 3000:3000
