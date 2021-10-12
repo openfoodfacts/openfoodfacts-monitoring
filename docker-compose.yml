@@ -108,6 +108,22 @@ services:
     networks:
       - monitoring
 
+  cadvisor:
+    restart: always
+    image: gcr.io/cadvisor/cadvisor:v0.40.0
+    privileged: true
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    volumes:
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /var/run:/var/run:ro
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+    ports:
+      - 8080:8080
+    networks:
+      - monitoring
+
   blackbox_exporter:
     restart: always
     image: prom/blackbox-exporter:v0.19.0
@@ -137,19 +153,13 @@ services:
     networks:
       - monitoring
 
-  cadvisor:
+  json_exporter:
     restart: always
-    image: gcr.io/cadvisor/cadvisor:v0.40.0
-    privileged: true
-    devices:
-      - /dev/kmsg:/dev/kmsg
+    image: prometheuscommunity/json-exporter
     volumes:
-      - /sys:/sys:ro
-      - /var/lib/docker:/var/lib/docker:ro
-      - /var/run:/var/run:ro
-      - /var/run/docker.sock:/var/run/docker.sock:rw
+      - ./configs/json_exporter/config.yml:/config.yml
     ports:
-      - 8080:8080
+      - 7979:7979
     networks:
       - monitoring
 

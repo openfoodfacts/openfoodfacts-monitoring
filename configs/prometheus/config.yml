@@ -22,9 +22,10 @@ scrape_configs:
       - prometheus:9090
       - alertmanager:9093
       - elasticsearch_exporter:9114
-      - blackbox_exporter:9115
       - cadvisor:8080
+      - blackbox_exporter:9115
       - node_exporter:9100
+      - json_exporter:7979
       labels:
         container: monitoring
         app: monitoring
@@ -88,3 +89,16 @@ scrape_configs:
         target_label: instance
       - target_label: __address__
         replacement: blackbox_exporter:9115
+
+  - job_name: json-org
+    metrics_path: /probe
+    static_configs:
+      - targets:
+        # - world.openfoodfacts.org/&json=1&fields=count/count
+        - world.openfoodfacts.org/misc/en:nutriscore-not-applicable&json=1&fields=count
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: json_exporter:7979 ## Location of the json exporter's real <hostname>:<port>
