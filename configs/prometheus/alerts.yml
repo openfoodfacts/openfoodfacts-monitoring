@@ -1,22 +1,80 @@
 groups:
-- name: infra-alerts
+- name: node-alerts
   rules:
-  - alert: Memory usage too high
-    expr: ((sum(container_memory_usage_bytes{instance=~"cadvisor:8080",image!=""}) by (instance) - sum(container_memory_cache{instance=~"cadvisor:8080",image!=""}) by (instance)) / sum(machine_memory_bytes{instance=~"cadvisor:8080"}) by (instance)) * 100 > 75
+  - alert: VMOutOfMemory
+    expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 25
     for: 15m
     labels:
-      severity: page
+      severity: warning
+      instance: "{{ $labels.instance }}"
     annotations:
-      summary: "High memory usage on instance 'dockers'"
-      description: "Memory usage on instance 'dockers' is at {{ $value }}%"
+      summary: Less than 25% of memory remaining on {{ $labels.instance }}
+      description: Remaining memory usage on VM {{ $labels.instance }} is {{ $value }}%  for more than 15 minutes.
+
+  - alert: VMOutOfDiskSpace
+    expr: (node_filesystem_avail_bytes{device="/dev/sda1", mountpoint="/"} * 100) / node_filesystem_size_bytes{device="/dev/sda1", mountpoint="/"} < 10
+    for: 15m
+    labels:
+      severity: warning
+      instance: "{{ $labels.instance }}"
+    annotations:
+      summary: Less than 10% of disk space remaining on {{ $labels.instance }}
+      description: Remaining disk space on {{ $labels.instance }} is {{ $value }}% for more than 15 minutes.
+
+- name: docker-alerts
+  - alert: DockerContainerHighMemoryUsage
+    expr: (sum(container_memory_working_set_bytes) by (container_label_com_docker_compose_project, container_label_com_docker_compose_service, container_label_org_opencontainers_image_revision, container_label_org_opencontainers_image_version, env) / sum(container_spec_memory_limit_bytes > 0) by (container_label_com_docker_compose_project, container_label_com_docker_compose_service, container_label_org_opencontainers_image_revision, container_label_org_opencontainers_image_version, env) * 100) > 80
+    for: 15m
+    labels:
+      severity: warning
+      app: "{{ $labels.container_label_com_docker_compose_project }}"
+      service: "{{ $labels.container_label_com_docker_compose_service }}"
+      env: "{{ $labels.env }}"
+      instance: "{{ $labels.instance }}"
+      image_revision: "{{ $labels.container_label_org_opencontainers_image_revision }}"
+      image_version: "{{ $labels.container_label_org_opencontainers_image_version }}"
+    annotations:
+      summary: More than 80% of maximum memory used on container '{{ $labels.name }}'
+      description: Container '{{ $labels.name }}' memory usage is at {{ $value }}% of maximum memory usage for more than 15 minutes.
+
+  - alert: DockerContainerHighCpuUsage
+    expr: (sum(rate(container_cpu_usage_seconds_total[5m])) by (container_label_com_docker_compose_project, container_label_com_docker_compose_service, container_label_org_opencontainers_image_revision, container_label_org_opencontainers_image_version, env) * 100) > 80
+    for: 15m
+    labels:
+      severity: warning
+      app: "{{ $labels.container_label_com_docker_compose_project }}"
+      service: "{{ $labels.container_label_com_docker_compose_service }}"
+      env: "{{ $labels.env }}"
+      instance: "{{ $labels.instance }}"
+      image_revision: "{{ $labels.container_label_org_opencontainers_image_revision }}"
+      image_version: "{{ $labels.container_label_org_opencontainers_image_version }}"
+    annotations:
+      summary: More than 80% of CPU used on container '{{ $labels.name }}'
+      description: Container '{{ $labels.name }}' CPU usage is at {{ $value }}% for more than 15 minutes.
 
 - name: service-slos
   rules:
-  - alert: HTTP 5xx codes too high
-    expr: sum(gunicorn_request_status{status=~"(2..|3..|4..)"}) / sum(gunicorn_request_status) * 100 < 99.99
+  - alert: APIHighRequestErrors
+    expr: sum by(env)(gunicorn_request_status{status=~"(2..|3..|4..)"}) / sum by(env)(gunicorn_request_status) * 100 < 99.99
     for: 15m
     labels:
       severity: page
+      app: robotoff
+      env: "{{ $labels.env }}"
     annotations:
-      summary: "99.99% of requests return a valid HTTP status code"
-      description: "Availability SLO is at {{ $value}}%. Target: 99.99%"
+      summary: Too many 5xx in Robotoff HTTP responses
+      description: "Availability SLO is at {{ $value }}% (target=99.99%) for more than 15 minutes."
+
+- name: service-probes
+  rules:
+  - alert: ServiceProbeFailed
+    expr: probe_success != 1
+    for: 15m
+    labels:
+      severity: page
+      app: "{{ $labels.app }}"
+      service: "{{ $labels.service }}"
+      env: "{{ $labels.env }}"
+    annotations:
+      summary: "{{ $labels.app }}-{{ $labels.env }} is down"
+      description: Service probe on URL '{{ $labels.instance }}' failed for more than 15 minutes.
