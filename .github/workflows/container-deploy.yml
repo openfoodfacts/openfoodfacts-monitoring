@@ -81,7 +81,6 @@ jobs:
         proxy_username: ${{ secrets.USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
-        envs: SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0
         script: |
           cd monitoring/
           make replace_env
