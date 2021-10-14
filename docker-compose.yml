@@ -22,14 +22,12 @@ services:
     restart: always
     image: grafana/grafana
     environment:
-      - GF_SERVER_ROUTER_LOGGING
-      - GF_SECURITY_ADMIN_USER
-      - GF_SECURITY_ADMIN_PASSWORD
       - INFLUXDB_DB
       - INFLUXDB_ADMIN_USER
       - INFLUXDB_ADMIN_PASSWORD
     volumes:
       - ./configs/grafana/:/etc/grafana/provisioning
+      - ./configs/grafana/config.ini:/usr/share/grafana/conf/defaults.ini
       - grafana-data:/var/lib/grafana
     ports:
       - 3000:3000
@@ -89,6 +87,7 @@ services:
     command:
       - '--config.file=/etc/alertmanager/config.yml'
       - '--storage.path=/alertmanager'
+      - '--web.external-url=https://alertmanager.openfoodfacts.org/'
     networks:
       - monitoring
 
@@ -103,6 +102,7 @@ services:
       - '--storage.tsdb.path=/prometheus'
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.external-url=https://prometheus.openfoodfacts.org/'
     ports:
       - 9090:9090
     networks:

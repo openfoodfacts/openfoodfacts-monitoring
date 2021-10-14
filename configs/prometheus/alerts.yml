@@ -1,7 +1,7 @@
 groups:
-- name: example
+- name: infra-alerts
   rules:
-  - alert: Memory usage is too high
+  - alert: Memory usage too high
     expr: ((sum(container_memory_usage_bytes{instance=~"cadvisor:8080",image!=""}) by (instance) - sum(container_memory_cache{instance=~"cadvisor:8080",image!=""}) by (instance)) / sum(machine_memory_bytes{instance=~"cadvisor:8080"}) by (instance)) * 100 > 75
     for: 15m
     labels:
@@ -9,3 +9,14 @@ groups:
     annotations:
       summary: "High memory usage on instance 'dockers'"
       description: "Memory usage on instance 'dockers' is at {{ $value }}%"
+
+- name: service-slos
+  rules:
+  - alert: HTTP 5xx codes too high
+    expr: sum(gunicorn_request_status{status=~"(2..|3..|4..)"}) / sum(gunicorn_request_status) * 100 < 99.99
+    for: 15m
+    labels:
+      severity: page
+    annotations:
+      summary: "99.99% of requests return a valid HTTP status code"
+      description: "Availability SLO is at {{ $value}}%. Target: 99.99%"

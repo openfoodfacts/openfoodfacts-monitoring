@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - deploy-*
     paths-ignore:
       - configs/**
 
@@ -59,6 +60,11 @@ jobs:
           echo "GF_SERVER_ROUTER_LOGGING=true" >> .env
           echo "GF_SECURITY_ADMIN_USER=${{ secrets.GF_SECURITY_ADMIN_USER }}" >> .env
           echo "GF_SECURITY_ADMIN_PASSWORD=${{ secrets.GF_SECURITY_ADMIN_PASSWORD }}" >> .env
+          echo "GF_AUTH_GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_OAUTH2_CLIENT_ID }}" >> .env
+          echo "GF_AUTH_GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_OAUTH2_CLIENT_SECRET }}" >> .env
+
+          # Alertmanager
+          echo "SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0=${{ secrets.SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0 }}" >> .env
 
           # InfluxDB
           echo "INFLUXDB_ADMIN_USER=${{ secrets.INFLUXDB_ADMIN_USER }}" >> .env
@@ -67,8 +73,6 @@ jobs:
 
     - name: Run envsubst on Prometheus configs
       uses: appleboy/ssh-action@master
-      env:
-        SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0: "${{ secrets.SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0}}"
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
@@ -80,8 +84,7 @@ jobs:
         envs: SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0
         script: |
           cd monitoring/
-          source .env
-          envsubst < configs/alertmanager/config.tpl.yml > configs/alertmanager/config.yml
+          make replace_env
 
     - name: Create external Docker volumes
       uses: appleboy/ssh-action@master
