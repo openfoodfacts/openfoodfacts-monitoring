@@ -22,14 +22,6 @@ services:
     restart: always
     image: grafana/grafana
     environment:
-      - GF_DOMAIN_NAME
-      - GF_HTTP_PROTOCOL
-      - GF_HTTP_PORT
-      - GF_SERVER_ROUTER_LOGGING
-      - GF_SECURITY_ADMIN_USER
-      - GF_SECURITY_ADMIN_PASSWORD
-      - GOOGLE_OAUTH2_CLIENT_ID
-      - GOOGLE_OAUTH2_CLIENT_SECRET
       - INFLUXDB_DB
       - INFLUXDB_ADMIN_USER
       - INFLUXDB_ADMIN_PASSWORD
