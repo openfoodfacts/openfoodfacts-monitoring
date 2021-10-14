@@ -1,5 +1,4 @@
 version: '3.7'
-
 volumes:
   influxdb-data:
     external: true
@@ -9,3 +8,14 @@ volumes:
     external: true
   prometheus-data:
     external: true
+services:
+  grafana:
+    environment:
+      - GF_AUTH_GOOGLE_ENABLED=true
+      - GF_AUTH_GOOGLE_ALLOW_SIGN_UP=true
+      - GF_AUTH_GOOGLE_ALLOWED_DOMAINS=openfoodfacts.org
+      - GF_AUTH_GOOGLE_CLIENT_ID=${GOOGLE_OAUTH2_CLIENT_ID}
+      - GF_AUTH_GOOGLE_CLIENT_SECRET=${GOOGLE_OAUTH2_CLIENT_SECRET}
+      - GF_SERVER_DOMAIN=openfoodfacts.org
+      - GF_SERVER_ROUTER_LOGGING=true
+      - GF_SERVER_ROOT_URL=https://grafana.openfoodfacts.org
