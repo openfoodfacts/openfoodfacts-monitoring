@@ -24,7 +24,6 @@ scrape_configs:
       - elasticsearch_exporter:9114
       - blackbox_exporter:9115
       - node_exporter:9100
-      - github_actions_exporter:9999
       - cadvisor:8080
       labels:
         container: monitoring

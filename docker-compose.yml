@@ -137,18 +137,6 @@ services:
     networks:
       - monitoring
 
-  github_actions_exporter:
-    restart: always
-    image: spendeskplatform/github-actions-exporter:v1.8.1
-    environment:
-      - GITHUB_TOKEN
-      - GITHUB_ORGAS=openfoodfacts
-      - GITHUB_REPOS=openfoodfacts/openfoodfacts-server
-    ports:
-      - 9999:9999
-    networks:
-      - monitoring
-
   cadvisor:
     restart: always
     image: gcr.io/cadvisor/cadvisor:v0.40.0
