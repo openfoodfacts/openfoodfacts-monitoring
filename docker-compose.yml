@@ -22,6 +22,7 @@ services:
     restart: always
     image: grafana/grafana
     environment:
+      - GF_SERVER_ROUTER_LOGGING
       - GF_SECURITY_ADMIN_USER
       - GF_SECURITY_ADMIN_PASSWORD
       - INFLUXDB_DB
@@ -29,7 +30,6 @@ services:
       - INFLUXDB_ADMIN_PASSWORD
     volumes:
       - ./configs/grafana/:/etc/grafana/provisioning
-      - ./configs/grafana/config.ini/:/usr/share/grafana/conf/defaults.ini
       - grafana-data:/var/lib/grafana
     ports:
       - 3000:3000

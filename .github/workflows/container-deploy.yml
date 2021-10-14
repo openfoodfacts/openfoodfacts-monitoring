@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - deploy-*
     paths-ignore:
       - configs/**
 
@@ -57,14 +56,9 @@ jobs:
           echo "COMPOSE_FILE=docker-compose.yml;docker/prod.yml" >> .env
 
           # Grafana
-          echo "GF_DOMAIN_NAME=openfoodfacts.org" >> .env
-          echo "GF_HTTP_PROTOCOL=https" >> .env
-          echo "GF_HTTP_PORT=80" >> .env
           echo "GF_SERVER_ROUTER_LOGGING=true" >> .env
           echo "GF_SECURITY_ADMIN_USER=${{ secrets.GF_SECURITY_ADMIN_USER }}" >> .env
           echo "GF_SECURITY_ADMIN_PASSWORD=${{ secrets.GF_SECURITY_ADMIN_PASSWORD }}" >> .env
-          echo "GOOGLE_OAUTH2_CLIENT_ID=${{ secrets.GOOGLE_OAUTH2_CLIENT_ID }}" >> .env
-          echo "GOOGLE_OAUTH2_CLIENT_SECRET=${{ secrets.GOOGLE_OAUTH2_CLIENT_SECRET }}" >> .env
 
           # Alertmanager
           echo "SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0=${{ secrets.SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0 }}" >> .env
