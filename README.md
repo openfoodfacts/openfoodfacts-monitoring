@@ -9,3 +9,5 @@ It contains Docker Compose deployments for:
 * **InfluxDB** running on port `8086`
 * **Prometheus** running on port `9090`
 * **AlertManager** running on port `9093`
+
+It also multiple metrics exporter to gather metrics from the above services.
