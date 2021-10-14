@@ -10,4 +10,4 @@ It contains Docker Compose deployments for:
 * **Prometheus** running on port `9090`
 * **AlertManager** running on port `9093`
 
-It also multiple metrics exporter to gather metrics from the above services.
+It also multiple Prometheus metrics exporters to gather metrics from the above services.
