@@ -27,7 +27,7 @@ services:
       - INFLUXDB_ADMIN_PASSWORD
     volumes:
       - ./configs/grafana/:/etc/grafana/provisioning
-      - ./configs/grafana/config.ini/:/usr/share/grafana/conf/defaults.ini
+      - ./configs/grafana/config.ini:/usr/share/grafana/conf/defaults.ini
       - grafana-data:/var/lib/grafana
     ports:
       - 3000:3000
