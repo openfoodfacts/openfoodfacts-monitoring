@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - deploy-*
     paths:
       - configs/**
 
@@ -33,6 +34,20 @@ jobs:
 
           # Checkout current commit SHA
           git checkout -qf ${{ github.sha }}
+
+    - name: Run envsubst on Prometheus configs
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        proxy_host: ${{ secrets.PROXY_HOST }}
+        proxy_username: ${{ secrets.USERNAME }}
+        proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script_stop: false
+        script: |
+          cd monitoring/
+          make replace_env
 
     - name: Restart services
       uses: appleboy/ssh-action@master
