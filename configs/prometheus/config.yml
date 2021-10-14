@@ -14,30 +14,35 @@ alerting:
       - alertmanager:9093
 
 scrape_configs:
-  - job_name: monitoring
-    static_configs:
-    - targets:
-      - influxdb:8086
-      - grafana:3000
-      - prometheus:9090
-      - alertmanager:9093
-      - elasticsearch_exporter:9114
-      - blackbox_exporter:9115
-      - node_exporter:9100
-      - cadvisor:8080
-      labels:
-        container: monitoring
-        app: monitoring
-        env: org
 
+  #--------------#
+  # NODE METRICS #
+  #--------------#
+  - job_name: node-net
+    static_configs:
+    - targets: ['10.1.0.200:9100']
+      labels:
+        app: node_exporter
+        env: net
+    - targets: ['10.1.0.200:8080']
+      labels:
+        app: cadvisor
+        env: net
+
+  #------------------#
+  # SERVICES METRICS #
+  #------------------#
   - job_name: off-net
     static_configs:
-    - targets: 
-      - 10.1.0.200:9113 # NGINX
-      - 10.1.0.200:9117 # Apache
+    - targets: ['10.1.0.200:9113'] # NGINX
       labels:
-        container: off-net
         app: "off"
+        service: frontend
+        env: net
+    - targets: ['10.1.0.200:9117'] # Apache
+      labels:
+        app: "off"
+        service: backend
         env: net
 
   - job_name: robotoff-net
@@ -45,19 +50,54 @@ scrape_configs:
     - targets: 
       - 10.1.0.200:9102 # StatsD Gunicorn
       labels:
-        container: robotoff-net
         app: robotoff
+        service: api
         env: net
 
+  - job_name: monitoring-org
+    static_configs:
+    - targets: ['influxdb:8086']
+      labels:
+        app: influxdb
+        env: org
+    - targets: ['grafana:3000']
+      labels:
+        app: grafana
+        env: org
+    - targets: ['prometheus:9090']
+      labels:
+        app: prometheus
+        env: org
+    - targets: ['alertmanager:9093']
+      labels:
+        app: alertmanager
+        env: org
+    - targets: ['elasticsearch_exporter:9114']
+      labels:
+        app: elasticsearch
+        env: org
+    - targets: ['blackbox_exporter:9115']
+      labels:
+        app: blackbox_exporter
+        env: org
+
+  #--------#
+  # PROBES #
+  #--------#
   - job_name: blackbox-net
     metrics_path: /probe
     params:
       module: [http_probe] 
     static_configs:
-      - targets:
-        - https://world.openfoodfacts.net
-        - https://robotoff.openfoodfacts.net/api/v1/insights
+      - targets: ['https://world.openfoodfacts.net']
         labels:
+          app: "off"
+          service: api
+          env: net
+      - targets: ['https://robotoff.openfoodfacts.net/api/v1/insights']
+        labels:
+          app: robotoff
+          service: api
           env: net
     relabel_configs:
       - source_labels: [__address__]
@@ -72,14 +112,40 @@ scrape_configs:
     params:
       module: [http_probe] 
     static_configs:
-      - targets:
-        - https://world.openfoodfacts.org
-        - https://world.openbeautyfacts.org
-        - https://world.openpetfoodfacts.org
-        - https://world.openproductsfacts.org
-        - https://robotoff.openfoodfacts.org/api/v1/insights
-        - https://monitoring.openfoodfacts.org/api/health
+      - targets: ['https://world.openfoodfacts.org']
         labels:
+          app: 'off'
+          service: api
+          env: org
+      - targets: ['https://world.openbeautyfacts.org']
+        labels:
+          app: obf
+          env: org
+      - targets: ['https://world.openpetfoodfacts.org']
+        labels:
+          app: opff
+          service: api
+          env: org
+      - targets: ['https://world.openproductsfacts.org']
+        labels:
+          app: opf
+          env: org
+      - targets: ['https://robotoff.openfoodfacts.org/api/v1/insights']
+        labels:
+          app: robotoff
+          service: api
+          env: org
+      - targets: ['https://grafana.openfoodfacts.org/api/health']
+        labels:
+          app: grafana
+          env: org
+      - targets: ['https://prometheus.openfoodfacts.org/-/healthy']
+        labels:
+          app: prometheus
+          env: org
+      - targets: ['https://alertmanager.openfoodfacts.org/-/healthy']
+        labels:
+          app: alertmanager
           env: org
     relabel_configs:
       - source_labels: [__address__]
