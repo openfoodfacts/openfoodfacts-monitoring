@@ -22,6 +22,7 @@ groups:
       description: Remaining disk space on {{ $labels.instance }} is {{ $value }}% for more than 15 minutes.
 
 - name: docker-alerts
+  rules:
   - alert: DockerContainerHighMemoryUsage
     expr: (sum(container_memory_working_set_bytes) by (container_label_com_docker_compose_project, container_label_com_docker_compose_service, container_label_org_opencontainers_image_revision, container_label_org_opencontainers_image_version, env) / sum(container_spec_memory_limit_bytes > 0) by (container_label_com_docker_compose_project, container_label_com_docker_compose_service, container_label_org_opencontainers_image_revision, container_label_org_opencontainers_image_version, env) * 100) > 80
     for: 15m
