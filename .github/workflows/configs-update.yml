@@ -35,6 +35,42 @@ jobs:
           # Checkout current commit SHA
           git checkout -qf ${{ github.sha }}
 
+    - name: Set environment variables
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        proxy_host: ${{ secrets.PROXY_HOST }}
+        proxy_username: ${{ secrets.USERNAME }}
+        proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script_stop: false
+        script: |
+          # Go to repository directory
+          cd monitoring/
+
+          # Set Docker Compose variables
+          echo "DOCKER_CLIENT_TIMEOUT=120" > .env
+          echo "COMPOSE_HTTP_TIMEOUT=120" >> .env
+          echo "COMPOSE_PROJECT_NAME=monitoring" >> .env
+          echo "COMPOSE_PATH_SEPARATOR=;" >> .env
+          echo "COMPOSE_FILE=docker-compose.yml;docker/prod.yml" >> .env
+
+          # Grafana
+          echo "GF_SERVER_ROUTER_LOGGING=true" >> .env
+          echo "GF_SECURITY_ADMIN_USER=${{ secrets.GF_SECURITY_ADMIN_USER }}" >> .env
+          echo "GF_SECURITY_ADMIN_PASSWORD=${{ secrets.GF_SECURITY_ADMIN_PASSWORD }}" >> .env
+          echo "GF_AUTH_GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_OAUTH2_CLIENT_ID }}" >> .env
+          echo "GF_AUTH_GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_OAUTH2_CLIENT_SECRET }}" >> .env
+
+          # Alertmanager
+          echo "SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0=${{ secrets.SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0 }}" >> .env
+
+          # InfluxDB
+          echo "INFLUXDB_ADMIN_USER=${{ secrets.INFLUXDB_ADMIN_USER }}" >> .env
+          echo "INFLUXDB_ADMIN_PASSWORD=${{ secrets.INFLUXDB_ADMIN_PASSWORD }}" >> .env
+          echo "INFLUXDB_DB=${{ secrets.INFLUXDB_DB }}" >> .env
+
     - name: Run envsubst on Prometheus configs
       uses: appleboy/ssh-action@master
       with:
