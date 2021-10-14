@@ -71,6 +71,9 @@ jobs:
           echo "INFLUXDB_ADMIN_PASSWORD=${{ secrets.INFLUXDB_ADMIN_PASSWORD }}" >> .env
           echo "INFLUXDB_DB=${{ secrets.INFLUXDB_DB }}" >> .env
 
+          # GitHub exporter
+          echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env
+
     - name: Run envsubst on Prometheus configs
       uses: appleboy/ssh-action@master
       with:
