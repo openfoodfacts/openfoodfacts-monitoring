@@ -57,7 +57,7 @@ groups:
   rules:
   - alert: APIHighRequestErrors
     expr: sum by(env)(gunicorn_request_status{status=~"(2..|3..|4..)"}) / sum by(env)(gunicorn_request_status) * 100 < 99.99
-    for: 15m
+    for: 5m
     labels:
       severity: page
       app: robotoff
@@ -70,7 +70,7 @@ groups:
   rules:
   - alert: ServiceProbeFailed
     expr: probe_success != 1
-    for: 15m
+    for: 5m
     labels:
       severity: page
       app: "{{ $labels.app }}"
