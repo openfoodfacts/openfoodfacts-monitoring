@@ -2,30 +2,34 @@ global:
   resolve_timeout: 1m
   slack_api_url: '${SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0}'
 
+global:
+  resolve_timeout: 1m
+  slack_api_url: '${SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0}'
+
 route:
   receiver: slack
   group_by:
-    - alertname
+  - alertname
   routes:
-    - receiver: slack
-      match:
-        severity: page|warning
-      continue: true
+  - receiver: slack
+    match:
+      severity: page|warning
+    continue: true
 
 receivers:
-  - name: slack
-    slack_configs:
-      - channel: '#infrastructure-alerts'
-        send_resolved: true
-        title: |-
-        [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }} for {{ .CommonLabels.job }}
-        text: >-
-        {{ range .Alerts -}}
-        *Alert:* {{ .Annotations.summary }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
+- name: 'slack-notifications'
+  slack_configs:
+  - channel: '#infrastructure-alerts'
+    send_resolved: true
+    title: |-
+     [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }} for {{ .CommonLabels.job }}
+    text: >-
+     {{ range .Alerts -}}
+     *Alert:* {{ .Annotations.summary }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
 
-        *Description:* {{ .Annotations.description }}
+     *Description:* {{ .Annotations.description }}
 
-        *Details:*
-          {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
-          {{ end }}
-        {{ end }}
+     *Details:*
+       {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
+       {{ end }}
+     {{ end }}
