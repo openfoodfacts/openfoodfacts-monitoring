@@ -154,6 +154,11 @@ scrape_configs:
           app: opf
           service: api
           env: org
+      - targets: ['https://world.pro.openproductsfacts.org']
+        labels:
+          app: off-pro
+          service: api
+          env: org
       - targets: ['https://robotoff.openfoodfacts.org/api/v1/insights']
         labels:
           app: robotoff
