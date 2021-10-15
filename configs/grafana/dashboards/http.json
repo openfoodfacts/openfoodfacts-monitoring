@@ -1,405 +1,401 @@
 {
-    "annotations": {
-        "list": [{
-            "builtIn": 1,
-            "datasource": "-- Grafana --",
-            "enable": true,
-            "hide": true,
-            "iconColor": "rgba(0, 211, 255, 1)",
-            "name": "Annotations & Alerts",
-            "target": {
-                "limit": 100,
-                "matchAny": false,
-                "tags": [],
-                "type": "dashboard"
-            },
-            "type": "dashboard"
-        }]
-    },
-    "editable": true,
-    "gnetId": null,
-    "graphTooltip": 0,
-    "iteration": 1633700671022,
-    "links": [],
-    "panels": [{
-            "datasource": null,
-            "description": "HTTP Probes of OpenFoodFacts services",
-            "fieldConfig": {
-                "defaults": {
-                    "color": {
-                        "mode": "thresholds"
-                    },
-                    "mappings": [],
-                    "max": 1,
-                    "min": 0,
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [{
-                                "color": "green",
-                                "value": null
-                            },
-                            {
-                                "color": "red",
-                                "value": 80
-                            }
-                        ]
-                    }
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 7,
-                "w": 24,
-                "x": 0,
-                "y": 0
-            },
-            "id": 4,
-            "options": {
-                "orientation": "auto",
-                "reduceOptions": {
-                    "calcs": [
-                        "lastNotNull"
-                    ],
-                    "fields": "",
-                    "values": false
-                },
-                "showThresholdLabels": false,
-                "showThresholdMarkers": true,
-                "text": {
-                    "titleSize": 14
-                }
-            },
-            "pluginVersion": "8.1.7",
-            "repeat": "instance",
-            "repeatDirection": "h",
-            "targets": [{
-                "exemplar": false,
-                "expr": "probe_success{env=\"$env\"}",
-                "format": "time_series",
-                "instant": false,
-                "interval": "",
-                "intervalFactor": 1,
-                "legendFormat": "{{instance}}",
-                "refId": "A"
-            }],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "HTTP Probes (instant)",
-            "type": "gauge"
+  "annotations": {
+    "list": [{
+      "builtIn": 1,
+      "datasource": "-- Grafana --",
+      "enable": true,
+      "hide": true,
+      "iconColor": "rgba(0, 211, 255, 1)",
+      "name": "Annotations & Alerts",
+      "target": {
+        "limit": 100,
+        "matchAny": false,
+        "tags": [],
+        "type": "dashboard"
+      },
+      "type": "dashboard"
+    }]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "iteration": 1634319552369,
+  "links": [],
+  "panels": [{
+      "datasource": null,
+      "description": "HTTP Probes of OpenFoodFacts services",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
         },
-        {
-            "datasource": null,
-            "description": "",
-            "fieldConfig": {
-                "defaults": {
-                    "color": {
-                        "mode": "palette-classic"
-                    },
-                    "custom": {
-                        "axisLabel": "",
-                        "axisPlacement": "auto",
-                        "axisSoftMax": 1,
-                        "axisSoftMin": 0,
-                        "barAlignment": 0,
-                        "drawStyle": "line",
-                        "fillOpacity": 0,
-                        "gradientMode": "none",
-                        "hideFrom": {
-                            "legend": false,
-                            "tooltip": false,
-                            "viz": false
-                        },
-                        "lineInterpolation": "stepBefore",
-                        "lineStyle": {
-                            "fill": "solid"
-                        },
-                        "lineWidth": 1,
-                        "pointSize": 3,
-                        "scaleDistribution": {
-                            "type": "linear"
-                        },
-                        "showPoints": "auto",
-                        "spanNulls": false,
-                        "stacking": {
-                            "group": "A",
-                            "mode": "none"
-                        },
-                        "thresholdsStyle": {
-                            "mode": "off"
-                        }
-                    },
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [{
-                            "color": "green",
-                            "value": null
-                        }]
-                    },
-                    "unit": "none"
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 12,
-                "w": 8,
-                "x": 0,
-                "y": 7
-            },
-            "id": 5,
-            "options": {
-                "legend": {
-                    "calcs": [],
-                    "displayMode": "table",
-                    "placement": "bottom"
-                },
-                "tooltip": {
-                    "mode": "multi"
-                }
-            },
-            "pluginVersion": "8.1.5",
-            "repeatDirection": "h",
-            "targets": [{
-                "exemplar": false,
-                "expr": "probe_success{env=\"$env\"}",
-                "format": "time_series",
-                "instant": false,
-                "interval": "",
-                "intervalFactor": 1,
-                "legendFormat": "{{instance}}",
-                "refId": "A"
-            }],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "HTTP Probes (history)",
-            "type": "timeseries"
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
         },
-        {
-            "datasource": null,
-            "description": "",
-            "fieldConfig": {
-                "defaults": {
-                    "color": {
-                        "mode": "palette-classic"
-                    },
-                    "custom": {
-                        "axisLabel": "",
-                        "axisPlacement": "auto",
-                        "axisSoftMax": 1,
-                        "axisSoftMin": 0,
-                        "barAlignment": 0,
-                        "drawStyle": "line",
-                        "fillOpacity": 0,
-                        "gradientMode": "none",
-                        "hideFrom": {
-                            "legend": false,
-                            "tooltip": false,
-                            "viz": false
-                        },
-                        "lineInterpolation": "stepBefore",
-                        "lineStyle": {
-                            "fill": "solid"
-                        },
-                        "lineWidth": 1,
-                        "pointSize": 3,
-                        "scaleDistribution": {
-                            "type": "linear"
-                        },
-                        "showPoints": "auto",
-                        "spanNulls": false,
-                        "stacking": {
-                            "group": "A",
-                            "mode": "none"
-                        },
-                        "thresholdsStyle": {
-                            "mode": "off"
-                        }
-                    },
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [{
-                            "color": "green",
-                            "value": null
-                        }]
-                    },
-                    "unit": "none"
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 12,
-                "w": 8,
-                "x": 8,
-                "y": 7
-            },
-            "id": 6,
-            "options": {
-                "legend": {
-                    "calcs": [],
-                    "displayMode": "table",
-                    "placement": "bottom"
-                },
-                "tooltip": {
-                    "mode": "multi"
-                }
-            },
-            "pluginVersion": "8.1.5",
-            "repeatDirection": "h",
-            "targets": [{
-                "exemplar": false,
-                "expr": "probe_http_status_code{env=\"$env\"}",
-                "format": "time_series",
-                "instant": false,
-                "interval": "",
-                "intervalFactor": 1,
-                "legendFormat": "{{instance}}",
-                "refId": "A"
-            }],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "Response HTTP status codes",
-            "type": "timeseries"
-        },
-        {
-            "datasource": null,
-            "description": "",
-            "fieldConfig": {
-                "defaults": {
-                    "color": {
-                        "mode": "palette-classic"
-                    },
-                    "custom": {
-                        "axisLabel": "",
-                        "axisPlacement": "auto",
-                        "axisSoftMax": 1,
-                        "axisSoftMin": 0,
-                        "barAlignment": 0,
-                        "drawStyle": "line",
-                        "fillOpacity": 0,
-                        "gradientMode": "none",
-                        "hideFrom": {
-                            "legend": false,
-                            "tooltip": false,
-                            "viz": false
-                        },
-                        "lineInterpolation": "stepBefore",
-                        "lineStyle": {
-                            "fill": "solid"
-                        },
-                        "lineWidth": 1,
-                        "pointSize": 3,
-                        "scaleDistribution": {
-                            "type": "linear"
-                        },
-                        "showPoints": "auto",
-                        "spanNulls": false,
-                        "stacking": {
-                            "group": "A",
-                            "mode": "none"
-                        },
-                        "thresholdsStyle": {
-                            "mode": "off"
-                        }
-                    },
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [{
-                            "color": "green",
-                            "value": null
-                        }]
-                    },
-                    "unit": "s"
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 12,
-                "w": 8,
-                "x": 16,
-                "y": 7
-            },
-            "id": 7,
-            "options": {
-                "legend": {
-                    "calcs": [],
-                    "displayMode": "table",
-                    "placement": "bottom"
-                },
-                "tooltip": {
-                    "mode": "multi"
-                }
-            },
-            "pluginVersion": "8.1.5",
-            "repeatDirection": "h",
-            "targets": [{
-                "exemplar": false,
-                "expr": "sum by(instance)(probe_http_duration_seconds{env=\"$env\"})",
-                "format": "time_series",
-                "instant": false,
-                "interval": "",
-                "intervalFactor": 1,
-                "legendFormat": "{{instance}}",
-                "refId": "A"
-            }],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "Response latencies",
-            "type": "timeseries"
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {
+          "titleSize": 14
         }
-    ],
-    "refresh": false,
-    "schemaVersion": 30,
-    "style": "dark",
-    "tags": [
-        "http",
-        "probes"
-    ],
-    "templating": {
-        "list": [{
-            "allValue": null,
-            "current": {
-                "selected": false,
-                "text": [
-                    "org"
-                ],
-                "value": [
-                    "org"
-                ]
-            },
-            "datasource": "Prometheus",
-            "definition": "",
-            "description": null,
-            "error": null,
-            "hide": 0,
-            "includeAll": false,
-            "label": "env",
-            "multi": false,
-            "name": "env",
-            "options": [],
-            "query": {
-                "query": "label_values(probe_success, env)",
-                "refId": "Prometheus-env-Variable-Query"
-            },
-            "refresh": 1,
-            "regex": "",
-            "skipUrlSync": false,
-            "sort": 1,
-            "tagValuesQuery": "",
-            "tags": [],
-            "tagsQuery": "",
-            "type": "query",
-            "useTags": false
-        }]
+      },
+      "pluginVersion": "8.1.0",
+      "repeat": "instance",
+      "repeatDirection": "h",
+      "targets": [{
+        "exemplar": false,
+        "expr": "probe_success{env=\"$env\"}",
+        "format": "time_series",
+        "instant": false,
+        "interval": "",
+        "intervalFactor": 1,
+        "legendFormat": "{{app}}-{{env}}",
+        "refId": "A"
+      }],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "HTTP Probes (instant)",
+      "type": "gauge"
     },
-    "time": {
-        "from": "now-5m",
-        "to": "now"
+    {
+      "datasource": null,
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMax": 1,
+            "axisSoftMin": 0,
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "stepBefore",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 3,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{
+              "color": "green",
+              "value": null
+            }]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 8,
+        "x": 0,
+        "y": 7
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "pluginVersion": "8.1.5",
+      "repeatDirection": "h",
+      "targets": [{
+        "exemplar": false,
+        "expr": "probe_success{env=\"$env\"}",
+        "format": "time_series",
+        "instant": false,
+        "interval": "",
+        "intervalFactor": 1,
+        "legendFormat": "{{instance}} ({{app}}-{{env}})",
+        "refId": "A"
+      }],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "HTTP Probes (history)",
+      "type": "timeseries"
     },
-    "timepicker": {},
-    "timezone": "",
-    "title": "HTTP Probes",
-    "uid": "PoOXcRvnz",
-    "version": 5
+    {
+      "datasource": null,
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMax": 1,
+            "axisSoftMin": 0,
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "stepBefore",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 3,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{
+              "color": "green",
+              "value": null
+            }]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 8,
+        "x": 8,
+        "y": 7
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "pluginVersion": "8.1.5",
+      "repeatDirection": "h",
+      "targets": [{
+        "exemplar": false,
+        "expr": "probe_http_status_code{env=\"$env\"}",
+        "format": "time_series",
+        "instant": false,
+        "interval": "",
+        "intervalFactor": 1,
+        "legendFormat": "{{instance}} ({{app}}-{{env}})",
+        "refId": "A"
+      }],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Response HTTP status codes",
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMax": 1,
+            "axisSoftMin": 0,
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "stepBefore",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 3,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{
+              "color": "green",
+              "value": null
+            }]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 8,
+        "x": 16,
+        "y": 7
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "pluginVersion": "8.1.5",
+      "repeatDirection": "h",
+      "targets": [{
+        "exemplar": false,
+        "expr": "sum by(instance,app,env)(probe_http_duration_seconds{env=\"$env\"})",
+        "format": "time_series",
+        "instant": false,
+        "interval": "",
+        "intervalFactor": 1,
+        "legendFormat": "{{instance}} ({{app}}-{{env}})",
+        "refId": "A"
+      }],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Response latencies",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": false,
+  "schemaVersion": 30,
+  "style": "dark",
+  "tags": [
+    "http",
+    "probes"
+  ],
+  "templating": {
+    "list": [{
+      "allValue": null,
+      "current": {
+        "selected": true,
+        "text": "org",
+        "value": "org"
+      },
+      "datasource": "Prometheus",
+      "definition": "",
+      "description": null,
+      "error": null,
+      "hide": 0,
+      "includeAll": false,
+      "label": "env",
+      "multi": false,
+      "name": "env",
+      "options": [],
+      "query": {
+        "query": "label_values(probe_success, env)",
+        "refId": "Prometheus-env-Variable-Query"
+      },
+      "refresh": 1,
+      "regex": "",
+      "skipUrlSync": false,
+      "sort": 1,
+      "tagValuesQuery": "",
+      "tags": [],
+      "tagsQuery": "",
+      "type": "query",
+      "useTags": false
+    }]
+  },
+  "time": {
+    "from": "now-5m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "HTTP Probes",
+  "uid": "PoOXcRvnz",
+  "version": 7
 }
