@@ -1043,7 +1043,7 @@
     ]
   },
   "timezone": "browser",
-  "title": "Prometheus Alerts",
+  "title": "Alerts",
   "uid": "eea-9_sik",
   "version": 33
 }
