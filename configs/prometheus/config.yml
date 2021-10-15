@@ -22,10 +22,12 @@ scrape_configs:
     - targets: ['10.1.0.200:9100']
       labels:
         app: node_exporter
+        service: metrics
         env: net
     - targets: ['10.1.0.200:8080']
       labels:
         app: cadvisor
+        service: metrics
         env: net
 
   #------------------#
@@ -57,26 +59,32 @@ scrape_configs:
     - targets: ['influxdb:8086']
       labels:
         app: influxdb
+        service: metrics
         env: org
     - targets: ['grafana:3000']
       labels:
         app: grafana
+        service: metrics
         env: org
     - targets: ['prometheus:9090']
       labels:
         app: prometheus
+        service: metrics
         env: org
     - targets: ['alertmanager:9093']
       labels:
         app: alertmanager
+        service: metrics
         env: org
     - targets: ['elasticsearch_exporter:9114']
       labels:
         app: elasticsearch
+        service: metrics
         env: org
     - targets: ['blackbox_exporter:9115']
       labels:
         app: blackbox_exporter
+        service: metrics
         env: org
 
   #--------#
@@ -118,6 +126,7 @@ scrape_configs:
       - targets: ['https://world.openbeautyfacts.org']
         labels:
           app: obf
+          service: api
           env: org
       - targets: ['https://world.openpetfoodfacts.org']
         labels:
@@ -127,6 +136,7 @@ scrape_configs:
       - targets: ['https://world.openproductsfacts.org']
         labels:
           app: opf
+          service: api
           env: org
       - targets: ['https://robotoff.openfoodfacts.org/api/v1/insights']
         labels:
@@ -136,14 +146,17 @@ scrape_configs:
       - targets: ['https://grafana.openfoodfacts.org/api/health']
         labels:
           app: grafana
+          service: api
           env: org
       - targets: ['https://prometheus.openfoodfacts.org/-/healthy']
         labels:
           app: prometheus
+          service: api
           env: org
       - targets: ['https://alertmanager.openfoodfacts.org/-/healthy']
         labels:
           app: alertmanager
+          service: api
           env: org
     relabel_configs:
       - source_labels: [__address__]
