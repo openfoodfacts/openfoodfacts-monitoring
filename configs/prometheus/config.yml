@@ -12,10 +12,10 @@ alerting:
     static_configs:
     - targets: ['alertmanager:9093']
 
-relabel_configs:
-  - source_labels: [__address__]
-    regex: '10\.1\.0\.2.+'
-    replacement: dockers
+# relabel_configs:
+#   - source_labels: [__address__]
+#     regex: '10\.1\.0\.2.+'
+#     replacement: dockers
 
 scrape_configs:
 
@@ -38,13 +38,13 @@ scrape_configs:
   #-----------------------#
   # DOCKER ENGINE METRICS #
   #-----------------------#
-  - job_name: "docker"
-    static_configs:
-      - targets: ["10.1.0.200:9323"]
-        labels:
-          app: docker
-          service: metrics
-          env: net
+  # - job_name: "docker"
+  #   static_configs:
+  #     - targets: ["10.1.0.200:9323"]
+  #       labels:
+  #         app: docker
+  #         service: metrics
+  #         env: net
 
   #------------------#
   # SERVICES METRICS #
