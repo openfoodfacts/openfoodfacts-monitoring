@@ -13,7 +13,7 @@ route:
     continue: true
 
 receivers:
-- name: 'slack-notifications'
+- name: slack
   slack_configs:
   - channel: '#infrastructure-alerts'
     send_resolved: true
