@@ -56,11 +56,12 @@ groups:
 - name: service-slos
   rules:
   - alert: APIHighRequestErrors
-    expr: sum by(env)(gunicorn_request_status{status=~"(2..|3..|4..)"}) / sum by(env)(gunicorn_request_status) * 100 < 99.99
+    expr: sum by(app, service, env)(gunicorn_request_status{status=~"(2..|3..|4..)"}) / sum by(app, service, env)(gunicorn_request_status) * 100 < 99.99
     for: 5m
     labels:
       severity: page
       app: robotoff
+      service: "{{ $labels.service }}"
       env: "{{ $labels.env }}"
     annotations:
       summary: Too many 5xx in Robotoff HTTP responses
