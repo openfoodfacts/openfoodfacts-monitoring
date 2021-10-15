@@ -64,7 +64,7 @@ groups:
       env: "{{ $labels.env }}"
     annotations:
       summary: Too many 5xx in Robotoff HTTP responses
-      description: "Availability SLO is at {{ $value }}% (target=99.99%) for more than 15 minutes."
+      description: "Availability SLO is at {{ $value }}% (target=99.99%) for more than 5 minutes."
 
 - name: service-probes
   rules:
@@ -78,4 +78,4 @@ groups:
       env: "{{ $labels.env }}"
     annotations:
       summary: "{{ $labels.app }}-{{ $labels.env }} is down"
-      description: Service probe on URL '{{ $labels.instance }}' failed for more than 15 minutes.
+      description: Service probe on URL '{{ $labels.instance }}' failed for more than 5 minutes.
