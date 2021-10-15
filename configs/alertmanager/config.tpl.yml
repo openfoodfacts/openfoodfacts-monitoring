@@ -6,6 +6,7 @@ route:
   receiver: slack
   group_by:
   - alertname
+  - env
   routes:
   - receiver: slack
     match:
