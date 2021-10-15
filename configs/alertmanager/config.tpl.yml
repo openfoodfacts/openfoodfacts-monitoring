@@ -24,7 +24,7 @@ receivers:
      {{- end }}
     text: >-
      {{ range .Alerts -}}
-     *Alert:* {{ .Annotations.title }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
+     *Alert:* {{ .Annotations.summary }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
 
      *Description:* {{ .Annotations.description }}
 
