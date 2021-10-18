@@ -1,61 +1,14 @@
 {
   "annotations": {
     "list": [{
-        "builtIn": 0,
-        "datasource": "-- Grafana --",
-        "enable": true,
-        "hide": true,
-        "iconColor": "dark-green",
-        "name": "Show successful deployments",
-        "target": {
-          "limit": 100,
-          "matchAny": false,
-          "tags": [
-            "status:success",
-            "type:deployment",
-            "origin:github"
-          ],
-          "type": "tags"
-        },
-        "type": "dashboard"
-      },
-      {
-        "builtIn": 0,
-        "datasource": "-- Grafana --",
-        "enable": true,
-        "hide": true,
-        "iconColor": "dark-red",
-        "name": "Show failed deployments",
-        "target": {
-          "limit": 100,
-          "matchAny": false,
-          "tags": [
-            "status:failure",
-            "type:deployment",
-            "origin:github"
-          ],
-          "type": "tags"
-        },
-        "type": "dashboard"
-      },
-      {
-        "datasource": "$datasource",
-        "enable": true,
-        "expr": "ALERTS_FOR_STATE{instance=~\"$instance\"} * 1000 and ignoring(alertstate) ALERTS{instance=~\"$instance\", alertstate=\"firing\"}",
-        "hide": true,
-        "iconColor": "dark-red",
-        "limit": 100,
-        "name": "Show incidents",
-        "showIn": 0,
-        "step": "2s",
-        "tagKeys": "alertname,app,env",
-        "tags": [],
-        "textFormat": "{{instance}}",
-        "titleFormat": "{{alertname}} for {{app}}-{{env}}",
-        "type": "tags",
-        "useValueForTime": true
-      }
-    ]
+      "builtIn": 1,
+      "datasource": "-- Grafana --",
+      "enable": true,
+      "hide": true,
+      "iconColor": "rgba(0, 211, 255, 1)",
+      "name": "Annotations & Alerts",
+      "type": "dashboard"
+    }]
   },
   "description": "Docker container metrics",
   "editable": true,
