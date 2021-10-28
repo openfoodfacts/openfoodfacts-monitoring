@@ -69,6 +69,14 @@ scrape_configs:
         app: robotoff
         service: api
         env: net
+  
+  - job_name: events-net
+    static_configs:
+    - targets: ['10.1.0.200:8000']
+      labels:
+        app: events
+        service: api
+        env: net
 
   - job_name: monitoring-org
     static_configs:
