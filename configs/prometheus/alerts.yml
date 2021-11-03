@@ -21,8 +21,10 @@ groups:
       summary: Less than 20% of disk space remaining on {{ $labels.instance }}
       description: Remaining disk space on {{ $labels.instance }} is {{ $value }}% for more than 15 minutes.
 
-- name: docker-alerts
-  rules:
+
+# TODO: Revisit, too noisy
+# - name: docker-alerts
+#   rules:
   # - alert: DockerContainerHighMemoryUsage
   #   expr: (sum(container_memory_working_set_bytes{name!=""}) by (container_label_com_docker_compose_project, container_label_com_docker_compose_service, container_label_org_opencontainers_image_revision, container_label_org_opencontainers_image_version, env) / sum(container_spec_memory_limit_bytes{name!=""} > 0) by (container_label_com_docker_compose_project, container_label_com_docker_compose_service, container_label_org_opencontainers_image_revision, container_label_org_opencontainers_image_version, env) * 100) > 80
   #   for: 15m
@@ -38,20 +40,20 @@ groups:
   #     summary: More than 80% of maximum memory used on container '{{ $labels.name }}'
   #     description: Container '{{ $labels.name }}' memory usage is at {{ $value }}% of maximum memory usage for more than 15 minutes.
 
-  - alert: DockerContainerHighCpuUsage
-    expr: (sum(rate(container_cpu_usage_seconds_total{name!=""}[5m])) by (container_label_com_docker_compose_project, container_label_com_docker_compose_service, container_label_org_opencontainers_image_revision, container_label_org_opencontainers_image_version, env) * 100) > 80
-    for: 15m
-    labels:
-      severity: warning
-      app: "{{ $labels.container_label_com_docker_compose_project }}"
-      service: "{{ $labels.container_label_com_docker_compose_service }}"
-      env: "{{ $labels.env }}"
-      instance: "{{ $labels.instance }}"
-      image_revision: "{{ $labels.container_label_org_opencontainers_image_revision }}"
-      image_version: "{{ $labels.container_label_org_opencontainers_image_version }}"
-    annotations:
-      summary: More than 80% of CPU used on container '{{ $labels.name }}'
-      description: Container '{{ $labels.name }}' CPU usage is at {{ $value }}% for more than 15 minutes.
+  # - alert: DockerContainerHighCpuUsage
+  #   expr: (sum(rate(container_cpu_usage_seconds_total{name!=""}[5m])) by (container_label_com_docker_compose_project, container_label_com_docker_compose_service, container_label_org_opencontainers_image_revision, container_label_org_opencontainers_image_version, env) * 100) > 80
+  #   for: 15m
+  #   labels:
+  #     severity: warning
+  #     app: "{{ $labels.container_label_com_docker_compose_project }}"
+  #     service: "{{ $labels.container_label_com_docker_compose_service }}"
+  #     env: "{{ $labels.env }}"
+  #     instance: "{{ $labels.instance }}"
+  #     image_revision: "{{ $labels.container_label_org_opencontainers_image_revision }}"
+  #     image_version: "{{ $labels.container_label_org_opencontainers_image_version }}"
+  #   annotations:
+  #     summary: More than 80% of CPU used on container '{{ $labels.name }}'
+  #     description: Container '{{ $labels.name }}' CPU usage is at {{ $value }}% for more than 15 minutes.
 
 - name: service-slos
   rules:
