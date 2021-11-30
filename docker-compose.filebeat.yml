@@ -4,7 +4,6 @@ services:
   filebeat:
     restart: always
     image: elastic/filebeat:7.2.0
-    user: root
     environment:
       - ELASTICSEARCH_HOSTS
     volumes:
