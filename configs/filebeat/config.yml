@@ -1,0 +1,57 @@
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+      templates:
+        - conditions:
+            contains:
+              docker.container.image: nginx
+          config:
+            - module: nginx
+              access:
+                enabled: true
+                input:
+                  type: docker
+                  containers:
+                    ids: "${data.docker.container.id}"
+                    stream: "stdout"
+              error:
+                enabled: true
+                input:
+                  type: docker
+                  containers:
+                    ids: "${data.docker.container.id}"
+                    stream: "stderr"
+
+# filebeat.inputs:
+# - type: container
+#   paths: 
+#     - '/var/lib/docker/containers/*/*.log'
+
+# processors:
+# - add_docker_metadata:
+#     host: "unix:///var/run/docker.sock"
+
+# - decode_json_fields:
+#     fields: ["message"]
+#     target: "json"
+#     overwrite_keys: true
+
+processors:
+- add_docker_metadata:
+    host: "unix:///var/run/docker.sock"
+- add_locale:
+    format: offset
+- add_host_metadata:
+    netinfo.enabled: true
+
+output.elasticsearch:
+  hosts: ["${ELASTICSEARCH_HOSTS}"]
+  indices:
+    - index: "logs-%{+yyyy.MM.dd}"
+
+# output.console:
+#   pretty: true
+# logging.json: true
+# logging.metrics.enabled: false
+

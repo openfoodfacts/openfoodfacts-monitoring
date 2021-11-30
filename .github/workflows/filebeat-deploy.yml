@@ -1,0 +1,107 @@
+name: Filebeat Deployment CI
+
+on:
+  push:
+    branches:
+      - main
+      - deploy-*
+    paths-ignore:
+      - configs/**
+
+jobs:
+  strategy:
+    matrix:
+      host: ["${{ secrets.HOST_NET }}", "${{ secrets.HOST_ORG }}"]
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout git repository
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ matrix.host }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        proxy_host: ${{ secrets.PROXY_HOST }}
+        proxy_username: ${{ secrets.USERNAME }}
+        proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script_stop: false
+        script: |
+          # Clone Git repository if not already there
+          [ ! -d 'filebeat' ] && git clone --depth 1 https://github.com/${{ github.repository }} filebeat --no-single-branch 2>&1
+
+          # Go to repository directory
+          cd filebeat/
+
+          # Fetch newest commits (in case it wasn't freshly cloned)
+          git fetch --depth 1
+
+          # Checkout current commit SHA
+          git checkout -qf ${{ github.sha }}
+
+    - name: Set environment variables
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ matrix.host }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        proxy_host: ${{ secrets.PROXY_HOST }}
+        proxy_username: ${{ secrets.USERNAME }}
+        proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script_stop: false
+        script: |
+          # Go to repository directory
+          cd filebeat/
+
+          # Set Docker Compose variablesx
+          echo "DOCKER_CLIENT_TIMEOUT=120" > .env
+          echo "COMPOSE_HTTP_TIMEOUT=120" >> .env
+          echo "COMPOSE_PROJECT_NAME=monitoring" >> .env
+          echo "COMPOSE_PATH_SEPARATOR=;" >> .env
+          echo "COMPOSE_FILE=docker/filebeat.yml" >> .env
+
+          # Filebeat
+          echo "ELASTICSEARCH_HOSTS=${{ secrets.HOST_NET }}:9200"
+
+    - name: Start services
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ matrix.host }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        proxy_host: ${{ secrets.PROXY_HOST }}
+        proxy_username: ${{ secrets.USERNAME }}
+        proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script_stop: false
+        script: |
+          cd filebeat/
+          make up
+
+    - name: Check services are up
+      uses: appleboy/ssh-action@master
+      if: ${{ always() }}
+      with:
+        host: ${{ matrix.host }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        proxy_host: ${{ secrets.PROXY_HOST }}
+        proxy_username: ${{ secrets.USERNAME }}
+        proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script_stop: false
+        script: |
+          cd filebeat/
+          make livecheck
+
+    - name: Cleanup obsolete Docker objects
+      uses: appleboy/ssh-action@master
+      if: ${{ always() }}
+      with:
+        host: ${{ matrix.host }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        proxy_host: ${{ secrets.PROXY_HOST }}
+        proxy_username: ${{ secrets.USERNAME }}
+        proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script_stop: false
+        script: |
+          cd filebeat/
+          make prune
