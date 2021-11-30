@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        host: ["${{ secrets.HOST_NET }}", "${{ secrets.HOST_ORG }}"]
+        host: ["10.1.0.200", "10.1.0.201"]
     steps:
     - name: Checkout git repository
       uses: appleboy/ssh-action@master
