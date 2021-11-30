@@ -9,11 +9,11 @@ on:
       - configs/**
 
 jobs:
-  strategy:
-    matrix:
-      host: ["${{ secrets.HOST_NET }}", "${{ secrets.HOST_ORG }}"]
   deploy:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        host: ["${{ secrets.HOST_NET }}", "${{ secrets.HOST_ORG }}"]
     steps:
     - name: Checkout git repository
       uses: appleboy/ssh-action@master
