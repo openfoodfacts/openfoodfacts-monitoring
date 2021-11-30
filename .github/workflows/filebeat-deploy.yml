@@ -38,6 +38,9 @@ jobs:
           # Checkout current commit SHA
           git checkout -qf ${{ github.sha }}
 
+          # Change permission of filebeat config
+          chown root:root filebeat/configs/filebeat/config.yml
+
     - name: Set environment variables
       uses: appleboy/ssh-action@master
       with:
