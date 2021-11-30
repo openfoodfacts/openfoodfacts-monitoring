@@ -39,7 +39,7 @@ jobs:
           git checkout -qf ${{ github.sha }}
 
           # Change permission of filebeat config
-          chown root:root configs/filebeat/config.yml
+          sudo chown root:root configs/filebeat/config.yml
 
     - name: Set environment variables
       uses: appleboy/ssh-action@master
