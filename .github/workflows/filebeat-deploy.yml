@@ -60,7 +60,7 @@ jobs:
           echo "COMPOSE_FILE=docker/filebeat.yml" >> .env
 
           # Filebeat
-          echo "ELASTICSEARCH_HOSTS=${{ secrets.HOST_NET }}:9200"
+          echo "ELASTICSEARCH_HOSTS=${{ secrets.HOST_NET }}:9200" >> .env
 
     - name: Start services
       uses: appleboy/ssh-action@master
