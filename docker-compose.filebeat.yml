@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+  filebeat:
+    restart: always
+    image: elastic/filebeat:7.2.0
+    user: root
+    environment:
+      - ELASTICSEARCH_HOSTS
+    volumes:
+      - ./configs/filebeat/config.yml:/usr/share/filebeat/filebeat.yml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock

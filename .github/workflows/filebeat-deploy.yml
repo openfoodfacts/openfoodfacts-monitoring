@@ -52,7 +52,7 @@ jobs:
           # Go to repository directory
           cd filebeat/
 
-          # Set Docker Compose variablesx
+          # Set Docker Compose variables
           echo "DOCKER_CLIENT_TIMEOUT=120" > .env
           echo "COMPOSE_HTTP_TIMEOUT=120" >> .env
           echo "COMPOSE_PROJECT_NAME=monitoring" >> .env
