@@ -1,4 +1,3 @@
-elasticsearch.hosts: ['elasticsearch:9200']
 logging:
   appenders:
     console_appender:
