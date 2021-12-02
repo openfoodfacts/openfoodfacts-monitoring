@@ -1,0 +1,16 @@
+elasticsearch.hosts: ['elasticsearch:9200']
+logging:
+  appenders:
+    console_appender:
+      type: console
+      layout:
+        type: pattern
+        highlight: true
+  root:
+    appenders: [default, console_appender]
+    level: warn
+  loggers:
+    - name: elasticsearch.query
+      level: debug
+xpack.discoverEnhanced.actions.exploreDataInContextMenu.enabled: true
+status.allowAnonymous: true
