@@ -62,6 +62,9 @@ jobs:
           echo "COMPOSE_PATH_SEPARATOR=;" >> .env
           echo "COMPOSE_FILE=docker-compose.filebeat.yml" >> .env
 
+          # Kibana
+          echo "KIBANA_URI=${{ secrets.HOST_NET }}:5601" >> .env
+
           # Filebeat
           echo "ELASTICSEARCH_HOSTS=${{ secrets.HOST_NET }}:9200" >> .env
 

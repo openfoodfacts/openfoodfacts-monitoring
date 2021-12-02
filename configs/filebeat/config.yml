@@ -50,6 +50,9 @@ output.elasticsearch:
   indices:
     - index: "logs-%{+yyyy.MM.dd}"
 
+setup.kibana:
+  host: "${KIBANA_URI}"
+
 # output.console:
 #   pretty: true
 # logging.json: true

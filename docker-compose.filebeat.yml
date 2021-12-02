@@ -8,6 +8,7 @@ services:
     privileged: true
     environment:
       - ELASTICSEARCH_HOSTS
+      - KIBANA_URI
     volumes:
       - ./configs/filebeat/config.yml:/usr/share/filebeat/filebeat.yml:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
