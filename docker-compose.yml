@@ -42,8 +42,6 @@ services:
     environment:
       ELASTICSEARCH_URL: http://elasticsearch:9200
       ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
-      KBN_PATH_CONF: /home/kibana/config
-      SERVER_NAME: kibana.openfoodfacts.org
     volumes:
       - ./configs/kibana/kibana.yml:/home/kibana/config/kibana.yml
     networks:
