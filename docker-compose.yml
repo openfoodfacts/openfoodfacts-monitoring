@@ -34,6 +34,16 @@ services:
     networks:
       - monitoring
 
+  kibana:
+    restart: always
+    image: kibana:7.14.2
+    ports:
+      - 5601:5601
+    volumes:
+      - ./configs/kibana/kibana.yml:/home/kibana/config/kibana.yml
+    networks:
+      - monitoring
+
   # elasticsearch-datagen:
   #   image: oliver006/es-test-data
   #   command:

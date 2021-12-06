@@ -179,6 +179,16 @@ scrape_configs:
           app: alertmanager
           service: api
           env: org
+      - targets: ['https://kibana.openfoodfacts.org/status']
+        labels:
+          app: kibana
+          service: ui
+          env: org
+      - targets: ['https://elasticsearch.openfoodfacts.org/_cluster/health?wait_for_status=yellow&timeout=50s']
+        labels:
+          app: elasticsearch
+          service: api
+          env: org
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
