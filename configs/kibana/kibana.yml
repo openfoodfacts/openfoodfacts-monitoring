@@ -13,3 +13,4 @@
 #       level: debug
 xpack.discoverEnhanced.actions.exploreDataInContextMenu.enabled: true
 status.allowAnonymous: true
+filebeat.config.modules.path: ${path.config}/modules.d/*.yml

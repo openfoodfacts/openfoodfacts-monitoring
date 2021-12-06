@@ -68,7 +68,7 @@ jobs:
           echo "KIBANA_URI=${{ secrets.HOST_NET }}:5601" >> .env
 
           # Filebeat
-          echo "ELASTICSEARCH_HOSTS=${{ secrets.HOST_NET }}:9200" >> .env
+          echo "ELASTICSEARCH_HOSTS=http://${{ secrets.HOST_NET }}:9200" >> .env
 
     - name: Start services
       uses: appleboy/ssh-action@master
