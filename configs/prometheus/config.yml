@@ -35,6 +35,19 @@ scrape_configs:
         service: metrics
         env: net
 
+  - job_name: node-org
+    static_configs:
+    - targets: ['10.1.0.201:9100']
+      labels:
+        app: node_exporter
+        service: metrics
+        env: org
+    - targets: ['10.1.0.201:8080']
+      labels:
+        app: cadvisor
+        service: metrics
+        env: org
+
   #-----------------------#
   # DOCKER ENGINE METRICS #
   #-----------------------#
@@ -69,6 +82,14 @@ scrape_configs:
         app: robotoff
         service: api
         env: net
+
+  - job_name: robotoff-org
+    static_configs:
+    - targets: ['10.1.0.201:9102'] # StatsD Gunicorn
+      labels:
+        app: robotoff
+        service: api
+        env: org
 
   - job_name: monitoring-org
     static_configs:
