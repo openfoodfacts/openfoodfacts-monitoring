@@ -6,7 +6,7 @@ services:
     image: elastic/filebeat:7.2.0
     user: "root"
     privileged: true
-    command: "chown root:root /usr/share/filebeat/filebeat.yml && ./filebeat -e -c /usr/share/filebeat/filebeat.yml"
+    command: ["--strict.perms=false"]
     environment:
       - ELASTICSEARCH_HOSTS
     volumes:
