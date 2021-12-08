@@ -6,6 +6,7 @@ It contains Docker Compose deployments for:
 
 * **ElasticSearch** running on port `9200` and `9300`
 * **Grafana** running on port `3000`
+* **Kibana** running on port `5601`
 * **InfluxDB** running on port `8086`
 * **Prometheus** running on port `9090`
 * **AlertManager** running on port `9093`
