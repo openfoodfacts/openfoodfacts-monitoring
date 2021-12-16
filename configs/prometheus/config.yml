@@ -184,7 +184,7 @@ scrape_configs:
           app: kibana
           service: ui
           env: org
-      - targets: ['https://elasticsearch.openfoodfacts.org/_cluster/health?wait_for_status=yellow&timeout=50s']
+      - targets: ['http://10.1.0.200/_cluster/health?wait_for_status=yellow&timeout=50s']
         labels:
           app: elasticsearch
           service: api
