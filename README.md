@@ -13,3 +13,11 @@ It contains Docker Compose deployments for:
 
 It also multiple Prometheus metrics exporters to gather metrics from the above services.
 
+## Configs
+
+* [Alerts](https://github.com/openfoodfacts/openfoodfacts-monitoring/blob/main/configs/prometheus/alerts.yml)
+* [Prometheus Scrape targets](https://github.com/openfoodfacts/openfoodfacts-monitoring/blob/main/configs/prometheus/config.yml)
+* [Grafana Dashboards](https://github.com/openfoodfacts/openfoodfacts-monitoring/tree/main/configs/grafana/dashboards)
+* [Grafana Datasources](https://github.com/openfoodfacts/openfoodfacts-monitoring/blob/main/configs/grafana/datasources/config.yml)
+* [HTTP Probe Config](https://github.com/openfoodfacts/openfoodfacts-monitoring/blob/main/configs/blackbox_exporter/config.yml)
+* [Filebeat Config](https://github.com/openfoodfacts/openfoodfacts-monitoring/blob/main/configs/filebeat/config.yml)
