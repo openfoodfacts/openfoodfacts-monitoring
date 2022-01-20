@@ -58,7 +58,7 @@ groups:
 - name: service-slos
   rules:
   - alert: APIHighRequestErrors
-    expr: sum by(app, service, env)(gunicorn_request_status{status=~"(2..|3..|4..)"}) / sum by(app, service, env)(gunicorn_request_status) * 100 < 99.99
+    expr: sum by(app, service, env)(gunicorn_request_status{status=~"(2..|3..|4..)"}) / sum by(app, service, env)(gunicorn_request_status) * 100 < 99.5
     for: 5m
     labels:
       severity: page
