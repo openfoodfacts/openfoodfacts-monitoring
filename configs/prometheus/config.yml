@@ -116,7 +116,7 @@ scrape_configs:
           app: "off"
           service: api
           env: net
-      - targets: ['https://robotoff.openfoodfacts.net/api/v1/insights']
+      - targets: ['https://robotoff.openfoodfacts.net/api/v1/insights?count=1']
         labels:
           app: robotoff
           service: api
