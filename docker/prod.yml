@@ -9,6 +9,9 @@ volumes:
   prometheus-data:
     external: true
 services:
+  elasticsearch:
+    environment:
+      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
   grafana:
     environment:
       - GF_AUTH_GOOGLE_ENABLED=true
