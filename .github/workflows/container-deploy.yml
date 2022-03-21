@@ -55,6 +55,9 @@ jobs:
           echo "COMPOSE_PROJECT_NAME=monitoring" >> .env
           echo "COMPOSE_PATH_SEPARATOR=;" >> .env
           echo "COMPOSE_FILE=docker-compose.yml;docker/prod.yml" >> .env
+          
+          # Github exporter
+          echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env
 
           # Grafana
           echo "GF_SERVER_ROUTER_LOGGING=true" >> .env

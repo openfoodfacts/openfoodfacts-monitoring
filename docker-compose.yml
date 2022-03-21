@@ -149,6 +149,17 @@ services:
     networks:
       - monitoring
 
+  github-exporter:
+    restart: always
+    image: infinityworks/github-exporter:latest
+    tty: true
+    stdin_open: true
+    ports:
+      - 9171:9171
+    environment:
+      - ORGS=openfoodfacts
+      - GITHUB_TOKEN
+
   cadvisor:
     restart: always
     image: gcr.io/cadvisor/cadvisor:v0.40.0
