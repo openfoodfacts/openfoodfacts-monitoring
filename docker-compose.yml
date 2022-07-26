@@ -60,7 +60,7 @@ services:
       - discovery.type=single-node
       - bootstrap.memory_lock=true
       - cluster.routing.allocation.disk.watermark.high=95%
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "ES_JAVA_OPTS=-Xms2048m -Xmx2048m"
     ulimits:
       memlock:
         soft: -1
@@ -68,7 +68,7 @@ services:
       nofile:
         soft: 262144
         hard: 262144
-    mem_limit: 2g
+    mem_limit: 2.5g
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
     ports:
