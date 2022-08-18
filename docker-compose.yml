@@ -60,7 +60,10 @@ services:
       - discovery.type=single-node
       - bootstrap.memory_lock=true
       - cluster.routing.allocation.disk.watermark.high=95%
-      - "ES_JAVA_OPTS=-Xms2048m -Xmx2048m"
+      - "indices.breaker.total.use_real_memory=true"
+      - "indices.breaker.total.limit=95%"
+      - "ES_JAVA_OPTS=-Xms8048m -Xmx8048m"
+      - "path.repo=/opt/elasticsearch/backups"
     ulimits:
       memlock:
         soft: -1
@@ -68,9 +71,10 @@ services:
       nofile:
         soft: 262144
         hard: 262144
-    mem_limit: 2.5g
+    mem_limit: 9g
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
+      - elasticsearch-backup:/opt/elasticsearch
     ports:
       - 9200:9200
       - 9300:9300
@@ -169,6 +173,7 @@ volumes:
   influxdb-data:
   grafana-data:
   elasticsearch-data:
+  elasticsearch-backup:
   prometheus-data:
   alertmanager-data:
 networks:
