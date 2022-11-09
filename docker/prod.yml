@@ -6,6 +6,8 @@ volumes:
     external: true
   elasticsearch-data:
     external: true
+  elasticsearch-backup:
+    external: true
   prometheus-data:
     external: true
 services:
