@@ -2,18 +2,23 @@ version: '3.7'
 volumes:
   influxdb-data:
     external: true
+    name: ${COMPOSE_PROJECT_NAME}_influxdb-data
   grafana-data:
     external: true
+    name: ${COMPOSE_PROJECT_NAME}_grafana-data
   elasticsearch-data:
     external: true
+    name: ${COMPOSE_PROJECT_NAME}_elasticsearch-data
   elasticsearch-backup:
     external: true
+    name: ${COMPOSE_PROJECT_NAME}_elasticsearch-backup
   prometheus-data:
     external: true
+    name: ${COMPOSE_PROJECT_NAME}_prometheus-data
 services:
   elasticsearch:
     environment:
-      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+      ES_JAVA_OPTS: "-Xms4g -Xmx4g"
   grafana:
     environment:
       - GF_AUTH_GOOGLE_ENABLED=true

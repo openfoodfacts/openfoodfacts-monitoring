@@ -8,7 +8,7 @@ ENV_FILE ?= .env
 DOCKER_COMPOSE=docker-compose --env-file=${ENV_FILE}
 
 # mount point for shared data
-SHARED_MOUNT_POINT ?= /mnt
+SHARED_MOUNT_POINT ?= /mnt/monitoring-volumes/
 
 .DEFAULT_GOAL := dev
 
@@ -51,13 +51,13 @@ log:
 # Production #
 #------------#
 create_external_volumes:
-	docker volume create influxdb-data
-	docker volume create grafana-data
-	docker volume create elasticsearch-data
-	docker volume create prometheus-data
-	docker volume create alertmanager-data
+	docker volume create ${COMPOSE_PROJECT_NAME}_influxdb-data
+	docker volume create ${COMPOSE_PROJECT_NAME}_grafana-data
+	docker volume create ${COMPOSE_PROJECT_NAME}_elasticsearch-data
+	docker volume create ${COMPOSE_PROJECT_NAME}_prometheus-data
+	docker volume create ${COMPOSE_PROJECT_NAME}_alertmanager-data
 # put backups on a shared volume
-	docker volume create --driver=local -o type=none -o o=bind -o device=${SHARED_MOUNT_POINT}/${COMPOSE_PROJECT_NAME}_elasticsearch-backup elasticsearch-backup
+	docker volume create --driver=local -o type=none -o o=bind -o device=${SHARED_MOUNT_POINT}/${COMPOSE_PROJECT_NAME}_elasticsearch-backup ${COMPOSE_PROJECT_NAME}_elasticsearch-backup
 
 replace_env:
 	. .env && envsubst '$${SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0}' < configs/alertmanager/config.tpl.yml > configs/alertmanager/config.yml
