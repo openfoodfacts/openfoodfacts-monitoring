@@ -5,21 +5,33 @@ on:
     branches:
       - main
       - deploy-*
-    paths-ignore:
-      - configs/**
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+    - name: Set env variables
+      run: |
+        # direct container access
+        # deploy target
+        echo "SSH_HOST=10.1.0.203" >> $GITHUB_ENV
+        echo "SSH_PROXY_HOST=ovh1.openfoodfacts.org" >> $GITHUB_ENV
+        echo "SSH_USERNAME=off" >> $GITHUB_ENV
+        # did only config change ? (in this case we only need a restart)
+        if ( git diff --name-only |grep -v configs/ )
+        then
+          echo "RESTART_ONLY=no" >> $GITHUB_ENV
+        else
+          echo "RESTART_ONLY=yes" >> $GITHUB_ENV
+        fi
     - name: Checkout git repository
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
+        host: ${{ env.SSH_HOST }}
+        username: ${{ env.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        proxy_host: ${{ secrets.PROXY_HOST }}
-        proxy_username: ${{ secrets.USERNAME }}
+        proxy_host: ${{ env.SSH_PROXY_HOST }}
+        proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
         script: |
@@ -38,11 +50,11 @@ jobs:
     - name: Set environment variables
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
+        host: ${{ env.SSH_HOST }}
+        username: ${{ env.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        proxy_host: ${{ secrets.PROXY_HOST }}
-        proxy_username: ${{ secrets.USERNAME }}
+        proxy_host: ${{ env.SSH_PROXY_HOST }}
+        proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
         script: |
@@ -58,7 +70,7 @@ jobs:
 
           # Grafana
           echo "GF_SERVER_ROUTER_LOGGING=true" >> .env
-          echo "GF_SECURITY_ADMIN_USER=${{ secrets.GF_SECURITY_ADMIN_USER }}" >> .env
+          echo "GF_SECURITY_ADMIN_USER=off" >> .env
           echo "GF_SECURITY_ADMIN_PASSWORD=${{ secrets.GF_SECURITY_ADMIN_PASSWORD }}" >> .env
           echo "GF_AUTH_GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_OAUTH2_CLIENT_ID }}" >> .env
           echo "GF_AUTH_GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_OAUTH2_CLIENT_SECRET }}" >> .env
@@ -67,18 +79,18 @@ jobs:
           echo "SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0=${{ secrets.SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0 }}" >> .env
 
           # InfluxDB
-          echo "INFLUXDB_ADMIN_USER=${{ secrets.INFLUXDB_ADMIN_USER }}" >> .env
+          echo "INFLUXDB_ADMIN_USER=off" >> .env
           echo "INFLUXDB_ADMIN_PASSWORD=${{ secrets.INFLUXDB_ADMIN_PASSWORD }}" >> .env
-          echo "INFLUXDB_DB=${{ secrets.INFLUXDB_DB }}" >> .env
+          echo "INFLUXDB_DB=db0" >> .env
 
     - name: Run envsubst on Prometheus configs
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
+        host: ${{ env.SSH_HOST }}
+        username: ${{ env.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        proxy_host: ${{ secrets.PROXY_HOST }}
-        proxy_username: ${{ secrets.USERNAME }}
+        proxy_host: ${{ env.SSH_PROXY_HOST }}
+        proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
         script: |
@@ -87,26 +99,43 @@ jobs:
 
     - name: Create external Docker volumes
       uses: appleboy/ssh-action@master
+      if: env.RESTART_ONLY == 'no'
       with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
+        host: ${{ env.SSH_HOST }}
+        username: ${{ env.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        proxy_host: ${{ secrets.PROXY_HOST }}
-        proxy_username: ${{ secrets.USERNAME }}
+        proxy_host: ${{ env.SSH_PROXY_HOST }}
+        proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
         script: |
           cd monitoring/
           make create_external_volumes
 
-    - name: Start services
+    - name: Recreate & start services
       uses: appleboy/ssh-action@master
+      if: env.RESTART_ONLY == 'no'
       with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
+        host: ${{ env.SSH_HOST }}
+        username: ${{ env.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        proxy_host: ${{ secrets.PROXY_HOST }}
-        proxy_username: ${{ secrets.USERNAME }}
+        proxy_host: ${{ env.SSH_PROXY_HOST }}
+        proxy_username: ${{ env.SSH_USERNAME }}
+        proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script_stop: false
+        script: |
+          cd monitoring/
+          make up
+
+    - name: re-start services only
+      uses: appleboy/ssh-action@master
+      if: env.RESTART_ONLY == 'yes'
+      with:
+        host: ${{ env.SSH_HOST }}
+        username: ${{ env.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        proxy_host: ${{ env.SSH_PROXY_HOST }}
+        proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
         script: |
@@ -117,11 +146,11 @@ jobs:
       uses: appleboy/ssh-action@master
       if: ${{ always() }}
       with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
+        host: ${{ env.SSH_HOST }}
+        username: ${{ env.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        proxy_host: ${{ secrets.PROXY_HOST }}
-        proxy_username: ${{ secrets.USERNAME }}
+        proxy_host: ${{ env.SSH_PROXY_HOST }}
+        proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
         script: |
@@ -130,13 +159,13 @@ jobs:
 
     - name: Cleanup obsolete Docker objects
       uses: appleboy/ssh-action@master
-      if: ${{ always() }}
+      if: env.RESTART_ONLY == 'no'
       with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
+        host: ${{ env.SSH_HOST }}
+        username: ${{ env.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        proxy_host: ${{ secrets.PROXY_HOST }}
-        proxy_username: ${{ secrets.USERNAME }}
+        proxy_host: ${{ env.SSH_PROXY_HOST }}
+        proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
         script: |

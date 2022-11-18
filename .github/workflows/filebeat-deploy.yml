@@ -13,18 +13,30 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        host: 
+        host:
+          # dockers
           - "10.1.0.200"
+          # prod dockers
           - "10.1.0.201"
+          # monitoring
+          - "10.1.0.203"
     steps:
+    - name: Set env variables
+      run: |
+        # direct container access
+        # deploy target
+        echo "SSH_HOST=${{ matrix.host }}" >> $GITHUB_ENV
+        echo "SSH_PROXY_HOST=ovh1.openfoodfacts.org" >> $GITHUB_ENV
+        echo "SSH_USERNAME=off" >> $GITHUB_ENV
+        echo "MONITORING_HOST=10.1.0.203" >> $GITHUB_ENV
     - name: Checkout git repository
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ matrix.host }}
-        username: ${{ secrets.USERNAME }}
+        host: ${{ env.SSH_HOST }}
+        username: ${{ env.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        proxy_host: ${{ secrets.PROXY_HOST }}
-        proxy_username: ${{ secrets.USERNAME }}
+        proxy_host: ${{ env.SSH_PROXY_HOST }}
+        proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
         script: |
@@ -46,11 +58,11 @@ jobs:
     - name: Set environment variables
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ matrix.host }}
-        username: ${{ secrets.USERNAME }}
+        host: ${{ env.SSH_HOST }}
+        username: ${{ env.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        proxy_host: ${{ secrets.PROXY_HOST }}
-        proxy_username: ${{ secrets.USERNAME }}
+        proxy_host: ${{ env.SSH_PROXY_HOST }}
+        proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
         script: |
@@ -65,19 +77,19 @@ jobs:
           echo "COMPOSE_FILE=docker-compose.filebeat.yml" >> .env
 
           # Kibana
-          echo "KIBANA_URI=${{ secrets.HOST_NET }}:5601" >> .env
+          echo "KIBANA_URI=${{ env.MONITORING_HOST }}:5601" >> .env
 
           # Filebeat
-          echo "ELASTICSEARCH_HOSTS=http://${{ secrets.HOST_NET }}:9200" >> .env
+          echo "ELASTICSEARCH_HOSTS=http://${{ env.MONITORING_HOST }}:9200" >> .env
 
     - name: Start services
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ matrix.host }}
-        username: ${{ secrets.USERNAME }}
+        host: ${{ env.SSH_HOST }}
+        username: ${{ env.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        proxy_host: ${{ secrets.PROXY_HOST }}
-        proxy_username: ${{ secrets.USERNAME }}
+        proxy_host: ${{ env.SSH_PROXY_HOST }}
+        proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
         script: |
@@ -88,11 +100,11 @@ jobs:
       uses: appleboy/ssh-action@master
       if: ${{ always() }}
       with:
-        host: ${{ matrix.host }}
-        username: ${{ secrets.USERNAME }}
+        host: ${{ env.SSH_HOST }}
+        username: ${{ env.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        proxy_host: ${{ secrets.PROXY_HOST }}
-        proxy_username: ${{ secrets.USERNAME }}
+        proxy_host: ${{ env.SSH_PROXY_HOST }}
+        proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
         script: |
@@ -103,11 +115,11 @@ jobs:
       uses: appleboy/ssh-action@master
       if: ${{ always() }}
       with:
-        host: ${{ matrix.host }}
-        username: ${{ secrets.USERNAME }}
+        host: ${{ env.SSH_HOST }}
+        username: ${{ env.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        proxy_host: ${{ secrets.PROXY_HOST }}
-        proxy_username: ${{ secrets.USERNAME }}
+        proxy_host: ${{ env.SSH_PROXY_HOST }}
+        proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
         script: |
