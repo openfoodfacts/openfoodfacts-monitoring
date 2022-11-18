@@ -35,6 +35,7 @@ jobs:
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
         script: |
+          echo "RESTART_ONLY is ${{ env.RESTART_ONLY }}"
           # Clone Git repository if not already there
           [ ! -d 'monitoring' ] && git clone --depth 1 https://github.com/${{ github.repository }} monitoring --no-single-branch 2>&1
 
@@ -44,7 +45,7 @@ jobs:
           # Fetch newest commits (in case it wasn't freshly cloned)
           # and Checkout current commit SHA
           git fetch --depth 1 && \
-          git checkout -qf ${{ github.sha }} && \
+          git checkout -qf ${{ github.sha }}
     - name: Set environment variables in .env
       uses: appleboy/ssh-action@master
       with:
@@ -94,7 +95,6 @@ jobs:
         script: |
           cd monitoring/
           make replace_env
-          echo "RESTART_ONLY is ${{ env.RESTART_ONLY }}"
 
     - name: Create external Docker volumes
       uses: appleboy/ssh-action@master
