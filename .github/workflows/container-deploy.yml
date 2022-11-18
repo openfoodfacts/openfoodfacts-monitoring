@@ -21,7 +21,6 @@ jobs:
         echo "SSH_HOST=10.1.0.203" >> $GITHUB_ENV
         echo "SSH_PROXY_HOST=ovh1.openfoodfacts.org" >> $GITHUB_ENV
         echo "SSH_USERNAME=off" >> $GITHUB_ENV
-        git checkout --depth=1 ${{ github.event.push.base_ref }}
         # did only config change ? (in this case we only need a restart)
         if ( git diff --name-only ${{ github.event.push.base_ref }} ${{ github.event.push.after }} |grep -v configs/ )
         then
