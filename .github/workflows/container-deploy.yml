@@ -22,15 +22,15 @@ jobs:
         echo "SSH_PROXY_HOST=ovh1.openfoodfacts.org" >> $GITHUB_ENV
         echo "SSH_USERNAME=off" >> $GITHUB_ENV
         # did only config change ? (in this case we only need a restart)
-        if ( git diff --name-only ${{ github.event.base_ref }} ${{ github.event.after }} |grep -v configs/ )
+        if ( git diff --name-only ${{ github.event.before }} ${{ github.event.after }} |grep -v configs/ )
         then
           echo "RESTART_ONLY=no" >> $GITHUB_ENV
         else
           echo "RESTART_ONLY=yes" >> $GITHUB_ENV
         fi
-        echo base_ref is ${{ github.event.base_ref }}
+        echo before is ${{ github.event.before }}
         echo after is ${{ github.event.after }}
-        git diff --name-only ${{ github.event.base_ref }} ${{ github.event.after }}
+        git diff --name-only ${{ github.event.before }} ${{ github.event.after }}
     - name: Checkout git repository
       uses: appleboy/ssh-action@master
       with:
