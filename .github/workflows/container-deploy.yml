@@ -10,7 +10,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: actions/checkout@v3
+    - name: checkout repo (needed to compute changed files)
+      uses: actions/checkout@v3
     - name: Set env variables
       run: |
         # direct container access
