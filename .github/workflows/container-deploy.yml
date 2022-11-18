@@ -96,6 +96,7 @@ jobs:
         script: |
           cd monitoring/
           make replace_env
+          echo "RESTART_ONLY is ${{ env.RESTART_ONLY }}"
 
     - name: Create external Docker volumes
       uses: appleboy/ssh-action@master
