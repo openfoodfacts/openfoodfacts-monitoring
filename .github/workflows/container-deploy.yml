@@ -131,6 +131,7 @@ jobs:
         script_stop: false
         script: |
           cd monitoring/
+          make create_backups_dir && \
           make up
 
     - name: re-start services only

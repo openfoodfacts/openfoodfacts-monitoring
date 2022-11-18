@@ -53,7 +53,8 @@ jobs:
           git checkout -qf ${{ github.sha }}
 
           # Change permission of filebeat config
-          sudo chown root:root configs/filebeat/config.yml
+          # without using sudo !
+          docker run --rm -v $(pwd)/configs/filebeat:/mnt -w /mnt bash chown root:root config.yml
 
     - name: Set environment variables
       uses: appleboy/ssh-action@master

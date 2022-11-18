@@ -17,7 +17,7 @@ SHARED_MOUNT_POINT ?= /mnt/monitoring-volumes/
 #----------------#
 dev: replace_env up
 
-up: create_backups_dir
+up:
 	@echo "🥫 Building and starting containers …"
 	${DOCKER_COMPOSE} up -d --build 2>&1
 
