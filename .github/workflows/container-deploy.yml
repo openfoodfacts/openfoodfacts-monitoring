@@ -24,6 +24,9 @@ jobs:
         else
           echo "RESTART_ONLY=yes" >> $GITHUB_ENV
         fi
+        echo base_ref is ${{ github.event.push.base_ref }}
+        echo after is ${{ github.event.push.after }}
+        git diff --name-only ${{ github.event.push.base_ref }} ${{ github.event.push.after }}
     - name: Checkout git repository
       uses: appleboy/ssh-action@master
       with:
