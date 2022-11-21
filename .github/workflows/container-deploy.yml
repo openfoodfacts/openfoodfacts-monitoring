@@ -5,24 +5,44 @@ on:
     branches:
       - main
       - deploy-*
-    paths-ignore:
-      - configs/**
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+    - name: checkout repo (needed to compute changed files)
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 100
+    - name: Set env variables
+      run: |
+        # direct container access
+        # deploy target
+        echo "SSH_HOST=10.1.0.203" >> $GITHUB_ENV
+        echo "SSH_PROXY_HOST=ovh1.openfoodfacts.org" >> $GITHUB_ENV
+        echo "SSH_USERNAME=off" >> $GITHUB_ENV
+        # did only config change ? (in this case we only need a restart)
+        if ( git diff --name-only ${{ github.event.before }} ${{ github.event.after }} |grep -v configs/ )
+        then
+          echo "RESTART_ONLY=no" >> $GITHUB_ENV
+        else
+          echo "RESTART_ONLY=yes" >> $GITHUB_ENV
+        fi
+        echo before is ${{ github.event.before }}
+        echo after is ${{ github.event.after }}
+        git diff --name-only ${{ github.event.before }} ${{ github.event.after }}
     - name: Checkout git repository
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
+        host: ${{ env.SSH_HOST }}
+        username: ${{ env.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        proxy_host: ${{ secrets.PROXY_HOST }}
-        proxy_username: ${{ secrets.USERNAME }}
+        proxy_host: ${{ env.SSH_PROXY_HOST }}
+        proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
         script: |
+          echo "RESTART_ONLY is ${{ env.RESTART_ONLY }}"
           # Clone Git repository if not already there
           [ ! -d 'monitoring' ] && git clone --depth 1 https://github.com/${{ github.repository }} monitoring --no-single-branch 2>&1
 
@@ -30,19 +50,17 @@ jobs:
           cd monitoring/
 
           # Fetch newest commits (in case it wasn't freshly cloned)
-          git fetch --depth 1
-
-          # Checkout current commit SHA
+          # and Checkout current commit SHA
+          git fetch --depth 1 && \
           git checkout -qf ${{ github.sha }}
-
-    - name: Set environment variables
+    - name: Set environment variables in .env
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
+        host: ${{ env.SSH_HOST }}
+        username: ${{ env.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        proxy_host: ${{ secrets.PROXY_HOST }}
-        proxy_username: ${{ secrets.USERNAME }}
+        proxy_host: ${{ env.SSH_PROXY_HOST }}
+        proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
         script: |
@@ -58,7 +76,7 @@ jobs:
 
           # Grafana
           echo "GF_SERVER_ROUTER_LOGGING=true" >> .env
-          echo "GF_SECURITY_ADMIN_USER=${{ secrets.GF_SECURITY_ADMIN_USER }}" >> .env
+          echo "GF_SECURITY_ADMIN_USER=off" >> .env
           echo "GF_SECURITY_ADMIN_PASSWORD=${{ secrets.GF_SECURITY_ADMIN_PASSWORD }}" >> .env
           echo "GF_AUTH_GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_OAUTH2_CLIENT_ID }}" >> .env
           echo "GF_AUTH_GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_OAUTH2_CLIENT_SECRET }}" >> .env
@@ -67,18 +85,18 @@ jobs:
           echo "SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0=${{ secrets.SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0 }}" >> .env
 
           # InfluxDB
-          echo "INFLUXDB_ADMIN_USER=${{ secrets.INFLUXDB_ADMIN_USER }}" >> .env
+          echo "INFLUXDB_ADMIN_USER=off" >> .env
           echo "INFLUXDB_ADMIN_PASSWORD=${{ secrets.INFLUXDB_ADMIN_PASSWORD }}" >> .env
-          echo "INFLUXDB_DB=${{ secrets.INFLUXDB_DB }}" >> .env
+          echo "INFLUXDB_DB=db0" >> .env
 
     - name: Run envsubst on Prometheus configs
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
+        host: ${{ env.SSH_HOST }}
+        username: ${{ env.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        proxy_host: ${{ secrets.PROXY_HOST }}
-        proxy_username: ${{ secrets.USERNAME }}
+        proxy_host: ${{ env.SSH_PROXY_HOST }}
+        proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
         script: |
@@ -87,26 +105,44 @@ jobs:
 
     - name: Create external Docker volumes
       uses: appleboy/ssh-action@master
+      if: env.RESTART_ONLY == 'no'
       with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
+        host: ${{ env.SSH_HOST }}
+        username: ${{ env.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        proxy_host: ${{ secrets.PROXY_HOST }}
-        proxy_username: ${{ secrets.USERNAME }}
+        proxy_host: ${{ env.SSH_PROXY_HOST }}
+        proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
         script: |
           cd monitoring/
           make create_external_volumes
 
-    - name: Start services
+    - name: Recreate & start services
       uses: appleboy/ssh-action@master
+      if: env.RESTART_ONLY == 'no'
       with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
+        host: ${{ env.SSH_HOST }}
+        username: ${{ env.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        proxy_host: ${{ secrets.PROXY_HOST }}
-        proxy_username: ${{ secrets.USERNAME }}
+        proxy_host: ${{ env.SSH_PROXY_HOST }}
+        proxy_username: ${{ env.SSH_USERNAME }}
+        proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script_stop: false
+        script: |
+          cd monitoring/
+          make create_backups_dir && \
+          make up
+
+    - name: re-start services only
+      uses: appleboy/ssh-action@master
+      if: env.RESTART_ONLY == 'yes'
+      with:
+        host: ${{ env.SSH_HOST }}
+        username: ${{ env.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        proxy_host: ${{ env.SSH_PROXY_HOST }}
+        proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
         script: |
@@ -117,11 +153,11 @@ jobs:
       uses: appleboy/ssh-action@master
       if: ${{ always() }}
       with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
+        host: ${{ env.SSH_HOST }}
+        username: ${{ env.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        proxy_host: ${{ secrets.PROXY_HOST }}
-        proxy_username: ${{ secrets.USERNAME }}
+        proxy_host: ${{ env.SSH_PROXY_HOST }}
+        proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
         script: |
@@ -130,13 +166,13 @@ jobs:
 
     - name: Cleanup obsolete Docker objects
       uses: appleboy/ssh-action@master
-      if: ${{ always() }}
+      if: env.RESTART_ONLY == 'no'
       with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
+        host: ${{ env.SSH_HOST }}
+        username: ${{ env.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        proxy_host: ${{ secrets.PROXY_HOST }}
-        proxy_username: ${{ secrets.USERNAME }}
+        proxy_host: ${{ env.SSH_PROXY_HOST }}
+        proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: false
         script: |

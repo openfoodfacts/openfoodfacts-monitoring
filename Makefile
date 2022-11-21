@@ -7,6 +7,9 @@ SHELL := /bin/bash
 ENV_FILE ?= .env
 DOCKER_COMPOSE=docker-compose --env-file=${ENV_FILE}
 
+# mount point for shared data
+SHARED_MOUNT_POINT ?= /mnt/monitoring-volumes/
+
 .DEFAULT_GOAL := dev
 
 #----------------#
@@ -17,6 +20,10 @@ dev: replace_env up
 up:
 	@echo "🥫 Building and starting containers …"
 	${DOCKER_COMPOSE} up -d --build 2>&1
+
+create_backups_dir:
+	@echo "🥫 Ensure backups dir for elasticsearch"
+	docker-compose run --rm -u root elasticsearch bash -c "mkdir -p /opt/elasticsearch/backups && chown elasticsearch:root -R /opt/elasticsearch/backups"
 
 down:
 	@echo "🥫 Bringing down containers …"
@@ -48,11 +55,15 @@ log:
 # Production #
 #------------#
 create_external_volumes:
-	docker volume create influxdb-data
-	docker volume create grafana-data
-	docker volume create elasticsearch-data
-	docker volume create prometheus-data
-	docker volume create alertmanager-data
+	docker volume create ${COMPOSE_PROJECT_NAME}_influxdb-data
+	docker volume create ${COMPOSE_PROJECT_NAME}_grafana-data
+	docker volume create ${COMPOSE_PROJECT_NAME}_elasticsearch-data
+	docker volume create ${COMPOSE_PROJECT_NAME}_prometheus-data
+	docker volume create ${COMPOSE_PROJECT_NAME}_alertmanager-data
+# put backups on a shared volume
+	# ensure directory exists
+	mkdir -p ${SHARED_MOUNT_POINT}/${COMPOSE_PROJECT_NAME}_elasticsearch-backup
+	docker volume create --driver=local -o type=none -o o=bind -o device=${SHARED_MOUNT_POINT}/${COMPOSE_PROJECT_NAME}_elasticsearch-backup ${COMPOSE_PROJECT_NAME}_elasticsearch-backup
 
 replace_env:
 	. .env && envsubst '$${SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0}' < configs/alertmanager/config.tpl.yml > configs/alertmanager/config.yml
