@@ -10,10 +10,10 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: checkout repo (needed to compute changed files)
+    - name: checkout repo on current branch
       uses: actions/checkout@v3
       with:
-        fetch-depth: 100
+        fetch-depth: 0
     - name: Set env variables
       run: |
         # direct container access
@@ -22,15 +22,18 @@ jobs:
         echo "SSH_PROXY_HOST=ovh1.openfoodfacts.org" >> $GITHUB_ENV
         echo "SSH_USERNAME=off" >> $GITHUB_ENV
         # did only config change ? (in this case we only need a restart)
-        if ( git diff --name-only ${{ github.event.before }} ${{ github.event.after }} |grep -v configs/ )
+        declare current_branch=$(git rev-parse --abbrev-ref HEAD)
+        echo $current_branch
+        git checkout -b main --track origin/main
+        git checkout $current_branch
+        if ( git diff --name-only main ${{ github.event.head }} |grep -v configs/ )
         then
           echo "RESTART_ONLY=no" >> $GITHUB_ENV
         else
           echo "RESTART_ONLY=yes" >> $GITHUB_ENV
         fi
-        echo before is ${{ github.event.before }}
-        echo after is ${{ github.event.after }}
-        git diff --name-only ${{ github.event.before }} ${{ github.event.after }}
+        echo "Changed file:"
+        git diff --name-only main ${{ github.event.head }}
     - name: Checkout git repository
       uses: appleboy/ssh-action@master
       with:

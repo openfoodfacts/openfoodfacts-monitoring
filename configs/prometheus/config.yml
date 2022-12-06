@@ -61,6 +61,12 @@ scrape_configs:
         app: "off"
         service: backend
         env: net
+# FIXME: first expose it !
+#    - targets: ['10.1.0.200:9187'] # Postgres
+#      labels:
+#        app: "off"
+#        service: postgres
+#        env: net
 
   - job_name: robotoff-net
     static_configs:
@@ -69,6 +75,27 @@ scrape_configs:
         app: robotoff
         service: api
         env: net
+# FIXME: first expose it !
+#    - targets: ['10.1.0.200:9187'] # Postgres
+#      labels:
+#        app: "robotoff"
+#        service: postgres
+#        env: net
+
+  - job_name: robotoff-org
+    static_configs:
+    - targets: ['10.1.0.201:9102'] # StatsD Gunicorn
+      labels:
+        app: robotoff
+        service: api
+        env: org
+# FIXME: first expose it !
+#    - targets: ['10.1.0.201:9187'] # Postgres
+#      labels:
+#        app: "robotoff"
+#        service: postgres
+#        env: org
+
 
   - job_name: monitoring-org
     static_configs:
