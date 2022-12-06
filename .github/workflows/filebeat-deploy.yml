@@ -73,7 +73,7 @@ jobs:
           # Set Docker Compose variables
           echo "DOCKER_CLIENT_TIMEOUT=120" > .env
           echo "COMPOSE_HTTP_TIMEOUT=120" >> .env
-          echo "COMPOSE_PROJECT_NAME=monitoring" >> .env
+          echo "COMPOSE_PROJECT_NAME=filebeat" >> .env
           echo "COMPOSE_PATH_SEPARATOR=;" >> .env
           echo "COMPOSE_FILE=docker-compose.node.yml" >> .env
 
@@ -82,6 +82,20 @@ jobs:
 
           # Filebeat
           echo "ELASTICSEARCH_HOSTS=http://${{ env.MONITORING_HOST }}:9200" >> .env
+
+    - name: Remove old services (temporary)
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ env.SSH_HOST }}
+        username: ${{ env.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        proxy_host: ${{ env.SSH_PROXY_HOST }}
+        proxy_username: ${{ env.SSH_USERNAME }}
+        proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script_stop: false
+        script: |
+          cd filebeat/
+          COMPOSE_PROJECT_NAME=monitoring docker-compose down --remove-orphans
 
     - name: Start services
       uses: appleboy/ssh-action@master
