@@ -24,7 +24,7 @@ scrape_configs:
   #--------------#
   - job_name: node-monitoring
     static_configs:
-    - targets: ['10.1.0.203:9300']
+    - targets: ['10.1.0.203:8281']
       labels:
         app: node_exporter
         service: metrics
@@ -36,7 +36,7 @@ scrape_configs:
         env: monitoring
   - job_name: node-org
     static_configs:
-    - targets: ['10.1.0.201:9300']
+    - targets: ['10.1.0.201:8281']
       labels:
         app: node_exporter
         service: metrics
@@ -48,7 +48,7 @@ scrape_configs:
         env: org
   - job_name: node-net
     static_configs:
-    - targets: ['10.1.0.200:9300']
+    - targets: ['10.1.0.200:8281']
       labels:
         app: node_exporter
         service: metrics

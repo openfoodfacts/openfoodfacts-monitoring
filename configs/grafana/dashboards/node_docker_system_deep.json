@@ -13648,8 +13648,8 @@
         "allValue": null,
         "current": {
           "selected": false,
-          "text": "10.1.0.200:9100",
-          "value": "10.1.0.200:9100"
+          "text": "10.1.0.200:8281",
+          "value": "10.1.0.200:8281"
         },
         "datasource": "${DS_PROMETHEUS}",
         "definition": "label_values(node_uname_info{job=\"$job\"}, instance)",

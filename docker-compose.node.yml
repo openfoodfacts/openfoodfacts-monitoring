@@ -30,7 +30,7 @@ services:
       - '--path.sysfs=/host/sys'
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
     ports:
-      - 9300:9100
+      - 8281:9100
   # this monitors docker on the host
   cadvisor:
     restart: always
