@@ -22,7 +22,7 @@ jobs:
         echo "SSH_PROXY_HOST=ovh1.openfoodfacts.org" >> $GITHUB_ENV
         echo "SSH_USERNAME=off" >> $GITHUB_ENV
         # did only config change ? (in this case we only need a restart)
-        current_branch = $(git rev-parse --abbrev-ref HEAD)
+        declare current_branch=$(git rev-parse --abbrev-ref HEAD)
         echo $current_branch
         git fetch origin main
         git checkout -b main
