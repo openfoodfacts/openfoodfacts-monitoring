@@ -10,10 +10,15 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: checkout repo (needed to compute changed files)
+    - name: checkout repo main branch  (needed to compute changed files)
       uses: actions/checkout@v3
       with:
-        fetch-depth: 0
+        ref: main
+        fetch-depth: 1
+    - name: checkout repo on current branch
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 100
     - name: Set env variables
       run: |
         # direct container access
