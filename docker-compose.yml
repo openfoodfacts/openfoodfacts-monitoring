@@ -136,6 +136,7 @@ services:
     networks:
       - monitoring
 
+  # this monitors the linux host itself
   node_exporter:
     restart: always
     image: prom/node-exporter:v1.2.2
@@ -153,6 +154,7 @@ services:
     networks:
       - monitoring
 
+  # this monitors docker on the host
   cadvisor:
     restart: always
     image: gcr.io/cadvisor/cadvisor:v0.40.0

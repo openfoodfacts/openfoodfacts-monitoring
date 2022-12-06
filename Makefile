@@ -8,7 +8,8 @@ ENV_FILE ?= .env
 DOCKER_COMPOSE=docker-compose --env-file=${ENV_FILE}
 
 # mount point for shared data
-SHARED_MOUNT_POINT ?= /mnt/monitoring-volumes/
+NFS_VOLUMES_ADDRESS ?= 10.0.0.3
+NFS_VOLUMES_BASE_PATH ?= /rpool/backups/monitoring-volumes/
 
 .DEFAULT_GOAL := dev
 
@@ -61,9 +62,7 @@ create_external_volumes:
 	docker volume create ${COMPOSE_PROJECT_NAME}_prometheus-data
 	docker volume create ${COMPOSE_PROJECT_NAME}_alertmanager-data
 # put backups on a shared volume
-	# ensure directory exists
-	mkdir -p ${SHARED_MOUNT_POINT}/${COMPOSE_PROJECT_NAME}_elasticsearch-backup
-	docker volume create --driver=local -o type=none -o o=bind -o device=${SHARED_MOUNT_POINT}/${COMPOSE_PROJECT_NAME}_elasticsearch-backup ${COMPOSE_PROJECT_NAME}_elasticsearch-backup
+	docker volume create --driver local --opt type=nfs --opt o=addr=${NFS_VOLUMES_ADDRESS},rw --opt device=:${NFS_VOLUMES_BASE_PATH}/monitoring_elasticsearch-backup ${COMPOSE_PROJECT_NAME}_elasticsearch-backup
 
 replace_env:
 	. .env && envsubst '$${SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0}' < configs/alertmanager/config.tpl.yml > configs/alertmanager/config.yml
