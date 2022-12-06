@@ -1,0 +1,47 @@
+version: '3.7'
+
+# this is the docker-compose for monitoring services on each node
+
+services:
+  filebeat:
+    # filebeat pushes logs to elasticsearch monitoring
+    restart: always
+    image: elastic/filebeat:7.2.0
+    user: "root"
+    privileged: true
+    command: ["--strict.perms=false"]
+    environment:
+      - ELASTICSEARCH_HOSTS
+    volumes:
+      - ./configs/filebeat/config.yml:/usr/share/filebeat/filebeat.yml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+  # this monitors the linux host itself
+  node_exporter:
+    restart: always
+    image: prom/node-exporter:v1.2.2
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    ports:
+      - 8281:9100
+  # this monitors docker on the host
+  cadvisor:
+    restart: always
+    image: gcr.io/cadvisor/cadvisor:v0.40.0
+    privileged: true
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    volumes:
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /var/run:/var/run:ro
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+    ports:
+      - 8280:8080

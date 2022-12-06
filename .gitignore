@@ -1,2 +1,5 @@
 .DS_Store
 configs/alertmanager/config.yml
+
+# editors
+.vscode/
