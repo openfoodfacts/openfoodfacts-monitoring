@@ -31,8 +31,6 @@ services:
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
     ports:
       - 9300:9100
-    networks:
-      - monitoring
   # this monitors docker on the host
   cadvisor:
     restart: always
@@ -47,5 +45,3 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:rw
     ports:
       - 8280:8080
-    networks:
-      - monitoring
