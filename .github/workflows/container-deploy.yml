@@ -24,16 +24,22 @@ jobs:
         # did only config change ? (in this case we only need a restart)
         declare current_branch=$(git rev-parse --abbrev-ref HEAD)
         echo $current_branch
-        git checkout -b main --track origin/main
-        git checkout $current_branch
-        if ( git diff --name-only main ${{ github.event.head }} |grep -v configs/ )
+        declare before=${{ github.event.before }}
+        if [[ $before =~ ^00000 ]]
+        then
+          # use main as reference
+          git checkout -b main --track origin/main
+          git checkout $current_branch
+          declare before=main
+        fi
+        if ( git diff --name-only $before ${{ github.event.head }} |grep -v configs/ )
         then
           echo "RESTART_ONLY=no" >> $GITHUB_ENV
         else
           echo "RESTART_ONLY=yes" >> $GITHUB_ENV
         fi
         echo "Changed file:"
-        git diff --name-only main ${{ github.event.head }}
+        git diff --name-only $before ${{ github.event.head }}
     - name: Checkout git repository
       uses: appleboy/ssh-action@master
       with:
