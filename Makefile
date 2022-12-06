@@ -32,11 +32,11 @@ create_backups_dir:
 
 down:
 	@echo "🥫 Bringing down containers …"
-	${DOCKER_COMPOSE} down
+	${DOCKER_COMPOSE} down --remove-orphans
 
 hdown:
 	@echo "🥫 Bringing down containers and associated volumes …"
-	${DOCKER_COMPOSE} down -v
+	${DOCKER_COMPOSE} down -v --remove-orphans
 
 reset: hdown up
 
