@@ -32,6 +32,8 @@ jobs:
           git checkout $current_branch
           declare before=main
         fi
+        echo before is: $before
+        echo head is: ${{ github.event.head }}
         if ( git diff --name-only $before ${{ github.event.head }} |grep -v configs/ )
         then
           echo "RESTART_ONLY=no" >> $GITHUB_ENV
