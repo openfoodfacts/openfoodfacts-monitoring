@@ -16,11 +16,15 @@ NFS_VOLUMES_BASE_PATH ?= /rpool/backups/monitoring-volumes/
 #----------------#
 # Docker Compose #
 #----------------#
-dev: replace_env up
+dev: replace_env build up
+
+build:
+	@echo "🥫 Building containers …"
+	${DOCKER_COMPOSE} build
 
 up:
-	@echo "🥫 Building and starting containers …"
-	${DOCKER_COMPOSE} up -d --build 2>&1
+	@echo "🥫 Starting containers …"
+	${DOCKER_COMPOSE} up -d 2>&1
 
 create_backups_dir:
 	@echo "🥫 Ensure backups dir for elasticsearch"

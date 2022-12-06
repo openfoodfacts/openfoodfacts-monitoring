@@ -13,6 +13,7 @@ jobs:
     - name: checkout repo on current branch
       uses: actions/checkout@v3
       with:
+        # there seem to be no choice but fetch-depth 0 to be able to checkout main
         fetch-depth: 0
     - name: Set env variables
       run: |
@@ -135,6 +136,7 @@ jobs:
         script: |
           cd monitoring/
           make create_backups_dir && \
+          make down && \
           make up
 
     - name: re-start services only
@@ -150,7 +152,7 @@ jobs:
         script_stop: false
         script: |
           cd monitoring/
-          make up
+          make restart
 
     - name: Check services are up
       uses: appleboy/ssh-action@master

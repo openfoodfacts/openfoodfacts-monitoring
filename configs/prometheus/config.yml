@@ -22,14 +22,38 @@ scrape_configs:
   #--------------#
   # NODE METRICS #
   #--------------#
+  - job_name: node-monitoring
+    static_configs:
+    - targets: ['10.1.0.203:9300']
+      labels:
+        app: node_exporter
+        service: metrics
+        env: monitoring
+    - targets: ['10.1.0.203:8280']
+      labels:
+        app: cadvisor
+        service: metrics
+        env: monitoring
+  - job_name: node-org
+    static_configs:
+    - targets: ['10.1.0.201:9300']
+      labels:
+        app: node_exporter
+        service: metrics
+        env: org
+    - targets: ['10.1.0.201:8280']
+      labels:
+        app: cadvisor
+        service: metrics
+        env: org
   - job_name: node-net
     static_configs:
-    - targets: ['10.1.0.200:9100']
+    - targets: ['10.1.0.200:9300']
       labels:
         app: node_exporter
         service: metrics
         env: net
-    - targets: ['10.1.0.200:8080']
+    - targets: ['10.1.0.200:8280']
       labels:
         app: cadvisor
         service: metrics
@@ -49,6 +73,14 @@ scrape_configs:
   #------------------#
   # SERVICES METRICS #
   #------------------#
+  - job_name: mongo-dev
+    static_configs:
+    - targets: ['10.1.0.200:9113'] # NGINX
+      labels:
+        app: "off"
+        service: frontend
+        env: net
+
   - job_name: off-net
     static_configs:
     - targets: ['10.1.0.200:9113'] # NGINX
@@ -136,7 +168,7 @@ scrape_configs:
   - job_name: blackbox-net
     metrics_path: /probe
     params:
-      module: [http_probe] 
+      module: [http_probe]
     static_configs:
       - targets: ['https://world.openfoodfacts.net']
         labels:

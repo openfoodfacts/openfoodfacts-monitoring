@@ -75,7 +75,7 @@ jobs:
           echo "COMPOSE_HTTP_TIMEOUT=120" >> .env
           echo "COMPOSE_PROJECT_NAME=monitoring" >> .env
           echo "COMPOSE_PATH_SEPARATOR=;" >> .env
-          echo "COMPOSE_FILE=docker-compose.filebeat.yml" >> .env
+          echo "COMPOSE_FILE=docker-compose.node.yml" >> .env
 
           # Kibana
           echo "KIBANA_URI=${{ env.MONITORING_HOST }}:5601" >> .env
@@ -95,7 +95,7 @@ jobs:
         script_stop: false
         script: |
           cd filebeat/
-          make up
+          make down && make up
 
     - name: Check services are up
       uses: appleboy/ssh-action@master
