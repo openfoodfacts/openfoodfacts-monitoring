@@ -1,4 +1,7 @@
 modules:
+  # This is the definition of the prober
+  # Look at blackbox-net and blackbox-org in prometheus configuration
+  # to see how it's used on different targets
   http_probe:
     prober: http
     timeout: 10s

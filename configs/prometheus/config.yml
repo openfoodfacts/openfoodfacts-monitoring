@@ -167,6 +167,8 @@ scrape_configs:
   #--------#
   - job_name: blackbox-net
     metrics_path: /probe
+    # avoid being too greedy, it's staging…
+    scrape_interval: 180s
     params:
       module: [http_probe]
     static_configs:
@@ -174,6 +176,11 @@ scrape_configs:
         labels:
           app: "off"
           service: api
+          env: net
+      - targets: ['https://world.openfoodfacts.net/images/products/376/002/924/8001/1.100.jpg']
+        labels:
+          app: 'off'
+          service: web
           env: net
       - targets: ['https://robotoff.openfoodfacts.net/api/v1/insights?count=1']
         labels:
@@ -190,10 +197,23 @@ scrape_configs:
 
   - job_name: blackbox-org
     metrics_path: /probe
+    # avoid being too greedy
+    scrape_interval: 60s
     params:
-      module: [http_probe] 
+      module: [http_probe]
     static_configs:
       - targets: ['https://world.openfoodfacts.org']
+        labels:
+          app: 'off'
+          service: api
+          env: org
+      # access to statics
+      - targets: ['https://world.openfoodfacts.org/images/products/376/002/924/8001/1.100.jpg']
+        labels:
+          app: 'off'
+          service: web
+          env: org
+      - targets: ['https://world.openfoodfacts.org/']
         labels:
           app: 'off'
           service: api
@@ -213,12 +233,12 @@ scrape_configs:
           app: opf
           service: api
           env: org
-      - targets: ['https://world.pro.openproductsfacts.org']
+      - targets: ['https://pro.world.openproductsfacts.org']
         labels:
           app: off-pro
           service: api
           env: org
-      - targets: ['https://robotoff.openfoodfacts.org/api/v1/insights']
+      - targets: ['https://robotoff.openfoodfacts.org/api/v1/health']
         labels:
           app: robotoff
           service: api
