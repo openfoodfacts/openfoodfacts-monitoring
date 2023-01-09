@@ -233,7 +233,7 @@ scrape_configs:
           app: opf
           service: api
           env: org
-      - targets: ['https://pro.world.openproductsfacts.org']
+      - targets: ['https://world.pro.openfoodfacts.org']
         labels:
           app: off-pro
           service: api
