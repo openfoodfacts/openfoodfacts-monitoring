@@ -88,6 +88,19 @@ scrape_configs:
           service: api
           env: org
 
+  - job_name: docker-postgres
+    static_configs:
+      - targets: ["10.1.0.201:9187"]
+        labels:
+          app: robotoff
+          service: postgres
+          env: org
+      - targets: ["10.1.0.200:9187"]
+        labels:
+          app: robotoff
+          service: postgres
+          env: net
+
   #--------#
   # PROBES #
   #--------#
