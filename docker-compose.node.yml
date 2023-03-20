@@ -6,10 +6,10 @@ services:
   filebeat:
     # filebeat pushes logs to elasticsearch monitoring
     restart: always
-    image: elastic/filebeat:7.2.0
+    image: elastic/filebeat:7.17.9
     user: "root"
     privileged: true
-    command: ["--strict.perms=false"]
+    command: [ "--strict.perms=false" ]
     environment:
       - ELASTICSEARCH_HOSTS
     volumes:
