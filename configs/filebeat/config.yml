@@ -20,7 +20,7 @@ processors:
 output.elasticsearch:
   hosts: ["${ELASTICSEARCH_HOSTS}"]
   indices:
-    - index: "logs-%{+yyyy.MM.dd}"
+    - index: "logs-%{+yyyy-MM-dd}"
 
 filebeat.config.modules.path: /usr/share/filebeat/modules.d/*.yml
 
