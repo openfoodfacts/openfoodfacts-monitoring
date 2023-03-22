@@ -17,10 +17,22 @@ processors:
 - add_host_metadata:
     netinfo.enabled: true
 
+logging.tostderr: true
+logging.level: error
+
+
 output.elasticsearch:
   hosts: ["${ELASTICSEARCH_HOSTS}"]
   indices:
-    - index: "logs-%{+yyyy-MM-dd}"
+    - index: "logs-%{+yyyy.MM.dd}-%{index_num}"
+
+
+setup.ilm.enabled: true
+setup.ilm.policy_name: logs
+setup.template.name: logs
+
+
+
 
 filebeat.config.modules.path: /usr/share/filebeat/modules.d/*.yml
 
