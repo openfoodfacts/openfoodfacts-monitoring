@@ -6,7 +6,11 @@ on:
       - main
       - deploy-*
     paths-ignore:
-      - configs/**
+      - configs/alertmanager/**
+      - configs/blackbox_exporter/**
+      - configs/grafana/**
+      - configs/kibana/**
+      - configs/prometheus/**
 
 jobs:
   deploy:
