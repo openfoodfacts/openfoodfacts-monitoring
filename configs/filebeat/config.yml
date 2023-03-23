@@ -23,12 +23,14 @@ logging.level: error
 
 output.elasticsearch:
   hosts: ["${ELASTICSEARCH_HOSTS}"]
-  indices:
-    - index: "logs-%{+yyyy.MM.dd}-%{index_num}"
+
+setup.ilm:
+  enabled: true
+  policy_name: "logs"
+  rollover_alias: "logs-current"
+  pattern: "logs-{now/d}-000001"
 
 
-setup.ilm.enabled: true
-setup.ilm.policy_name: logs
 setup.template.name: logs
 
 
