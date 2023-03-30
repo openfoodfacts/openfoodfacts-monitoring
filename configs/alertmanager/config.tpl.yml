@@ -1,31 +1,63 @@
 global:
   resolve_timeout: 1m
-  slack_api_url: '${SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0}'
 
 route:
-  receiver: slack
+  receiver: default-receiver
   group_by:
   - alertname
   - env
   routes:
-  - receiver: slack
+  - receiver: slack-warning
     match:
-      severity: page|warning
+      severity: warning
     continue: true
+  - receiver: slack-page
+    match:
+      severity: page
+  
 
 receivers:
-- name: slack
+- name: default-receiver
   slack_configs:
-  - channel: '#infrastructure-alerts'
+  - api_url: 'https://hooks.slack.com/services/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'
+    channel: '#alerts'
     send_resolved: true
     title: |-
      [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }} for .{{ .CommonLabels.env }} env
     text: >-
      {{ range .Alerts -}}
      *Alert:* {{ .Annotations.summary }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
-
      *Description:* {{ .Annotations.description }}
-
+     *Details:*
+       {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
+       {{ end }}
+     {{ end }}
+- name: slack-warning
+  slack_configs:
+  - api_url: 'https://hooks.slack.com/services/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'
+    channel: '#alerts-warning'
+    send_resolved: true
+    title: |-
+     [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }} for .{{ .CommonLabels.env }} env
+    text: >-
+     {{ range .Alerts -}}
+     *Alert:* {{ .Annotations.summary }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
+     *Description:* {{ .Annotations.description }}
+     *Details:*
+       {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
+       {{ end }}
+     {{ end }}
+- name: slack-page
+  slack_configs:
+  - api_url: 'https://hooks.slack.com/services/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'
+    channel: '#alerts-page'
+    send_resolved: true
+    title: |-
+     [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }} for .{{ .CommonLabels.env }} env
+    text: >-
+     {{ range .Alerts -}}
+     *Alert:* {{ .Annotations.summary }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
+     *Description:* {{ .Annotations.description }}
      *Details:*
        {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
        {{ end }}
