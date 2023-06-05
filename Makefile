@@ -59,6 +59,8 @@ log:
 #------------#
 # Production #
 #------------#
+
+# Create all external volumes needed for production. Using external volumes is useful to prevent data loss (as they are not deleted when performing docker down -v)
 create_external_volumes:
 	docker volume create ${COMPOSE_PROJECT_NAME}_influxdb-data
 	docker volume create ${COMPOSE_PROJECT_NAME}_grafana-data
@@ -66,6 +68,8 @@ create_external_volumes:
 	docker volume create ${COMPOSE_PROJECT_NAME}_prometheus-data
 	docker volume create ${COMPOSE_PROJECT_NAME}_alertmanager-data
 # put backups on a shared volume
+# Last volume `${COMPOSE_PROJECT_NAME}_elasticsearch-backup` is an NFS mount from the backup ZFS dataset.
+# We cannot mount directly `${NFS_VOLUMES_BASE_PATH}`, we have to mount a subfolder (`monitoring_elasticsearch-backup`) to prevent permission issues
 	docker volume create --driver local --opt type=nfs --opt o=addr=${NFS_VOLUMES_ADDRESS},rw --opt device=:${NFS_VOLUMES_BASE_PATH}/monitoring_elasticsearch-backup ${COMPOSE_PROJECT_NAME}_elasticsearch-backup
 
 replace_env:
