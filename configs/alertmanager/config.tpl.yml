@@ -13,12 +13,12 @@ route:
   - receiver: slack-prod
     matchers:
     - severity =~ "page|warning"
-    - env = ".org"
+    - env = "org"
     continue: true
   - receiver: slack-staging
     matchers:
     - severity =~ "page|warning"
-    - env = ".net"
+    - env = "net"
     continue: true
 
 templates:
