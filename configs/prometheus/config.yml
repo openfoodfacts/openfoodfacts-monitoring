@@ -1,275 +1,146 @@
 # my global config
 global:
-  scrape_interval:     15s # By default, scrape targets every 15 seconds.
+  scrape_interval: 15s # By default, scrape targets every 15 seconds.
   evaluation_interval: 15s # By default, scrape targets every 15 seconds.
 
 rule_files:
-  - 'alerts.yml'
+  - "alerts.yml"
 
 alerting:
   alertmanagers:
-  - scheme: http
-    static_configs:
-    - targets: ['alertmanager:9093']
-
-# relabel_configs:
-#   - source_labels: [__address__]
-#     regex: '10\.1\.0\.2.+'
-#     replacement: dockers
+    - scheme: http
+      static_configs:
+        - targets: ["alertmanager:9093"]
 
 scrape_configs:
-
-  #--------------#
-  # NODE METRICS #
-  #--------------#
-  - job_name: node-monitoring
+  - job_name: docker-cadvisor
     static_configs:
-    - targets: ['10.1.0.203:8281']
-      labels:
-        app: node_exporter
-        service: metrics
-        env: monitoring
-    - targets: ['10.1.0.203:8280']
-      labels:
-        app: cadvisor
-        service: metrics
-        env: monitoring
-  - job_name: node-org
-    static_configs:
-    - targets: ['10.1.0.201:8281']
-      labels:
-        app: node_exporter
-        service: metrics
-        env: org
-    - targets: ['10.1.0.201:8280']
-      labels:
-        app: cadvisor
-        service: metrics
-        env: org
-  - job_name: node-net
-    static_configs:
-    - targets: ['10.1.0.200:8281']
-      labels:
-        app: node_exporter
-        service: metrics
-        env: net
-    - targets: ['10.1.0.200:8280']
-      labels:
-        app: cadvisor
-        service: metrics
-        env: net
+      - targets: ["10.1.0.203:8280"]
+        labels:
+          env: monitoring
+      - targets: ["10.1.0.201:8280"]
+        labels:
+          env: org
+      - targets: ["10.1.0.200:8280"]
+        labels:
+          env: net
 
-  #-----------------------#
-  # DOCKER ENGINE METRICS #
-  #-----------------------#
-  # - job_name: "docker"
-  #   static_configs:
-  #     - targets: ["10.1.0.200:9323"]
-  #       labels:
-  #         app: docker
-  #         service: metrics
-  #         env: net
-
-  #------------------#
-  # SERVICES METRICS #
-  #------------------#
-  - job_name: mongo-dev
+  - job_name: docker-node-exporter
     static_configs:
-    - targets: ['10.1.0.200:9113'] # NGINX
-      labels:
-        app: "off"
-        service: frontend
-        env: net
+      - targets: ["10.1.0.203:8281"]
+        labels:
+          env: monitoring
+      - targets: ["10.1.0.201:8281"]
+        labels:
+          env: org
+      - targets: ["10.1.0.200:8281"]
+        labels:
+          env: net
 
-  - job_name: off-net
+  # TODO: use Docker Service Discovery https://prometheus.io/docs/prometheus/latest/configuration/configuration/#docker_sd_config
+  - job_name: docker-containers
+    sample_limit: 50000
     static_configs:
-    - targets: ['10.1.0.200:9113'] # NGINX
-      labels:
-        app: "off"
-        service: frontend
-        env: net
-    - targets: ['10.1.0.200:9117'] # Apache
-      labels:
-        app: "off"
-        service: backend
-        env: net
-# FIXME: first expose it !
-#    - targets: ['10.1.0.200:9187'] # Postgres
-#      labels:
-#        app: "off"
-#        service: postgres
-#        env: net
+      - targets: ["prometheus:9090"]
+        labels:
+          app: prometheus
+      - targets: ["grafana:3000"]
+        labels:
+          app: grafana
+      - targets: ["alertmanager:9093"]
+        labels:
+          app: alertmanager
+      - targets: ["elasticsearch_exporter:9114"]
+        labels:
+          app: elasticsearch_exporter
+          env: org
+      - targets: ["blackbox_exporter:9115"]
+        labels:
+          app: blackbox_exporter
+          env: org
 
-  - job_name: robotoff-net
+  - job_name: docker-nginx
     static_configs:
-    - targets: ['10.1.0.200:9102'] # StatsD Gunicorn
-      labels:
-        app: robotoff
-        service: api
-        env: net
-    - targets: ['10.1.0.200:9187'] # Postgres
-      labels:
-        app: "robotoff"
-        service: postgres
-        env: net
+      - targets: ["10.1.0.200:9113"]
+        labels:
+          app: off
+          service: frontend
+          env: net
 
-  - job_name: robotoff-org
+  - job_name: docker-apache
     static_configs:
-    - targets: ['10.1.0.201:9102'] # StatsD Gunicorn
-      labels:
-        app: robotoff
-        service: api
-        env: org
-    - targets: ['10.1.0.201:9187'] # Postgres
-      labels:
-        app: "robotoff"
-        service: postgres
-        env: org
+      - targets: ["10.1.0.200:9117"]
+        labels:
+          app: off
+          service: backend
+          env: net
 
-
-  - job_name: monitoring-org
+  - job_name: docker-statsd
     static_configs:
-    - targets: ['influxdb:8086']
-      labels:
-        app: influxdb
-        service: metrics
-        env: org
-    - targets: ['grafana:3000']
-      labels:
-        app: grafana
-        service: metrics
-        env: org
-    - targets: ['prometheus:9090']
-      labels:
-        app: prometheus
-        service: metrics
-        env: org
-    - targets: ['alertmanager:9093']
-      labels:
-        app: alertmanager
-        service: metrics
-        env: org
-    - targets: ['elasticsearch_exporter:9114']
-      labels:
-        app: elasticsearch
-        service: metrics
-        env: org
-    - targets: ['blackbox_exporter:9115']
-      labels:
-        app: blackbox_exporter
-        service: metrics
-        env: org
+      - targets: ["10.1.0.200:9102"]
+        labels:
+          app: robotoff
+          service: api
+          env: net
+      - targets: ["10.1.0.201:9102"]
+        labels:
+          app: robotoff
+          service: api
+          env: org
+
+  - job_name: docker-postgres
+    static_configs:
+      - targets: ["10.1.0.201:9187"]
+        labels:
+          app: robotoff
+          service: postgres
+          env: org
+      - targets: ["10.1.0.200:9187"]
+        labels:
+          app: robotoff
+          service: postgres
+          env: net
 
   #--------#
   # PROBES #
   #--------#
-  - job_name: blackbox-net
+  - job_name: blackbox-exporter
     metrics_path: /probe
-    # avoid being too greedy, it's staging…
-    scrape_interval: 180s
-    params:
-      module: [http_probe]
-    static_configs:
-      - targets: ['https://world.openfoodfacts.net']
-        labels:
-          app: "off"
-          service: api
-          env: net
-      - targets: ['https://world.openfoodfacts.net/images/products/376/002/924/8001/1.100.jpg']
-        labels:
-          app: 'off'
-          service: web
-          env: net
-      - targets: ['https://robotoff.openfoodfacts.net/api/v1/insights?count=1']
-        labels:
-          app: robotoff
-          service: api
-          env: net
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: __param_target
-      - source_labels: [__param_target]
-        target_label: instance
-      - target_label: __address__
-        replacement: blackbox_exporter:9115
-
-  - job_name: blackbox-org
-    metrics_path: /probe
-    # avoid being too greedy
     scrape_interval: 60s
     params:
       module: [http_probe]
-    static_configs:
-      - targets: ['https://world.openfoodfacts.org']
-        labels:
-          app: 'off'
-          service: api
-          env: org
-      # access to statics
-      - targets: ['https://world.openfoodfacts.org/images/products/376/002/924/8001/1.100.jpg']
-        labels:
-          app: 'off'
-          service: web
-          env: org
-      - targets: ['https://world.openfoodfacts.org/']
-        labels:
-          app: 'off'
-          service: api
-          env: org
-      - targets: ['https://world.openbeautyfacts.org']
-        labels:
-          app: obf
-          service: api
-          env: org
-      - targets: ['https://world.openpetfoodfacts.org']
-        labels:
-          app: opff
-          service: api
-          env: org
-      - targets: ['https://world.openproductsfacts.org']
-        labels:
-          app: opf
-          service: api
-          env: org
-      - targets: ['https://world.pro.openfoodfacts.org']
-        labels:
-          app: off-pro
-          service: api
-          env: org
-      - targets: ['https://robotoff.openfoodfacts.org/api/v1/health']
-        labels:
-          app: robotoff
-          service: api
-          env: org
-      - targets: ['https://grafana.openfoodfacts.org/api/health']
-        labels:
-          app: grafana
-          service: api
-          env: org
-      - targets: ['https://prometheus.openfoodfacts.org/-/healthy']
-        labels:
-          app: prometheus
-          service: api
-          env: org
-      - targets: ['https://alertmanager.openfoodfacts.org/-/healthy']
-        labels:
-          app: alertmanager
-          service: api
-          env: org
-      - targets: ['https://kibana.openfoodfacts.org/status']
-        labels:
-          app: kibana
-          service: ui
-          env: org
-      - targets: ['http://10.1.0.203:9200/_cluster/health?wait_for_status=yellow&timeout=50s']
-        labels:
-          app: elasticsearch
-          service: api
-          env: org
     relabel_configs:
       - source_labels: [__address__]
+        regex: ^([^|]+)\|(.+)$ # splits target by | and uses 2nd token as target for blackbox_exporter
+        replacement: ${2}
         target_label: __param_target
+      - source_labels: [__address__]
+        regex: (.+)\|(.+) # splits target by | and uses 1st token as 'app' label
+        replacement: ${1}
+        target_label: app
       - source_labels: [__param_target]
         target_label: instance
-      - target_label: __address__
-        replacement: blackbox_exporter:9115
+      - replacement: blackbox_exporter:9115
+        target_label: __address__
+    static_configs:
+      - targets:
+          - off|https://world.openfoodfacts.net
+          - off-web|https://world.openfoodfacts.net/images/products/376/002/924/8001/1.100.jpg
+          - robotoff|https://robotoff.openfoodfacts.net/api/v1/insights?count=1
+        labels:
+          env: net
+      - targets:
+          - off|https://world.openfoodfacts.org
+          - off-web|https://world.openfoodfacts.org/images/products/376/002/924/8001/1.100.jpg
+          - obf|https://world.openbeautyfacts.org
+          - opff|https://world.openpetfoodfacts.org
+          - opf|https://world.openproductsfacts.org
+          - off-pro|https://world.pro.openfoodfacts.org
+          - robotoff|https://robotoff.openfoodfacts.org/api/v1/health
+          - grafana|https://grafana.openfoodfacts.org/api/health
+          - prometheus|https://prometheus.openfoodfacts.org/-/healthy
+          - alertmanager|https://alertmanager.openfoodfacts.org/-/healthy
+          - kibana|https://kibana.openfoodfacts.org/status
+          - elasticsearch|http://10.1.0.203:9200/_cluster/health?wait_for_status=yellow&timeout=50s
+        labels:
+          env: org
