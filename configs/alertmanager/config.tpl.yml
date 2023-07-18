@@ -1,32 +1,39 @@
+# See https://prometheus.io/docs/alerting/latest/configuration/ for documentation about configuration
 global:
   resolve_timeout: 1m
   slack_api_url: '${SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0}'
 
 route:
-  receiver: slack
+  receiver: slack-prod
   group_by:
   - alertname
   - env
   routes:
-  - receiver: slack
-    match:
-      severity: page|warning
+  # We post the alert to a different Slack channel for staging and prod env
+  - receiver: slack-prod
+    matchers:
+    - severity =~ "page|warning"
+    - env = "org"
+    continue: true
+  - receiver: slack-staging
+    matchers:
+    - severity =~ "page|warning"
+    - env = "net"
     continue: true
 
+templates:
+- '/etc/alertmanager/templates/slack.tmpl'
+
 receivers:
-- name: slack
+- name: slack-prod
   slack_configs:
   - channel: '#infrastructure-alerts'
     send_resolved: true
-    title: |-
-     [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }} for .{{ .CommonLabels.env }} env
-    text: >-
-     {{ range .Alerts -}}
-     *Alert:* {{ .Annotations.summary }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
-
-     *Description:* {{ .Annotations.description }}
-
-     *Details:*
-       {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
-       {{ end }}
-     {{ end }}
+    title: '{{ template "slack.title" . }}'
+    text: '{{ template "slack.text" . }}'
+- name: slack-staging
+  slack_configs:
+  - channel: '#infrastructure-alerts-staging'
+    send_resolved: true
+    title: '{{ template "slack.title" . }}'
+    text: '{{ template "slack.text" . }}'

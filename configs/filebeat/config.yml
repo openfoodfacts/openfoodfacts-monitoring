@@ -2,40 +2,12 @@ filebeat.autodiscover:
   providers:
     - type: docker
       hints.enabled: true
-      templates:
-        - conditions:
-            contains:
-              docker.container.image: nginx
-          config:
-            - module: nginx
-              access:
-                enabled: true
-                input:
-                  type: docker
-                  containers:
-                    ids: "${data.docker.container.id}"
-                    stream: "stdout"
-              error:
-                enabled: true
-                input:
-                  type: docker
-                  containers:
-                    ids: "${data.docker.container.id}"
-                    stream: "stderr"
-
-# filebeat.inputs:
-# - type: container
-#   paths: 
-#     - '/var/lib/docker/containers/*/*.log'
-
-# processors:
-# - add_docker_metadata:
-#     host: "unix:///var/run/docker.sock"
-
-# - decode_json_fields:
-#     fields: ["message"]
-#     target: "json"
-#     overwrite_keys: true
+      co.elastic.logs/module: nginx
+      co.elastic.logs/fileset.stdout: access
+      co.elastic.logs/fileset.stderr: error
+      co.elastic.logs/json.keys_under_root: true
+      co.elastic.logs/json.add_error_key: true
+      co.elastic.logs/json.message_key: log
 
 processors:
 - add_docker_metadata:
@@ -45,10 +17,24 @@ processors:
 - add_host_metadata:
     netinfo.enabled: true
 
+logging.tostderr: true
+logging.level: error
+
+
 output.elasticsearch:
   hosts: ["${ELASTICSEARCH_HOSTS}"]
-  indices:
-    - index: "logs-%{+yyyy.MM.dd}"
+
+setup.ilm:
+  enabled: true
+  policy_name: "logs"
+  rollover_alias: "logs-current"
+  pattern: "logs-{now/d}-000001"
+
+
+setup.template.name: logs
+
+
+
 
 filebeat.config.modules.path: /usr/share/filebeat/modules.d/*.yml
 
