@@ -126,12 +126,15 @@ scrape_configs:
       - targets:
           - off|https://world.openfoodfacts.net
           - off-web|https://world.openfoodfacts.net/images/products/376/002/924/8001/1.100.jpg
+          - off-product|https://world.openfoodfacts.net/product/3017620422003/nutella-ferrero
           - robotoff|https://robotoff.openfoodfacts.net/api/v1/insights?count=1
         labels:
           env: net
       - targets:
           # Open Food Facts app (apache)
           - off|https://world.openfoodfacts.org
+          # Product page
+          - off-product|https://world.openfoodfacts.org/product/3017620422003/nutella-ferrero
           # Open Food Facts static resources
           - off-static|https://static.openfoodfacts.org/images/logos/off-logo-horizontal-light.svg
           # Open Food Facts images
