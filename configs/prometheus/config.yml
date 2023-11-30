@@ -127,7 +127,9 @@ scrape_configs:
           - off|https://world.openfoodfacts.net
           - off-web|https://world.openfoodfacts.net/images/products/376/002/924/8001/1.100.jpg
           - off-product|https://world.openfoodfacts.net/product/3017620422003/nutella-ferrero
-          - robotoff|https://robotoff.openfoodfacts.net/api/v1/insights?count=1
+          - robotoff|https://robotoff.openfoodfacts.net/api/v1/health
+          - off-query|https://query.openfoodfacts.net/health
+          - off-search|https://search.openfoodfacts.net/
         labels:
           env: net
       - targets:
@@ -144,6 +146,8 @@ scrape_configs:
           - opf|https://world.openproductsfacts.org
           - off-pro|https://world.pro.openfoodfacts.org
           - robotoff|https://robotoff.openfoodfacts.org/api/v1/health
+          - off-query|https://query.openfoodfacts.org/health
+          - off-search|https://search.openfoodfacts.org/
           - grafana|https://grafana.openfoodfacts.org/api/health
           - prometheus|https://prometheus.openfoodfacts.org/-/healthy
           - alertmanager|https://alertmanager.openfoodfacts.org/-/healthy
