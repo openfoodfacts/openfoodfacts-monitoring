@@ -31,6 +31,11 @@ modules:
         insecure_skip_verify: false
       preferred_ip_protocol: "ip4" # defaults to "ip6"
       ip_protocol_fallback: false  # no fallback to "ip6"
+  icmp:  # aka ping
+    prober: icmp
+    timeout: 5s
+    icmp:
+      preferred_ip_protocol: "ip4"
   # http_post_2xx:
   #   prober: http
   #   timeout: 5s
