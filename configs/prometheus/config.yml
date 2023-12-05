@@ -176,6 +176,8 @@ scrape_configs:
     static_configs:
       - targets:
           - ovh1:ovh1.openfoodfacts.org
+          - proxy1_ovh:proxy1.openfoodfacts.org
+          - proxy2_free:proxy2.openfoodfacts.org
           - ovh2:ovh2.openfoodfacts.org
           - ovh3:ovh3.openfoodfacts.org
           - off1:off1.openfoodfacts.org
