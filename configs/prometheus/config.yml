@@ -164,7 +164,7 @@ scrape_configs:
     metrics_path: /probe
     scrape_interval: 60s
     params:
-      module: [icmp_probe]
+      module: [icmp]
     relabel_configs:
       - source_labels: [__address__]
         regex: ^([^|]+)\|(.+)$ # splits target by | and uses 2nd token as target for blackbox_exporter
@@ -175,7 +175,7 @@ scrape_configs:
         replacement: ${1}
         target_label: app
       - source_labels: [__param_target]
-        target_label: instance
+        target_label: target
       - replacement: blackbox_exporter:9115
         target_label: __address__
     static_configs:
