@@ -150,6 +150,7 @@ scrape_configs:
           - off-query|https://query.openfoodfacts.org/health
           - off-search|https://search.openfoodfacts.org/
           - off-facets-kp|https://facets-kp.openfoodfacts.org/
+          - folksonomy|https://api.folksonomy.openfoodfacts.org/
           - grafana|https://grafana.openfoodfacts.org/api/health
           - prometheus|https://prometheus.openfoodfacts.org/-/healthy
           - alertmanager|https://alertmanager.openfoodfacts.org/-/healthy
