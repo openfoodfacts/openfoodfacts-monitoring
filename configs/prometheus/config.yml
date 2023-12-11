@@ -174,16 +174,17 @@ scrape_configs:
         regex: (.+)\|(.+) # splits target by | and uses 1st token as 'app' label
         replacement: ${1}
         target_label: app
+      # we use target as instance name
       - source_labels: [__param_target]
-        target_label: target
+        target_label: instance
       - replacement: blackbox_exporter:9115
         target_label: __address__
     static_configs:
       - targets:
-          - ovh1:ovh1.openfoodfacts.org
-          - proxy1_ovh:proxy1.openfoodfacts.org
-          - proxy2_free:proxy2.openfoodfacts.org
-          - ovh2:ovh2.openfoodfacts.org
-          - ovh3:ovh3.openfoodfacts.org
-          - off1:off1.openfoodfacts.org
-          - off2:off2.openfoodfacts.org
+          - ovh1|ovh1.openfoodfacts.org
+          - proxy1_ovh|proxy1.openfoodfacts.org
+          - proxy2_free|proxy2.openfoodfacts.org
+          - ovh2|ovh2.openfoodfacts.org
+          - ovh3|ovh3.openfoodfacts.org
+          - off1|off1.openfoodfacts.org
+          - off2|off2.openfoodfacts.org
