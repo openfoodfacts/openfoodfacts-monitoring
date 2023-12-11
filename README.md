@@ -2,6 +2,8 @@
 
 This repository contains the deployments of monitoring tools used across Open Food Facts infrastructure.
 
+See [Infrastructure / Observability](https://openfoodfacts.github.io/openfoodfacts-infrastructure/observability/) for more documentation.
+
 It contains Docker Compose deployments for services deployed on monitoring server:
 
 * **ElasticSearch** (for gathering logs) running on port `9200` and `9300`
@@ -19,6 +21,7 @@ It also contains exporters that should be deployed on each nodes (see `docker-co
 * **cadvisor** [^cadvisor] gather docker metrics
 * **node_exporter** [^node_exporter] gather host metrics
 
+PS: if you modify this, please keep [corresponding page in infrastructure](https://github.com/openfoodfacts/openfoodfacts-infrastructure/blob/develop/docs/observability.md) up to date
 
 [^cadvisor]: https://prometheus.io/docs/guides/cadvisor/
 [^filebeat]: https://www.elastic.co/fr/beats/filebeat
