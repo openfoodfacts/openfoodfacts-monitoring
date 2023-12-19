@@ -101,6 +101,22 @@ scrape_configs:
           service: postgres
           env: net
 
+  - job_name: mysqld
+    static_configs:
+      - targets: ["10.1.0.107:9104"]
+        labels:
+          app: matomo
+          service: mysqld
+          env: prod
+
+  - job_name: nginx
+    static_configs:
+      - targets: ["10.1.0.107:9113"]
+        labels:
+          app: matomo
+          service: nginx
+          env: prod
+  
   #--------#
   # PROBES #
   #--------#
