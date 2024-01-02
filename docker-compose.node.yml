@@ -15,6 +15,7 @@ services:
       - KIBANA_URI
     volumes:
       - ./configs/filebeat/config.yml:/usr/share/filebeat/filebeat.yml:ro
+      - ./configs/filebeat/ilm-config.json:/usr/share/filebeat/ilm-config.json:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock
   # this monitors the linux host itself
