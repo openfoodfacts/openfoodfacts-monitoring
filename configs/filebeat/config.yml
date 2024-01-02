@@ -29,7 +29,9 @@ setup.ilm:
   policy_name: "logs"
   rollover_alias: "logs-current"
   pattern: "logs-{now/d}-000001"
-#  overwrite: true
+  policy_file: ilm-config.json
+  # use this if you need to re-create ILM policy
+  # overwrite: true
 
 
 setup.template.name: logs
