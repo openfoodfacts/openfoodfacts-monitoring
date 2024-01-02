@@ -29,6 +29,7 @@ setup.ilm:
   policy_name: "logs"
   rollover_alias: "logs-current"
   pattern: "logs-{now/d}-000001"
+#  overwrite: true
 
 
 setup.template.name: logs
