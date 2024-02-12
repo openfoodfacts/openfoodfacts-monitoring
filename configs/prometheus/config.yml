@@ -147,6 +147,8 @@ scrape_configs:
           - off-query|https://query.openfoodfacts.net/health
           - off-search|https://search.openfoodfacts.net/
           - off-facets-kp|https://facets-kp.openfoodfacts.net/
+          - prices-api|https://prices.openfoodfacts.net/api/v1/status
+          - prices-app|https://prices.openfoodfacts.net/app/
         labels:
           env: net
       - targets:
@@ -167,6 +169,9 @@ scrape_configs:
           - off-search|https://search.openfoodfacts.org/
           - off-facets-kp|https://facets-kp.openfoodfacts.org/
           - folksonomy|https://api.folksonomy.openfoodfacts.org/
+          - prices-api|https://prices.openfoodfacts.org/api/v1/status
+          - prices-app|https://prices.openfoodfacts.org/app/
+          # tools
           - grafana|https://grafana.openfoodfacts.org/api/health
           - prometheus|https://prometheus.openfoodfacts.org/-/healthy
           - alertmanager|https://alertmanager.openfoodfacts.org/-/healthy
