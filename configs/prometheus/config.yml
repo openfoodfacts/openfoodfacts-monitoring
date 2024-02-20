@@ -116,6 +116,21 @@ scrape_configs:
           app: matomo
           service: nginx
           env: prod
+
+  - job_name: mongodb
+    scheme: https
+    basic_auth:
+      username: prometheus
+      password_file: /etc/prometheus/secrets/free-exporters.txt
+    metrics_path: mongo/mongodb/metrics
+    static_configs:
+      - targets: ["free-exporters.openfoodfacts.org:443"]
+        labels:
+          app: off
+          service: mongodb
+          env: prod
+
+
   
   #--------#
   # PROBES #
