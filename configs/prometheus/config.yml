@@ -117,18 +117,40 @@ scrape_configs:
           service: nginx
           env: prod
 
-  - job_name: mongodb
+  # NGINX is proxying the exporters of servers at freeA
+  # this rule enable to get them
+  - job_name: free-exporters
     scheme: https
     basic_auth:
       username: prometheus
       password_file: /etc/prometheus/secrets/free-exporters.txt
-    metrics_path: mongo/mongodb/metrics
     static_configs:
-      - targets: ["free-exporters.openfoodfacts.org:443"]
+      - targets:
+        # those must follow <container>/<service>
+        # corresponding url is https://free-exporters.openfoodfacts.org/<target>/metrics
+        - mongo/mongodb
         labels:
           app: off
-          service: mongodb
           env: prod
+          base_url: free-exporters.openfoodfacts.org:443
+          metrics_path: metrics
+    relabel_configs:
+      # get instance, second part of target
+      - source_labels: [__address__]
+        regex: ^[^/]+/(.*)$
+        replacement: ${1}
+        target_label: instance
+      # the metrics path is adress + /metrics
+      - source_labels: [__address__, metrics_path]
+        separator: /
+        target_label: __metrics_path__
+      # put base url as address, as it is the same for all
+      - source_labels: [base_url]
+        target_label: __address__A
+      # drop labels that where only useful for configuration
+      - regex: ^(base_url|metrics_path)$
+        action: labeldrop
+
 
 
   
