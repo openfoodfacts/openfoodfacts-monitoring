@@ -1,3 +1,6 @@
+# secrets !
+secrets/
+
 .DS_Store
 configs/alertmanager/config.yml
 
