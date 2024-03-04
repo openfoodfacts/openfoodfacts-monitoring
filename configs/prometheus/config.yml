@@ -117,7 +117,8 @@ scrape_configs:
           service: nginx
           env: prod
 
-  # NGINX is proxying the exporters of servers at freeA
+  # NGINX is proxying the exporters of servers at free
+``
   # this rule enable to get them
   - job_name: free-exporters
     scheme: https
@@ -146,7 +147,7 @@ scrape_configs:
         target_label: __metrics_path__
       # put base url as address, as it is the same for all
       - source_labels: [base_url]
-        target_label: __address__A
+        target_label: __address__
       # drop labels that where only useful for configuration
       - regex: ^(base_url|metrics_path)$
         action: labeldrop
