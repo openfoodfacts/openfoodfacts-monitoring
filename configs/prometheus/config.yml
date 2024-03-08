@@ -118,7 +118,6 @@ scrape_configs:
           env: prod
 
   # NGINX is proxying the exporters of servers at free
-``
   # this rule enable to get them
   - job_name: free-exporters
     scheme: https
