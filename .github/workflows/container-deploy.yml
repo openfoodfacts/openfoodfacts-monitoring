@@ -101,6 +101,10 @@ jobs:
           echo "INFLUXDB_ADMIN_PASSWORD=${{ secrets.INFLUXDB_ADMIN_PASSWORD }}" >> .env
           echo "INFLUXDB_DB=db0" >> .env
 
+          # set secrets
+          mkdir -p configs/prometheus/secrets
+          echo "${{ secrets.FREE_EXPORTERS_PASSWORD }}" > configs/prometheus/secrets/free-exporters.txt
+
     - name: Run envsubst on Prometheus configs
       uses: appleboy/ssh-action@master
       with:
