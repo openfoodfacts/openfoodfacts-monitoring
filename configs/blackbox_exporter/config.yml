@@ -31,6 +31,28 @@ modules:
         insecure_skip_verify: false
       preferred_ip_protocol: "ip4" # defaults to "ip6"
       ip_protocol_fallback: false  # no fallback to "ip6"
+  http_probe_html:
+    prober: http
+    timeout: 10s
+    http:
+      valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+      valid_status_codes: [200, 301, 302]
+      method: GET
+      headers:
+        User-Agent: Blackbox Monitoring - Docker - Version 1.0 - monitoring.openfoodfacts.com
+        Content-Type: text/html
+      basic_auth:
+        username: "off"
+        password: "off"
+      follow_redirects: true
+      fail_if_ssl: false
+      fail_if_not_ssl: false
+      fail_if_body_matches_regexp:
+        - "Could not connect to database"
+      tls_config:
+        insecure_skip_verify: false
+      preferred_ip_protocol: "ip4" # defaults to "ip6"
+      ip_protocol_fallback: false  # no fallback to "ip6"
   icmp:  # aka ping
     prober: icmp
     timeout: 5s
