@@ -151,10 +151,10 @@ scrape_configs:
           base_url: free-exporters.openfoodfacts.org:443
           metrics_path: metrics
     relabel_configs:
-      # get instance, second part of target
+      # get instance, firts part + second part of target
       - source_labels: [__address__]
-        regex: ^[^/]+/(.*)$
-        replacement: ${1}
+        regex: ^([^/]+)/(.*)$
+        replacement: ${1}-${2}
         target_label: instance
       # the metrics path is adress + /metrics
       - source_labels: [__address__, metrics_path]
