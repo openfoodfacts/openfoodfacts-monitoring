@@ -65,8 +65,9 @@
           },
           "tableColumn": "",
           "targets": [{
-            "expr": "apache_uptime_seconds_total{instance=~\"$host:$port\"}",
+            "expr": "apache_uptime_seconds_total{instance=~\"$host\"}",
             "format": "time_series",
+            "instant": true,
             "intervalFactor": 2,
             "refId": "A",
             "step": 240
@@ -124,7 +125,7 @@
           "stack": false,
           "steppedLine": false,
           "targets": [{
-              "expr": "count(apache_up{instance=~\"$host:$port\"} == 1)",
+              "expr": "count(apache_up{instance=~\"$host\"} == 1)",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "Apache Up",
@@ -132,7 +133,7 @@
               "step": 240
             },
             {
-              "expr": "scalar(count(apache_up{instance=~\"$host:$port\"} == 0))",
+              "expr": "scalar(count(apache_up{instance=~\"$host\"} == 0))",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "Apache Down",
@@ -219,7 +220,7 @@
           "stack": false,
           "steppedLine": false,
           "targets": [{
-            "expr": "rate(apache_sent_kilobytes_total{instance=~\"$host:$port\"}[5m])",
+            "expr": "rate(apache_sent_kilobytes_total{instance=~\"$host\"}[5m])",
             "format": "time_series",
             "intervalFactor": 2,
             "legendFormat": "Kilobytes Sent",
@@ -294,7 +295,7 @@
           "stack": false,
           "steppedLine": false,
           "targets": [{
-            "expr": "rate(apache_accesses_total{instance=~\"$host:$port\"}[5m])",
+            "expr": "rate(apache_accesses_total{instance=~\"$host\"}[5m])",
             "format": "time_series",
             "intervalFactor": 2,
             "legendFormat": "Accesses",
@@ -381,7 +382,7 @@
         "stack": true,
         "steppedLine": false,
         "targets": [{
-          "expr": "apache_scoreboard{instance=~\"$host:$port\"}",
+          "expr": "apache_scoreboard{instance=~\"$host\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "{{ state }}",
@@ -466,7 +467,7 @@
           "stack": true,
           "steppedLine": false,
           "targets": [{
-            "expr": "apache_workers{instance=~\"$host:$port\"}\n",
+            "expr": "apache_workers{instance=~\"$host\"}\n",
             "format": "time_series",
             "intervalFactor": 2,
             "legendFormat": "{{ state }}",
@@ -541,7 +542,7 @@
           "stack": false,
           "steppedLine": false,
           "targets": [{
-            "expr": "apache_cpuload{instance=~\"$host:$port\"}",
+            "expr": "apache_cpuload{instance=~\"$host\"}",
             "format": "time_series",
             "intervalFactor": 2,
             "legendFormat": "Load",
@@ -610,28 +611,7 @@
         "options": [],
         "query": "label_values(apache_up, instance)",
         "refresh": 2,
-        "regex": "/([^:]+):.*/",
         "sort": 1,
-        "tagValuesQuery": "",
-        "tags": [],
-        "tagsQuery": "",
-        "type": "query",
-        "useTags": false
-      },
-      {
-        "allValue": null,
-        "current": {},
-        "datasource": "Prometheus",
-        "hide": 2,
-        "includeAll": false,
-        "label": null,
-        "multi": false,
-        "name": "port",
-        "options": [],
-        "query": "label_values(apache_up, instance)",
-        "refresh": 1,
-        "regex": "/[^:]+:(.*)/",
-        "sort": 0,
         "tagValuesQuery": "",
         "tags": [],
         "tagsQuery": "",
