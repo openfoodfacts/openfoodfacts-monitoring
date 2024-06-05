@@ -142,6 +142,7 @@ scrape_configs:
         # those must follow <container>/<service>
         # corresponding url is https://free-exporters.openfoodfacts.org/<target>/metrics
         - mongo/mongodb
+        - off1-proxy/nginx
         - proxy/nginx
         - off/nginx
         - off/apache
