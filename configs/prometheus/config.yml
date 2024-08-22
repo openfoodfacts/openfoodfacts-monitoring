@@ -101,6 +101,16 @@ scrape_configs:
           service: postgres
           env: net
 
+  - job_name: pmg-postfix
+    static_configs:
+      - targets:
+        # PMG
+        - "10.1.0.102:9154"
+        labels:
+          app: Proxmox mail gateway
+          service: postfix
+          env: prod
+
   - job_name: docker-elasticsearch
     static_configs:
       - targets: ["10.1.0.200:9114"]

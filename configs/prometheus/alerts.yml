@@ -22,6 +22,17 @@ groups:
       description: Remaining disk space on {{ $labels.instance }} is {{ $value }}% for more than 15 minutes.
 
 
+  - alert: Postfix mail messages queue is high
+    expr: postfix_showq_message_age_seconds_count > 20
+    for: 1h
+    labels:
+      severity: warning
+      instance: "{{ $labels.instance }}"
+    annotations:
+      summary: stalled messages in queue {{ $labels.queue }} of {{ $labels.app }} ({{ $labels.instance }})
+      description: Number of messages for queue {{ $labels.queue }} of {{ $labels.app }} ({{ $labels.instance }}) is {{ $value }} for more than 1h.
+
+
 # TODO: Revisit, too noisy
 # - name: docker-alerts
 #   rules:
