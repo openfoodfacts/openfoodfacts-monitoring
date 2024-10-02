@@ -212,7 +212,7 @@ scrape_configs:
           - off-search|https://search.openfoodfacts.net/
           - off-facets-kp|https://facets-kp.openfoodfacts.net/
           - prices-api|https://prices.openfoodfacts.net/api/v1/status
-          - prices-app|https://prices.openfoodfacts.net/app/
+          - prices-app|https://prices.openfoodfacts.net/
         labels:
           env: net
       - targets:
@@ -234,7 +234,7 @@ scrape_configs:
           - off-facets-kp|https://facets-kp.openfoodfacts.org/
           - folksonomy|https://api.folksonomy.openfoodfacts.org/
           - prices-api|https://prices.openfoodfacts.org/api/v1/status
-          - prices-app|https://prices.openfoodfacts.org/app/
+          - prices-app|https://prices.openfoodfacts.org/
           # tools
           - blog|https://blog.openfoodfacts.org/
           - wiki|https://wiki.openfoodfacts.org/
