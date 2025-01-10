@@ -156,6 +156,7 @@ scrape_configs:
         - proxy/nginx
         - off/nginx
         - off/apache
+        - off/apache-priority
         labels:
           app: off
           env: prod
