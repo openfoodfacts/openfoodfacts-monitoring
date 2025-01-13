@@ -162,7 +162,7 @@ scrape_configs:
           env: prod
           base_url: free-exporters.openfoodfacts.org:443
           metrics_path: metrics
-    relabel_configs:
+    relabel_configs: &proxied_exporters_relabel_config
       # get instance, firts part + second part of target
       - source_labels: [__address__]
         regex: ^([^/]+)/(.*)$
@@ -179,7 +179,22 @@ scrape_configs:
       - regex: ^(base_url|metrics_path)$
         action: labeldrop
 
-
+  - job_name: ks1-exporters
+    scheme: https
+    basic_auth:
+      username: prometheus
+      password_file: /etc/prometheus/secrets/ks1.txt
+    static_configs:
+      - targets:
+        # those must follow <container>/<service>
+        # corresponding url is https://ks1.openfoodfacts.org/<target>/metrics
+        - images-ks1/nginx
+        labels:
+          app: off
+          env: prod
+          base_url: ks1.openfoodfacts.org:443
+          metrics_path: metrics
+    relabel_configs: *proxied_exporters_relabel_config
 
   
   #--------#
