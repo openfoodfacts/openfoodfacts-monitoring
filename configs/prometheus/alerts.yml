@@ -32,6 +32,17 @@ groups:
       summary: stalled messages in queue {{ $labels.queue }} of {{ $labels.app }} ({{ $labels.instance }})
       description: Number of messages for queue {{ $labels.queue }} of {{ $labels.app }} ({{ $labels.instance }}) is {{ $value }} for more than 1h.
 
+  - alert: Postfix - too few message sent
+    # sent message per seconds on last 24h is less than 1/2 of the average sent messages per seconds on previous 240h
+    expr: rate(postfix_smtpd_messages_processed_total[24h]) < (0.5 * rate(postfix_smtpd_messages_processed_total[240h] offset 24h))
+    for: 1h
+    labels:
+      severity: warning
+      instance: "{{ $labels.instance }}"
+    annotations:
+      summary: Significant drop of sent messages on last 24h {{ $labels.app }} ({{ $labels.instance }})
+      description: Number of messages sent per hour on last 24h (1 day) is less than half of the rate on previous 240h (10 day) for {{ $labels.app }} ({{ $labels.instance }}).
+
 
 # TODO: Revisit, too noisy
 # - name: docker-alerts
