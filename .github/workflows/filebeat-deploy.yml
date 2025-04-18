@@ -17,22 +17,25 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        host:
+        server:
           # dockers
-          - "10.1.0.200"
+          - host: "10.1.0.200"
+            proxy: "ovh1.openfoodfacts.org"
           # prod dockers
-          - "10.1.0.201"
-          # monitoring
-          - "10.1.0.203"
+          - host: "10.1.0.201"
+            proxy: "ovh1.openfoodfacts.org"
+          # monitoring-01
+          - host: "34.1.5.157"
+            proxy: "" # no proxy
     steps:
     - name: Set env variables
       run: |
         # direct container access
         # deploy target
-        echo "SSH_HOST=${{ matrix.host }}" >> $GITHUB_ENV
-        echo "SSH_PROXY_HOST=ovh1.openfoodfacts.org" >> $GITHUB_ENV
+        echo "SSH_HOST=${{ matrix.server.host }}" >> $GITHUB_ENV
+        echo "SSH_PROXY_HOST=${{ matrix.server.proxy }}" >> $GITHUB_ENV
         echo "SSH_USERNAME=off" >> $GITHUB_ENV
-        echo "MONITORING_HOST=10.1.0.203" >> $GITHUB_ENV
+        echo "MONITORING_HOST=34.1.5.157" >> $GITHUB_ENV # monitoring-01
     - name: Checkout git repository
       uses: appleboy/ssh-action@master
       with:

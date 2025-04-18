@@ -19,8 +19,8 @@ jobs:
       run: |
         # direct container access
         # deploy target
-        echo "SSH_HOST=10.1.0.203" >> $GITHUB_ENV
-        echo "SSH_PROXY_HOST=ovh1.openfoodfacts.org" >> $GITHUB_ENV
+        echo "SSH_HOST=34.1.5.157" >> $GITHUB_ENV # monitoring-01
+        echo "SSH_PROXY_HOST=" >> $GITHUB_ENV # no proxy
         echo "SSH_USERNAME=off" >> $GITHUB_ENV
         # did only config change ? (in this case we only need a restart)
         declare current_branch=$(git rev-parse --abbrev-ref HEAD)
