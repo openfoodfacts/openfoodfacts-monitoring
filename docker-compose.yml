@@ -29,20 +29,18 @@ services:
       - ./configs/grafana/:/etc/grafana/provisioning
       - ./configs/grafana/config.ini:/usr/share/grafana/conf/defaults.ini
       - grafana-data:/var/lib/grafana
-    ports:
-      - 3000:3000
     networks:
       - monitoring
+      - reverse_proxy_network # using port 3000
 
   kibana:
     restart: always
     image: kibana:7.14.2
-    ports:
-      - 5601:5601
     volumes:
       - ./configs/kibana/kibana.yml:/home/kibana/config/kibana.yml
     networks:
       - monitoring
+      - reverse_proxy_network # using port 5601
 
   # elasticsearch-datagen:
   #   image: oliver006/es-test-data
@@ -94,8 +92,6 @@ services:
   alertmanager:
     restart: always
     image: prom/alertmanager:v0.23.0
-    ports:
-      - 9093:9093
     volumes:
       - alertmanager-data:/var/lib/prometheus/alertmanager
       - ./configs/alertmanager/:/etc/alertmanager/
@@ -105,6 +101,7 @@ services:
       - '--web.external-url=https://alertmanager.openfoodfacts.org/'
     networks:
       - monitoring
+      - reverse_proxy_network # using port 9093
 
   prometheus:
     restart: always
@@ -119,10 +116,9 @@ services:
       - '--web.console.templates=/usr/share/prometheus/consoles'
       - '--web.external-url=https://prometheus.openfoodfacts.org/'
       - '--web.enable-admin-api'
-    ports:
-      - 9090:9090
     networks:
       - monitoring
+      - reverse_proxy_network # using port 9090
 
   blackbox_exporter:
     restart: always
@@ -143,5 +139,8 @@ volumes:
   elasticsearch-backup:
   prometheus-data:
   alertmanager-data:
+
 networks:
   monitoring:
+  reverse_proxy_network:
+    external: true
