@@ -244,7 +244,7 @@ scrape_configs:
           - prometheus|https://prometheus.openfoodfacts.org/-/healthy
           - alertmanager|https://alertmanager.openfoodfacts.org/-/healthy
           - kibana|https://kibana.openfoodfacts.org/status
-          - elasticsearch|http://10.1.0.203:9200/_cluster/health?wait_for_status=yellow&timeout=50s
+          - elasticsearch|http://elasticsearch:9200/_cluster/health?wait_for_status=yellow&timeout=50s
           # matomo, see https://matomo.org/faq/how-to/faq_20278/
           - matomo-interface|https://analytics.openfoodfacts.org/index.php?module=Login
           - matomo-tracker|https://analytics.openfoodfacts.org/matomo.php
