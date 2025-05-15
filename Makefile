@@ -73,13 +73,7 @@ create_external_volumes:
 	docker volume create ${COMPOSE_PROJECT_NAME}_elasticsearch-data
 	docker volume create ${COMPOSE_PROJECT_NAME}_prometheus-data
 	docker volume create ${COMPOSE_PROJECT_NAME}_alertmanager-data
-# put backups on a shared volume
-# Last volume `${COMPOSE_PROJECT_NAME}_elasticsearch-backup` is an NFS mount from the backup ZFS dataset.
-# Two important notes:
-# - we use `nolock` as there shouldn't be any concurrent writes on the same file, and `soft` to prevent the docker container from freezing if the NFS
-#   connection is lost
-# - we cannot mount directly `${NFS_VOLUMES_BACKUP_BASE_PATH}`, we have to mount a subfolder (`monitoring_elasticsearch-backup`) to prevent permission issues
-	docker volume create --driver local --opt type=nfs --opt o=addr=${NFS_VOLUMES_ADDRESS},nolock,soft,rw --opt device=:${NFS_VOLUMES_BASE_PATH}/monitoring_elasticsearch-backup ${COMPOSE_PROJECT_NAME}_elasticsearch-backup
+	docker volume create ${COMPOSE_PROJECT_NAME}_elasticsearch-backup
 
 replace_env:
 	. .env && envsubst '$${SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0}' < configs/alertmanager/config.tpl.yml > configs/alertmanager/config.yml
