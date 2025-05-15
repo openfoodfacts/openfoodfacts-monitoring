@@ -11,7 +11,7 @@ services:
     volumes:
       - influxdb-data:/var/lib/influxdb
     ports:
-      - 8086:8086
+      - ${INFLUXDB_EXPOSE:-127.0.0.1:8086}:8086
     mem_limit: 5g
     networks:
       - monitoring
@@ -72,8 +72,8 @@ services:
       - elasticsearch-data:/usr/share/elasticsearch/data
       - elasticsearch-backup:/opt/elasticsearch
     ports:
-      - 9200:9200
-      - 9300:9300
+      - ${ES_API_EXPOSE:-127.0.0.1:9200}:9200
+      - ${ES_NODE_COMMUNICATION_EXPOSE:-127.0.0.1:9300}:9300
     networks:
       - monitoring
 
@@ -81,9 +81,9 @@ services:
     restart: always
     image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
     command:
-     - '--es.uri=http://elasticsearch:9200'
+      - '--es.uri=http://elasticsearch:9200'
     ports:
-    - 9114:9114
+      - ${ES_EXPORTER_EXPOSE:-127.0.0.1:9114}:9114
     networks:
       - monitoring
 
@@ -129,7 +129,7 @@ services:
     volumes:
       - "./configs/blackbox_exporter:/config"
     ports:
-      - 9115:9115
+      - ${BLACKBOX_EXPORTER_EXPOSE:-127.0.0.1:9115}:9115
     networks:
       - monitoring
 
