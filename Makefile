@@ -5,7 +5,7 @@ export $(shell sed 's/=.*//' .env)
 
 SHELL := /bin/bash
 ENV_FILE ?= .env
-DOCKER_COMPOSE=docker-compose --env-file=${ENV_FILE}
+DOCKER_COMPOSE=docker compose --env-file=${ENV_FILE}
 
 # mount point for shared data
 NFS_VOLUMES_ADDRESS ?= 10.0.0.3
@@ -28,10 +28,10 @@ up:
 
 create_backups_dir:
 	@echo "🥫 Ensure backups dir for elasticsearch"
-	docker-compose run --rm -u root elasticsearch bash -c "mkdir -p /opt/elasticsearch/backups && chown elasticsearch:root /opt/elasticsearch/backups"
+	docker compose run --rm -u root elasticsearch bash -c "mkdir -p /opt/elasticsearch/backups && chown elasticsearch:root /opt/elasticsearch/backups"
 # the chown -R takes far too long on a big backup directory through NFS with high latency…
 # removed it for now
-#	docker-compose run --rm -u root elasticsearch bash -c "mkdir -p /opt/elasticsearch/backups && chown elasticsearch:root -R /opt/elasticsearch/backups"
+#	docker compose run --rm -u root elasticsearch bash -c "mkdir -p /opt/elasticsearch/backups && chown elasticsearch:root -R /opt/elasticsearch/backups"
 
 down:
 	@echo "🥫 Bringing down containers …"
@@ -56,7 +56,7 @@ livecheck:
 	docker/docker-livecheck.sh
 
 log:
-	@echo "🥫 Reading logs (docker-compose) …"
+	@echo "🥫 Reading logs (docker compose) …"
 	${DOCKER_COMPOSE} logs -f
 
 #------------#
