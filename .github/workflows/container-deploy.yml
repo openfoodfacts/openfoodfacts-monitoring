@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - deploy-*
-      - deploy-container-*
+      - container-deploy-*
 
 jobs:
   deploy:
