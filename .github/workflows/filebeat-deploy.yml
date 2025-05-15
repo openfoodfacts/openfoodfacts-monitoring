@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - deploy-*
-      - deploy-filebeat-*
+      - filebeat-deploy-*
     paths-ignore:
       - configs/alertmanager/**
       - configs/blackbox_exporter/**
