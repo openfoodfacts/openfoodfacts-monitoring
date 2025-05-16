@@ -116,7 +116,6 @@ services:
       - '--web.enable-admin-api'
     networks:
       - monitoring
-      - reverse_proxy_network # using port 9090
     # enable reaching host internal ip
     extra_hosts:
       - "host.docker.internal:host-gateway"

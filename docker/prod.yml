@@ -1,4 +1,9 @@
-version: '3.7'
+x-expose-reverse-proxy: &expose-reverse-proxy
+  networks:
+    # services needs to be reachable by the nginx proxy, but not to the internet
+    - reverse_proxy_internal
+
+
 volumes:
   alertmanager-data:
     external: true
@@ -18,11 +23,12 @@ volumes:
   prometheus-data:
     external: true
     name: ${COMPOSE_PROJECT_NAME}_prometheus-data
+
 services:
-  elasticsearch:
-    environment:
-      ES_JAVA_OPTS: "-Xms4g -Xmx4g"
+  influxdb:
+    <: *expose-reverse-proxy
   grafana:
+    <: *expose-reverse-proxy
     environment:
       - GF_AUTH_GOOGLE_ENABLED=true
       - GF_AUTH_GOOGLE_ALLOW_SIGN_UP=true
@@ -34,3 +40,13 @@ services:
       - GF_SERVER_DOMAIN=openfoodfacts.org
       - GF_SERVER_ROUTER_LOGGING=true
       - GF_SERVER_ROOT_URL=https://grafana.openfoodfacts.org
+  kibana:
+    <: *expose-reverse-proxy
+  elasticsearch:
+    <: *expose-reverse-proxy
+    environment:
+      ES_JAVA_OPTS: "-Xms4g -Xmx4g"
+  elasticsearch_exporter:
+    <: *expose-reverse-proxy
+  prometheus:
+    <: *expose-reverse-proxy
