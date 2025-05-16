@@ -7,9 +7,8 @@ SHELL := /bin/bash
 ENV_FILE ?= .env
 DOCKER_COMPOSE=docker compose --env-file=${ENV_FILE}
 
-# mount point for shared data
-NFS_VOLUMES_ADDRESS ?= 10.0.0.3
-NFS_VOLUMES_BASE_PATH ?= /rpool/backups/monitoring-volumes/
+# mount point for backup data
+ES_BACKUP_VOLUME_PATH?=/hdd-zfs/monitoring-es-backups/
 
 .DEFAULT_GOAL := dev
 
@@ -73,7 +72,7 @@ create_external_volumes:
 	docker volume create ${COMPOSE_PROJECT_NAME}_elasticsearch-data
 	docker volume create ${COMPOSE_PROJECT_NAME}_prometheus-data
 	docker volume create ${COMPOSE_PROJECT_NAME}_alertmanager-data
-	docker volume create ${COMPOSE_PROJECT_NAME}_elasticsearch-backup
+	docker volume create --opt type=none --opt o=bind --opt device=${ES_BACKUP_VOLUME_PATH} ${COMPOSE_PROJECT_NAME}_elasticsearch-backup
 
 replace_env:
 	. .env && envsubst '$${SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0}' < configs/alertmanager/config.tpl.yml > configs/alertmanager/config.yml
