@@ -15,7 +15,7 @@ ES_BACKUP_VOLUME_PATH?=/hdd-zfs/monitoring-es-backups/
 #----------------#
 # Docker Compose #
 #----------------#
-dev: replace_env build create_external_networks up
+dev: replace_env build up
 
 build:
 	@echo "🥫 Building containers …"
@@ -62,9 +62,6 @@ log:
 # Production #
 #------------#
 
-# Create external networks (useful in dev)
-create_external_networks:
-	docker network create reverse_proxy_network || true
 # Create all external volumes needed for production. Using external volumes is useful to prevent data loss (as they are not deleted when performing docker down -v)
 create_external_volumes:
 	docker volume create ${COMPOSE_PROJECT_NAME}_influxdb-data

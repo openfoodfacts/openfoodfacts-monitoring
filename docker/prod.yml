@@ -50,3 +50,8 @@ services:
     <<: *expose-reverse-proxy
   prometheus:
     <<: *expose-reverse-proxy
+
+networks:
+  # this network is used by the reverse proxy to reach the services
+  reverse_proxy_internal:
+    external: true
