@@ -26,9 +26,9 @@ volumes:
 
 services:
   influxdb:
-    <: *expose-reverse-proxy
+    <<: *expose-reverse-proxy
   grafana:
-    <: *expose-reverse-proxy
+    <<: *expose-reverse-proxy
     environment:
       - GF_AUTH_GOOGLE_ENABLED=true
       - GF_AUTH_GOOGLE_ALLOW_SIGN_UP=true
@@ -41,12 +41,12 @@ services:
       - GF_SERVER_ROUTER_LOGGING=true
       - GF_SERVER_ROOT_URL=https://grafana.openfoodfacts.org
   kibana:
-    <: *expose-reverse-proxy
+    <<: *expose-reverse-proxy
   elasticsearch:
-    <: *expose-reverse-proxy
+    <<: *expose-reverse-proxy
     environment:
       ES_JAVA_OPTS: "-Xms4g -Xmx4g"
   elasticsearch_exporter:
-    <: *expose-reverse-proxy
+    <<: *expose-reverse-proxy
   prometheus:
-    <: *expose-reverse-proxy
+    <<: *expose-reverse-proxy
