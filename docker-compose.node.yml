@@ -12,7 +12,7 @@ services:
     command: [ "--strict.perms=false" ]
     environment:
       - ELASTICSEARCH_HOSTS
-      - KIBANA_URI
+      - KIBANA_HOST
     volumes:
       - ./configs/filebeat/config.yml:/usr/share/filebeat/filebeat.yml:ro
       - ./configs/filebeat/ilm-config.json:/usr/share/filebeat/ilm-config.json:ro
