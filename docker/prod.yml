@@ -48,6 +48,8 @@ services:
       ES_JAVA_OPTS: "-Xms4g -Xmx4g"
   elasticsearch_exporter:
     <<: *expose-reverse-proxy
+  alertmanager:
+    <<: *expose-reverse-proxy
   prometheus:
     <<: *expose-reverse-proxy
 
