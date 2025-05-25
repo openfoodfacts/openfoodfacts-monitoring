@@ -13,30 +13,94 @@ alerting:
         - targets: ["alertmanager:9093"]
 
 scrape_configs:
-  - job_name: docker-cadvisor
+  # OVH promox cluster exporters
+  # They are exposed on the reverse proxy at ovh-exporters.openfoodfacts.org
+  # this rule enable to get them
+  - job_name: ovh-exporters
+    scheme: https
+    basic_auth:
+      username: prometheus
+      password_file: /etc/prometheus/secrets/ovh.txt
     static_configs:
-      - targets: ["10.1.0.203:8280"]
+      - targets:
+          # those must follow job/env/app/service
+          # corresponding url is https://ovh-exporters.openfoodfacts.org/job/env/app/service/metrics
+        - "docker-cadvisor/net/docker/cadvisor"
+        - "docker-prod/org/docker/cadvisor"
+          # node exporter
+        - "node-exporter/net/system/vm"
+        - "node-exporter/org/system/vm"
+          # docker nginx
+        - "docker-nginx/net/off/frontend"
+          # docker apache
+        - "docker-apache/net/off/backend"
+          # docker-statsd (for robotoff gunicorn)
+        - "docker-statsd/net/robotoff/api"
+          # moved to moji "docker-statsd/org/robotoff/api" 10.1.0.201:9102;
+          # docker-postgres
+        - "docker-postgres/net/robotoff/postgres"
+          # moved to moji - "docker-postgres/org/robotoff/postgres" 10.1.0.201:9187;
+          # Proxmox gateway postfix
+        - "pmg-postfix/prod/pmg/postfix"
+          # docker-elasticsearch
+        - "docker-elasticsearch/net/search-a-licious/elasticsearch"
+        - "docker-elasticsearch/org/search-a-licious/elasticsearch"
+          # matomo mysqld
+        - "mysqld/prod/matomo/mysqld"
+          # matomo nginx
+        - "mysqld/prod/matomo/nginx"
         labels:
-          env: monitoring
-      - targets: ["10.1.0.201:8280"]
-        labels:
-          env: org
-      - targets: ["10.1.0.200:8280"]
-        labels:
-          env: net
+          base_url: ovh-exporters.openfoodfacts.org:443
+          metrics_path: metrics
+    relabel_configs: &ovh_exporters_relabel_config
+      # get job name, first part
+      - source_labels: [__address__]
+        regex: ^([^/]+)/.*$
+        replacement: ${1}
+        target_label: job
+      # get env, second part
+      - source_labels: [__address__]
+        regex: ^[^/]+/([^/]+)/.*$
+        replacement: ${1}
+        target_label: env
+      # get app, third part
+      - source_labels: [__address__]
+        regex: ^[^/]+/[^/]+/([^/]+)/.*$
+        replacement: ${1}
+        target_label: app
+      # get service, fourth part
+      - source_labels: [__address__]
+        regex: ^[^/]+/[^/]+/[^/]+/([^/]+)$
+        replacement: ${1}
+        target_label: service
+      # the metrics path is adress + /metrics
+      - source_labels: [__address__, metrics_path]
+        separator: /
+        target_label: __metrics_path__
+      # put base url as address, as it is the same for all
+      - source_labels: [base_url]
+        target_label: __address__
+      # drop labels that where only useful for configuration
+      - regex: ^(base_url|metrics_path)$
+        action: labeldrop
 
-  - job_name: docker-node-exporter
+  # local jobs, on the same host
+  - job_name: monitoring-exporters
     static_configs:
-      - targets: ["10.1.0.203:8281"]
+      - targets: ["host.docker.internal:8280"]
         labels:
+          job: docker-cadvisor
+          app: docker
           env: monitoring
-      - targets: ["10.1.0.201:8281"]
+          service: cadvisor
+      - targets: ["host.docker.internal:8281"]
         labels:
-          env: org
-      - targets: ["10.1.0.200:8281"]
-        labels:
-          env: net
+          job: node-exporter
+          app: system
+          env: monitoring
+          service: vm
 
+  # local jobs in the same docker network
   # TODO: use Docker Service Discovery https://prometheus.io/docs/prometheus/latest/configuration/configuration/#docker_sd_config
   - job_name: docker-containers
     sample_limit: 50000
@@ -59,87 +123,7 @@ scrape_configs:
           app: blackbox_exporter
           env: org
 
-  - job_name: docker-nginx
-    static_configs:
-      - targets: ["10.1.0.200:9113"]
-        labels:
-          app: off
-          service: frontend
-          env: net
-
-  - job_name: docker-apache
-    static_configs:
-      - targets: ["10.1.0.200:9117"]
-        labels:
-          app: off
-          service: backend
-          env: net
-
-  - job_name: docker-statsd
-    static_configs:
-      - targets: ["10.1.0.200:9102"]
-        labels:
-          app: robotoff
-          service: api
-          env: net
-      - targets: ["10.1.0.201:9102"]
-        labels:
-          app: robotoff
-          service: api
-          env: org
-
-  - job_name: docker-postgres
-    static_configs:
-      - targets: ["10.1.0.201:9187"]
-        labels:
-          app: robotoff
-          service: postgres
-          env: org
-      - targets: ["10.1.0.200:9187"]
-        labels:
-          app: robotoff
-          service: postgres
-          env: net
-
-  - job_name: pmg-postfix
-    static_configs:
-      - targets:
-        # PMG
-        - "10.1.0.102:9154"
-        labels:
-          app: Proxmox mail gateway
-          service: postfix
-          env: prod
-
-  - job_name: docker-elasticsearch
-    static_configs:
-      - targets: ["10.1.0.200:9114"]
-        labels:
-          app: search-a-licious
-          service: elasticsearch
-          env: net
-      - targets: ["10.1.0.201:9114"]
-        labels:
-          app: search-a-licious
-          service: elasticsearch
-          env: org
-
-  - job_name: mysqld
-    static_configs:
-      - targets: ["10.1.0.107:9104"]
-        labels:
-          app: matomo
-          service: mysqld
-          env: prod
-
-  - job_name: nginx
-    static_configs:
-      - targets: ["10.1.0.107:9113"]
-        labels:
-          app: matomo
-          service: nginx
-          env: prod
-
+  # Free promox cluster Exporters
   # NGINX is proxying the exporters of servers at free
   # this rule enable to get them
   - job_name: free-exporters
@@ -260,7 +244,7 @@ scrape_configs:
           - prometheus|https://prometheus.openfoodfacts.org/-/healthy
           - alertmanager|https://alertmanager.openfoodfacts.org/-/healthy
           - kibana|https://kibana.openfoodfacts.org/status
-          - elasticsearch|http://10.1.0.203:9200/_cluster/health?wait_for_status=yellow&timeout=50s
+          - elasticsearch|http://elasticsearch:9200/_cluster/health?wait_for_status=yellow&timeout=50s
           # matomo, see https://matomo.org/faq/how-to/faq_20278/
           - matomo-interface|https://analytics.openfoodfacts.org/index.php?module=Login
           - matomo-tracker|https://analytics.openfoodfacts.org/matomo.php

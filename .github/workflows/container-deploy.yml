@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - deploy-*
+      - container-deploy-*
 
 jobs:
   deploy:
@@ -19,8 +20,8 @@ jobs:
       run: |
         # direct container access
         # deploy target
-        echo "SSH_HOST=10.1.0.203" >> $GITHUB_ENV
-        echo "SSH_PROXY_HOST=ovh1.openfoodfacts.org" >> $GITHUB_ENV
+        echo "SSH_HOST=34.1.5.157" >> $GITHUB_ENV # monitoring-01
+        echo "SSH_PROXY_HOST=" >> $GITHUB_ENV # no proxy
         echo "SSH_USERNAME=off" >> $GITHUB_ENV
         # did only config change ? (in this case we only need a restart)
         declare current_branch=$(git rev-parse --abbrev-ref HEAD)
@@ -48,10 +49,10 @@ jobs:
       with:
         host: ${{ env.SSH_HOST }}
         username: ${{ env.SSH_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
         proxy_host: ${{ env.SSH_PROXY_HOST }}
         proxy_username: ${{ env.SSH_USERNAME }}
-        proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
         script_stop: false
         script: |
           echo "RESTART_ONLY is ${{ env.RESTART_ONLY }}"
@@ -70,10 +71,10 @@ jobs:
       with:
         host: ${{ env.SSH_HOST }}
         username: ${{ env.SSH_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
         proxy_host: ${{ env.SSH_PROXY_HOST }}
         proxy_username: ${{ env.SSH_USERNAME }}
-        proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
         script_stop: false
         script: |
           # Go to repository directory
@@ -110,10 +111,10 @@ jobs:
       with:
         host: ${{ env.SSH_HOST }}
         username: ${{ env.SSH_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
         proxy_host: ${{ env.SSH_PROXY_HOST }}
         proxy_username: ${{ env.SSH_USERNAME }}
-        proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
         script_stop: false
         script: |
           cd monitoring/
@@ -125,10 +126,10 @@ jobs:
       with:
         host: ${{ env.SSH_HOST }}
         username: ${{ env.SSH_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
         proxy_host: ${{ env.SSH_PROXY_HOST }}
         proxy_username: ${{ env.SSH_USERNAME }}
-        proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
         script_stop: false
         script: |
           cd monitoring/
@@ -140,10 +141,10 @@ jobs:
       with:
         host: ${{ env.SSH_HOST }}
         username: ${{ env.SSH_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
         proxy_host: ${{ env.SSH_PROXY_HOST }}
         proxy_username: ${{ env.SSH_USERNAME }}
-        proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
         script_stop: false
         script: |
           cd monitoring/
@@ -157,10 +158,10 @@ jobs:
       with:
         host: ${{ env.SSH_HOST }}
         username: ${{ env.SSH_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
         proxy_host: ${{ env.SSH_PROXY_HOST }}
         proxy_username: ${{ env.SSH_USERNAME }}
-        proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
         script_stop: false
         script: |
           cd monitoring/
@@ -172,10 +173,10 @@ jobs:
       with:
         host: ${{ env.SSH_HOST }}
         username: ${{ env.SSH_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
         proxy_host: ${{ env.SSH_PROXY_HOST }}
         proxy_username: ${{ env.SSH_USERNAME }}
-        proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
         script_stop: false
         script: |
           cd monitoring/
@@ -187,10 +188,10 @@ jobs:
       with:
         host: ${{ env.SSH_HOST }}
         username: ${{ env.SSH_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
         proxy_host: ${{ env.SSH_PROXY_HOST }}
         proxy_username: ${{ env.SSH_USERNAME }}
-        proxy_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
         script_stop: false
         script: |
           cd monitoring/
