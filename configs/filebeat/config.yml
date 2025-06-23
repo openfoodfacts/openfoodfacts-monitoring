@@ -23,6 +23,9 @@ logging.level: error
 
 output.elasticsearch:
   hosts: ["${ELASTICSEARCH_HOSTS}"]
+  # basic auth credentials
+  username: "${ELASTICSEARCH_USERNAME}"
+  password: "${ELASTICSEARCH_PASSWORD}"
 
 setup.ilm:
   enabled: true
@@ -42,8 +45,10 @@ setup.template.name: logs
 filebeat.config.modules.path: /usr/share/filebeat/modules.d/*.yml
 
 setup.kibana:
-  host: "${KIBANA_URI}"
-
+  host: "${KIBANA_HOST}"
+  # basic auth credentials
+  username: "${ELASTICSEARCH_USERNAME}"
+  password: "${ELASTICSEARCH_PASSWORD}"
 # output.console:
 #   pretty: true
 # logging.json: true
