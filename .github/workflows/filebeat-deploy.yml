@@ -44,8 +44,9 @@ jobs:
         echo "SSH_HOST=${{ matrix.server.host }}" >> $GITHUB_ENV
         echo "SSH_PROXY_HOST=${{ matrix.server.proxy }}" >> $GITHUB_ENV
         echo "SSH_USERNAME=off" >> $GITHUB_ENV
-        echo "KIBANA_HOST=https://kibana.openfoodfacts.org" >> $GITHUB_ENV
-        echo "ELASTICSEARCH_HOSTS=https://elasticsearch.openfoodfacts.org" >> $GITHUB_ENV
+        # note: we must explicit the scheme and the port in the URL
+        echo "KIBANA_HOST=https://kibana.openfoodfacts.org:443" >> $GITHUB_ENV
+        echo "ELASTICSEARCH_HOSTS=https://elasticsearch.openfoodfacts.org:443" >> $GITHUB_ENV
         echo "ELASTICSEARCH_USERNAME=off" >> $GITHUB_ENV
 
     - name: Checkout git repository
