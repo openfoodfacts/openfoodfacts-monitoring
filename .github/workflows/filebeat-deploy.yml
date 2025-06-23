@@ -45,6 +45,7 @@ jobs:
         echo "SSH_USERNAME=off" >> $GITHUB_ENV
         echo "KIBANA_HOST=https://kibana.openfoodfacts.org" >> $GITHUB_ENV
         echo "ELASTICSEARCH_HOSTS=https://elasticsearch.openfoodfacts.org" >> $GITHUB_ENV
+        echo "ELASTICSEARCH_USERNAME=off" >> $GITHUB_ENV
 
     - name: Checkout git repository
       uses: appleboy/ssh-action@master
@@ -97,6 +98,8 @@ jobs:
           # Filebeat config
           echo "KIBANA_HOST=${{ env.KIBANA_HOST }}" >> .env
           echo "ELASTICSEARCH_HOSTS=${{ env.ELASTICSEARCH_HOSTS }}" >> .env
+          echo "ELASTICSEARCH_USERNAME=${{ env.ELASTICSEARCH_USERNAME }}" >> .env
+          echo "ELASTICSEARCH_PASSWORD=${{ secrets.ELASTICSEARCH_PASSWORD }}" >> .env
 
     - name: Start services
       uses: appleboy/ssh-action@master
