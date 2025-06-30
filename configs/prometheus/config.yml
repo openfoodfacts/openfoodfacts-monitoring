@@ -246,13 +246,60 @@ scrape_configs:
           - forum|https://forum.openfoodfacts.org/
           # technical tools
           - grafana|https://grafana.openfoodfacts.org/api/health
-          - prometheus|https://prometheus.openfoodfacts.org/-/healthy
-          - alertmanager|https://alertmanager.openfoodfacts.org/-/healthy
-          - kibana|https://kibana.openfoodfacts.org/status
-          - elasticsearch|http://elasticsearch:9200/_cluster/health?wait_for_status=yellow&timeout=50s
           # matomo, see https://matomo.org/faq/how-to/faq_20278/
           - matomo-interface|https://analytics.openfoodfacts.org/index.php?module=Login
           - matomo-tracker|https://analytics.openfoodfacts.org/matomo.php
+        labels:
+          env: org
+  # prober for targets that require basic auth, using the monitoring password
+  - job_name: blackbox-exporter-auth-monitoring
+    metrics_path: /probe
+    scrape_interval: 60s
+    params:
+      module: [http_probe_auth_monitoring]
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: ^([^|]+)\|(.+)$ # splits target by | and uses 2nd token as target for blackbox_exporter
+        replacement: ${2}
+        target_label: __param_target
+      - source_labels: [__address__]
+        regex: (.+)\|(.+) # splits target by | and uses 1st token as 'app' label
+        replacement: ${1}
+        target_label: app
+      - source_labels: [__param_target]
+        target_label: instance
+      - replacement: blackbox_exporter:9115
+        target_label: __address__
+    static_configs:
+      - targets:
+          - prometheus|https://prometheus.openfoodfacts.org/-/healthy
+          - alertmanager|https://alertmanager.openfoodfacts.org/-/healthy
+        labels:
+          env: org
+  # prober for targets that require basic auth, using the elasticsearch password
+  - job_name: blackbox-exporter-auth-elasticsearch
+    metrics_path: /probe
+    scrape_interval: 60s
+    params:
+      module: [http_probe_auth_elasticsearch]
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: ^([^|]+)\|(.+)$ # splits target by | and uses 2nd token as target for blackbox_exporter
+        replacement: ${2}
+        target_label: __param_target
+      - source_labels: [__address__]
+        regex: (.+)\|(.+) # splits target by | and uses 1st token as 'app' label
+        replacement: ${1}
+        target_label: app
+      - source_labels: [__param_target]
+        target_label: instance
+      - replacement: blackbox_exporter:9115
+        target_label: __address__
+    static_configs:
+      - targets:
+          # technical tools
+          - kibana|https://kibana.openfoodfacts.org/status
+          - elasticsearch|https://elasticsearch.openfoodfacts.org/_cluster/health?wait_for_status=yellow&timeout=50s
         labels:
           env: org
   # prober for target that only support html as content-type (not json)
