@@ -11,188 +11,193 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: checkout repo on current branch
-      uses: actions/checkout@v3
-      with:
-        # there seem to be no choice but fetch-depth 0 to be able to checkout main
-        fetch-depth: 0
-    - name: Set env variables
-      run: |
-        # direct container access
-        # deploy target
-        echo "SSH_HOST=34.1.5.157" >> $GITHUB_ENV # monitoring-01
-        echo "SSH_PROXY_HOST=" >> $GITHUB_ENV # no proxy
-        echo "SSH_USERNAME=off" >> $GITHUB_ENV
-        # did only config change ? (in this case we only need a restart)
-        declare current_branch=$(git rev-parse --abbrev-ref HEAD)
-        echo $current_branch
-        declare before=${{ github.event.before }}
-        if [[ $before =~ ^00000 ]]
-        then
-          # use main as reference
-          git checkout -b main --track origin/main
-          git checkout $current_branch
-          declare before=main
-        fi
-        echo before is: $before
-        echo head is: ${{ github.event.head }}
-        if ( git diff --name-only $before ${{ github.event.after }} |grep -v configs/ )
-        then
-          echo "RESTART_ONLY=no" >> $GITHUB_ENV
-        else
-          echo "RESTART_ONLY=yes" >> $GITHUB_ENV
-        fi
-        echo "Changed file:"
-        git diff --name-only $before ${{ github.event.after }}
-    - name: Checkout git repository
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ env.SSH_HOST }}
-        username: ${{ env.SSH_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-        proxy_host: ${{ env.SSH_PROXY_HOST }}
-        proxy_username: ${{ env.SSH_USERNAME }}
-        proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-        script_stop: false
-        script: |
-          echo "RESTART_ONLY is ${{ env.RESTART_ONLY }}"
-          # Clone Git repository if not already there
-          [ ! -d 'monitoring' ] && git clone --depth 1 https://github.com/${{ github.repository }} monitoring --no-single-branch 2>&1
+      - name: checkout repo on current branch
+        uses: actions/checkout@v3
+        with:
+          # there seem to be no choice but fetch-depth 0 to be able to checkout main
+          fetch-depth: 0
+      - name: Set env variables
+        run: |
+          # direct container access
+          # deploy target
+          echo "SSH_HOST=34.1.5.157" >> $GITHUB_ENV # monitoring-01
+          echo "SSH_PROXY_HOST=" >> $GITHUB_ENV # no proxy
+          echo "SSH_USERNAME=off" >> $GITHUB_ENV
+          # did only config change ? (in this case we only need a restart)
+          declare current_branch=$(git rev-parse --abbrev-ref HEAD)
+          echo $current_branch
+          declare before=${{ github.event.before }}
+          if [[ $before =~ ^00000 ]]
+          then
+            # use main as reference
+            git checkout -b main --track origin/main
+            git checkout $current_branch
+            declare before=main
+          fi
+          echo before is: $before
+          echo head is: ${{ github.event.head }}
+          if ( git diff --name-only $before ${{ github.event.after }} |grep -v configs/ )
+          then
+            echo "RESTART_ONLY=no" >> $GITHUB_ENV
+          else
+            echo "RESTART_ONLY=yes" >> $GITHUB_ENV
+          fi
+          echo "Changed file:"
+          git diff --name-only $before ${{ github.event.after }}
+      - name: Checkout git repository
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.SSH_HOST }}
+          username: ${{ env.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
+          proxy_host: ${{ env.SSH_PROXY_HOST }}
+          proxy_username: ${{ env.SSH_USERNAME }}
+          proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
+          script_stop: false
+          script: |
+            echo "RESTART_ONLY is ${{ env.RESTART_ONLY }}"
+            # Clone Git repository if not already there
+            [ ! -d 'monitoring' ] && git clone --depth 1 https://github.com/${{ github.repository }} monitoring --no-single-branch 2>&1
 
-          # Go to repository directory
-          cd monitoring/
+            # Go to repository directory
+            cd monitoring/
 
-          # Fetch newest commits (in case it wasn't freshly cloned)
-          # and Checkout current commit SHA
-          git fetch --depth 1 && \
-          git checkout -qf ${{ github.sha }}
-    - name: Set environment variables in .env
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ env.SSH_HOST }}
-        username: ${{ env.SSH_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-        proxy_host: ${{ env.SSH_PROXY_HOST }}
-        proxy_username: ${{ env.SSH_USERNAME }}
-        proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-        script_stop: false
-        script: |
-          # Go to repository directory
-          cd monitoring/
+            # Fetch newest commits (in case it wasn't freshly cloned)
+            # and Checkout current commit SHA
+            git fetch --depth 1 && \
+            git checkout -qf ${{ github.sha }}
+      - name: Set environment variables in .env
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.SSH_HOST }}
+          username: ${{ env.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
+          proxy_host: ${{ env.SSH_PROXY_HOST }}
+          proxy_username: ${{ env.SSH_USERNAME }}
+          proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
+          script_stop: false
+          script: |
+            # Go to repository directory
+            cd monitoring/
 
-          # Set Docker Compose variables
-          echo "DOCKER_CLIENT_TIMEOUT=120" > .env
-          echo "COMPOSE_HTTP_TIMEOUT=120" >> .env
-          echo "COMPOSE_PROJECT_NAME=monitoring" >> .env
-          echo "COMPOSE_PATH_SEPARATOR=;" >> .env
-          echo "COMPOSE_FILE=docker-compose.yml;docker/prod.yml" >> .env
+            # Set Docker Compose variables
+            echo "DOCKER_CLIENT_TIMEOUT=120" > .env
+            echo "COMPOSE_HTTP_TIMEOUT=120" >> .env
+            echo "COMPOSE_PROJECT_NAME=monitoring" >> .env
+            echo "COMPOSE_PATH_SEPARATOR=;" >> .env
+            echo "COMPOSE_FILE=docker-compose.yml;docker/prod.yml" >> .env
 
-          # Grafana
-          echo "GF_SERVER_ROUTER_LOGGING=true" >> .env
-          echo "GF_SECURITY_ADMIN_USER=off" >> .env
-          echo "GF_SECURITY_ADMIN_PASSWORD=${{ secrets.GF_SECURITY_ADMIN_PASSWORD }}" >> .env
-          echo "GF_AUTH_GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_OAUTH2_CLIENT_ID }}" >> .env
-          echo "GF_AUTH_GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_OAUTH2_CLIENT_SECRET }}" >> .env
+            # Grafana
+            echo "GF_SERVER_ROUTER_LOGGING=true" >> .env
+            echo "GF_SECURITY_ADMIN_USER=off" >> .env
+            echo "GF_SECURITY_ADMIN_PASSWORD=${{ secrets.GF_SECURITY_ADMIN_PASSWORD }}" >> .env
+            echo "GF_AUTH_GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_OAUTH2_CLIENT_ID }}" >> .env
+            echo "GF_AUTH_GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_OAUTH2_CLIENT_SECRET }}" >> .env
 
-          # Alertmanager
-          echo "SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0=${{ secrets.SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0 }}" >> .env
+            # Alertmanager
+            echo "SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0=${{ secrets.SLACK_WEBHOOK_URL_INFRASTRUCTURE_ALERTS_0 }}" >> .env
 
-          # InfluxDB
-          echo "INFLUXDB_ADMIN_USER=off" >> .env
-          echo "INFLUXDB_ADMIN_PASSWORD=${{ secrets.INFLUXDB_ADMIN_PASSWORD }}" >> .env
-          echo "INFLUXDB_DB=db0" >> .env
+            # InfluxDB
+            echo "INFLUXDB_ADMIN_USER=off" >> .env
+            echo "INFLUXDB_ADMIN_PASSWORD=${{ secrets.INFLUXDB_ADMIN_PASSWORD }}" >> .env
+            echo "INFLUXDB_DB=db0" >> .env
 
-          # set secrets
-          mkdir -p configs/prometheus/secrets
-          echo "${{ secrets.FREE_EXPORTERS_PASSWORD }}" > configs/prometheus/secrets/free-exporters.txt
+            # Prometheus secrets
+            mkdir -p configs/prometheus/secrets
+            echo "${{ secrets.FREE_EXPORTERS_PASSWORD }}" > configs/prometheus/secrets/free-exporters.txt
 
-    - name: Run envsubst on Prometheus configs
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ env.SSH_HOST }}
-        username: ${{ env.SSH_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-        proxy_host: ${{ env.SSH_PROXY_HOST }}
-        proxy_username: ${{ env.SSH_USERNAME }}
-        proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-        script_stop: false
-        script: |
-          cd monitoring/
-          make replace_env
+            # Blackbox secrets
+            mkdir -p configs/blackbox_exporter/secrets
+            echo "${{ secrets.MONITORING_BASIC_AUTH_PASSWORD }}" > configs/blackbox_exporter/secrets/monitoring_basic_auth.secret
+            echo "${{ secrets.ELASTICSEARCH_BASIC_AUTH_PASSWORD }}" > configs/blackbox_exporter/secrets/elasticsearch_basic_auth.secret
 
-    - name: Create external Docker volumes
-      uses: appleboy/ssh-action@master
-      if: env.RESTART_ONLY == 'no'
-      with:
-        host: ${{ env.SSH_HOST }}
-        username: ${{ env.SSH_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-        proxy_host: ${{ env.SSH_PROXY_HOST }}
-        proxy_username: ${{ env.SSH_USERNAME }}
-        proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-        script_stop: false
-        script: |
-          cd monitoring/
-          make create_external_volumes
+      - name: Run envsubst on Prometheus configs
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.SSH_HOST }}
+          username: ${{ env.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
+          proxy_host: ${{ env.SSH_PROXY_HOST }}
+          proxy_username: ${{ env.SSH_USERNAME }}
+          proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
+          script_stop: false
+          script: |
+            cd monitoring/
+            make replace_env
 
-    - name: Recreate & start services
-      uses: appleboy/ssh-action@master
-      if: env.RESTART_ONLY == 'no'
-      with:
-        host: ${{ env.SSH_HOST }}
-        username: ${{ env.SSH_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-        proxy_host: ${{ env.SSH_PROXY_HOST }}
-        proxy_username: ${{ env.SSH_USERNAME }}
-        proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-        script_stop: false
-        script: |
-          cd monitoring/
-          make create_backups_dir && \
-          make down && \
-          make up
+      - name: Create external Docker volumes
+        uses: appleboy/ssh-action@master
+        if: env.RESTART_ONLY == 'no'
+        with:
+          host: ${{ env.SSH_HOST }}
+          username: ${{ env.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
+          proxy_host: ${{ env.SSH_PROXY_HOST }}
+          proxy_username: ${{ env.SSH_USERNAME }}
+          proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
+          script_stop: false
+          script: |
+            cd monitoring/
+            make create_external_volumes
 
-    - name: re-start services only
-      uses: appleboy/ssh-action@master
-      if: env.RESTART_ONLY == 'yes'
-      with:
-        host: ${{ env.SSH_HOST }}
-        username: ${{ env.SSH_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-        proxy_host: ${{ env.SSH_PROXY_HOST }}
-        proxy_username: ${{ env.SSH_USERNAME }}
-        proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-        script_stop: false
-        script: |
-          cd monitoring/
-          make restart
+      - name: Recreate & start services
+        uses: appleboy/ssh-action@master
+        if: env.RESTART_ONLY == 'no'
+        with:
+          host: ${{ env.SSH_HOST }}
+          username: ${{ env.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
+          proxy_host: ${{ env.SSH_PROXY_HOST }}
+          proxy_username: ${{ env.SSH_USERNAME }}
+          proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
+          script_stop: false
+          script: |
+            cd monitoring/
+            make create_backups_dir && \
+            make down && \
+            make up
 
-    - name: Check services are up
-      uses: appleboy/ssh-action@master
-      if: ${{ always() }}
-      with:
-        host: ${{ env.SSH_HOST }}
-        username: ${{ env.SSH_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-        proxy_host: ${{ env.SSH_PROXY_HOST }}
-        proxy_username: ${{ env.SSH_USERNAME }}
-        proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-        script_stop: false
-        script: |
-          cd monitoring/
-          make livecheck
+      - name: re-start services only
+        uses: appleboy/ssh-action@master
+        if: env.RESTART_ONLY == 'yes'
+        with:
+          host: ${{ env.SSH_HOST }}
+          username: ${{ env.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
+          proxy_host: ${{ env.SSH_PROXY_HOST }}
+          proxy_username: ${{ env.SSH_USERNAME }}
+          proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
+          script_stop: false
+          script: |
+            cd monitoring/
+            make restart
 
-    - name: Cleanup obsolete Docker objects
-      uses: appleboy/ssh-action@master
-      if: env.RESTART_ONLY == 'no'
-      with:
-        host: ${{ env.SSH_HOST }}
-        username: ${{ env.SSH_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-        proxy_host: ${{ env.SSH_PROXY_HOST }}
-        proxy_username: ${{ env.SSH_USERNAME }}
-        proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-        script_stop: false
-        script: |
-          cd monitoring/
-          make prune
+      - name: Check services are up
+        uses: appleboy/ssh-action@master
+        if: ${{ always() }}
+        with:
+          host: ${{ env.SSH_HOST }}
+          username: ${{ env.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
+          proxy_host: ${{ env.SSH_PROXY_HOST }}
+          proxy_username: ${{ env.SSH_USERNAME }}
+          proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
+          script_stop: false
+          script: |
+            cd monitoring/
+            make livecheck
+
+      - name: Cleanup obsolete Docker objects
+        uses: appleboy/ssh-action@master
+        if: env.RESTART_ONLY == 'no'
+        with:
+          host: ${{ env.SSH_HOST }}
+          username: ${{ env.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
+          proxy_host: ${{ env.SSH_PROXY_HOST }}
+          proxy_username: ${{ env.SSH_USERNAME }}
+          proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
+          script_stop: false
+          script: |
+            cd monitoring/
+            make prune

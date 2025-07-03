@@ -21,7 +21,7 @@ It also contains exporters that should be deployed on each nodes (see `docker-co
 * **cadvisor** [^cadvisor] gather docker metrics
 * **node_exporter** [^node_exporter] gather host metrics
 
-PS: if you modify this, please keep [corresponding page in infrastructure](https://github.com/openfoodfacts/openfoodfacts-infrastructure/blob/develop/docs/observability.md) up to date
+PS: if you modify this, please keep [corresponding page in infrastructure](https://github.com/openfoodfacts/openfoodfacts-infrastructure/blob/develop/docs/observability.md) up to date
 
 [^cadvisor]: https://prometheus.io/docs/guides/cadvisor/
 [^filebeat]: https://www.elastic.co/fr/beats/filebeat
@@ -35,3 +35,17 @@ PS: if you modify this, please keep [corresponding page in infrastructure](http
 * [Grafana Datasources](https://github.com/openfoodfacts/openfoodfacts-monitoring/blob/main/configs/grafana/datasources/config.yml)
 * [HTTP Probe Config](https://github.com/openfoodfacts/openfoodfacts-monitoring/blob/main/configs/blackbox_exporter/config.yml)
 * [Filebeat Config](https://github.com/openfoodfacts/openfoodfacts-monitoring/blob/main/configs/filebeat/config.yml)
+
+### Testing blackbox exporter config locally
+
+You can first start the blackbox exporter service:
+`docker compose up blackbox-exporter`
+Look at the log, it may tell about errors in the config.
+
+You can then test a probe manually, you must pass as parameter the `target` (the URL to probe),
+and the `module` used to probe it. Adding `debug=true` will help you debug the probe.
+
+For example:
+http://127.0.0.1:9115/probe?target=https://prometheus.openfoodfacts.org/&module=http_probe_auth_monitoring&debug=true will probe `http://prometheus.openfoodfacts.org` with the `http_probe_auth_monitoring` module.
+
+Look at the `probe_success` metrics to see if the probe succeeded.
