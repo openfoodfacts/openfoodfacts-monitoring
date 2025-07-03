@@ -1,3 +1,7 @@
+# This is the blackbox exporter configuration file.
+#
+# If you want to test it locally refer to README.md
+
 modules:
 
   # prober without any auth so that we can reuse the configuration
@@ -48,7 +52,7 @@ modules:
       <<: *http_probe_http
       basic_auth:
         username: "off"
-        password_file: "/config/monitoring_basic_auth.secret"
+        password_file: "/config/secrets/monitoring_basic_auth.secret"
 
   # Just like http_probe, but setting the basic auth to the
   # user "off" and the password used for elasticsearch and kibana websites.
@@ -59,7 +63,7 @@ modules:
       <<: *http_probe_http
       basic_auth:
         username: "off"
-        password_file: "/config/elasticsearch_basic_auth.secret"
+        password_file: "/config/secrets/elasticsearch_basic_auth.secret"
 
   # Prober fetching html content
   # Some website might not answer to a request asking for JSON

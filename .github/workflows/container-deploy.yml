@@ -107,6 +107,7 @@ jobs:
             echo "${{ secrets.FREE_EXPORTERS_PASSWORD }}" > configs/prometheus/secrets/free-exporters.txt
 
             # Blackbox secrets
+            mkdir -p configs/blackbox_exporter/secrets
             echo "${{ secrets.MONITORING_BASIC_AUTH_PASSWORD }}" > configs/blackbox_exporter/secrets/monitoring_basic_auth.secret
             echo "${{ secrets.ELASTICSEARCH_BASIC_AUTH_PASSWORD }}" > configs/blackbox_exporter/secrets/elasticsearch_basic_auth.secret
 
