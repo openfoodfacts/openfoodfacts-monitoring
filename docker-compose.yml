@@ -1,6 +1,6 @@
 services:
   influxdb:
-    restart: always
+    restart: ${RESTART_POLICY:-always}
     image: influxdb:1.7.11-alpine
     environment:
       - INFLUXDB_ADMIN_USER
@@ -17,7 +17,7 @@ services:
       - monitoring
 
   grafana:
-    restart: always
+    restart: ${RESTART_POLICY:-always}
     image: grafana/grafana:8.1.0
     environment:
       - INFLUXDB_DB
@@ -31,7 +31,7 @@ services:
       - monitoring
 
   kibana:
-    restart: always
+    restart: ${RESTART_POLICY:-always}
     image: kibana:7.14.2
     volumes:
       - ./configs/kibana/kibana.yml:/home/kibana/config/kibana.yml
@@ -48,7 +48,7 @@ services:
   #     - monitoring
 
   elasticsearch:
-    restart: always
+    restart: ${RESTART_POLICY:-always}
     image: elasticsearch:7.14.1
     environment:
       - discovery.type=single-node
@@ -76,7 +76,7 @@ services:
       - monitoring
 
   elasticsearch_exporter:
-    restart: always
+    restart: ${RESTART_POLICY:-always}
     image: quay.io/prometheuscommunity/elasticsearch-exporter:latest
     command:
       - '--es.uri=http://elasticsearch:9200'
@@ -86,7 +86,7 @@ services:
       - monitoring
 
   alertmanager:
-    restart: always
+    restart: ${RESTART_POLICY:-always}
     image: prom/alertmanager:v0.23.0
     volumes:
       - alertmanager-data:/var/lib/prometheus/alertmanager
@@ -99,7 +99,7 @@ services:
       - monitoring
 
   prometheus:
-    restart: always
+    restart: ${RESTART_POLICY:-always}
     image: prom/prometheus:v2.30.0
     volumes:
       - ./configs/prometheus/:/etc/prometheus/
@@ -120,7 +120,7 @@ services:
       - "host.docker.internal:host-gateway"
 
   blackbox_exporter:
-    restart: always
+    restart: ${RESTART_POLICY:-always}
     image: prom/blackbox-exporter:v0.19.0
     command: --config.file=/config/config.yml
     dns: 8.8.8.8
