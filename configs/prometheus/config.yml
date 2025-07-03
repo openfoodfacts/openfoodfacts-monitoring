@@ -185,16 +185,15 @@ scrape_configs:
           metrics_path: metrics
     relabel_configs: *proxied_exporters_relabel_config
 
-  
   #--------#
   # PROBES #
   #--------#
   - job_name: blackbox-exporter
     metrics_path: /probe
     scrape_interval: 60s
-    params:
-      module: [http_probe]
     relabel_configs:
+      - source_labels: [probe_module]
+        target_label: __param_module
       - source_labels: [__address__]
         regex: ^([^|]+)\|(.+)$ # splits target by | and uses 2nd token as target for blackbox_exporter
         replacement: ${2}
@@ -220,6 +219,7 @@ scrape_configs:
           - prices-app|https://prices.openfoodfacts.net/
         labels:
           env: net
+          probe_module: http_probe_auth
       - targets:
           # Open Food Facts app (apache)
           - off|https://world.openfoodfacts.org
@@ -251,101 +251,27 @@ scrape_configs:
           - matomo-tracker|https://analytics.openfoodfacts.org/matomo.php
         labels:
           env: org
-  # prober for targets that require basic auth, using the monitoring password
-  - job_name: blackbox-exporter-auth-monitoring
-    metrics_path: /probe
-    scrape_interval: 60s
-    params:
-      module: [http_probe_auth_monitoring]
-    relabel_configs:
-      - source_labels: [__address__]
-        regex: ^([^|]+)\|(.+)$ # splits target by | and uses 2nd token as target for blackbox_exporter
-        replacement: ${2}
-        target_label: __param_target
-      - source_labels: [__address__]
-        regex: (.+)\|(.+) # splits target by | and uses 1st token as 'app' label
-        replacement: ${1}
-        target_label: app
-      - source_labels: [__param_target]
-        target_label: instance
-      - replacement: blackbox_exporter:9115
-        target_label: __address__
-    static_configs:
+          probe_module: http_probe
       - targets:
           - prometheus|https://prometheus.openfoodfacts.org/-/healthy
           - alertmanager|https://alertmanager.openfoodfacts.org/-/healthy
         labels:
           env: org
-  # prober for targets that require basic auth, using the elasticsearch password
-  - job_name: blackbox-exporter-auth-elasticsearch
-    metrics_path: /probe
-    scrape_interval: 60s
-    params:
-      module: [http_probe_auth_elasticsearch]
-    relabel_configs:
-      - source_labels: [__address__]
-        regex: ^([^|]+)\|(.+)$ # splits target by | and uses 2nd token as target for blackbox_exporter
-        replacement: ${2}
-        target_label: __param_target
-      - source_labels: [__address__]
-        regex: (.+)\|(.+) # splits target by | and uses 1st token as 'app' label
-        replacement: ${1}
-        target_label: app
-      - source_labels: [__param_target]
-        target_label: instance
-      - replacement: blackbox_exporter:9115
-        target_label: __address__
-    static_configs:
+          probe_module: http_probe_auth_monitoring
       - targets:
           # technical tools
           - kibana|https://kibana.openfoodfacts.org/status
           - elasticsearch|https://elasticsearch.openfoodfacts.org/_cluster/health?wait_for_status=yellow&timeout=50s
         labels:
           env: org
-  # prober for target that only support html as content-type (not json)
-  - job_name: blackbox-exporter-html
-    metrics_path: /probe
-    scrape_interval: 60s
-    params:
-      module: [http_probe_html]
-    relabel_configs:
-      - source_labels: [__address__]
-        regex: ^([^|]+)\|(.+)$ # splits target by | and uses 2nd token as target for blackbox_exporter
-        replacement: ${2}
-        target_label: __param_target
-      - source_labels: [__address__]
-        regex: (.+)\|(.+) # splits target by | and uses 1st token as 'app' label
-        replacement: ${1}
-        target_label: app
-      - source_labels: [__param_target]
-        target_label: instance
-      - replacement: blackbox_exporter:9115
-        target_label: __address__
-    static_configs:
+          probe_module: http_probe_auth_elasticsearch
+      # prober for target that only support html as content-type (not json)
       - targets:
           - connect|https://connect.openfoodfacts.org/
         labels:
           env: org
-  - job_name: blackbox-exporter-icmp
-    metrics_path: /probe
-    scrape_interval: 60s
-    params:
-      module: [icmp]
-    relabel_configs:
-      - source_labels: [__address__]
-        regex: ^([^|]+)\|(.+)$ # splits target by | and uses 2nd token as target for blackbox_exporter
-        replacement: ${2}
-        target_label: __param_target
-      - source_labels: [__address__]
-        regex: (.+)\|(.+) # splits target by | and uses 1st token as 'app' label
-        replacement: ${1}
-        target_label: app
-      # we use target as instance name
-      - source_labels: [__param_target]
-        target_label: instance
-      - replacement: blackbox_exporter:9115
-        target_label: __address__
-    static_configs:
+          probe_module: http_probe_auth_html
+        # pinging
       - targets:
           - ovh1|ovh1.openfoodfacts.org
           - proxy1_ovh|proxy1.openfoodfacts.org
@@ -354,3 +280,7 @@ scrape_configs:
           - ovh3|ovh3.openfoodfacts.org
           - off1|off1.openfoodfacts.org
           - off2|off2.openfoodfacts.org
+        labels:
+          env: org
+          probe_module: icmp
+

@@ -5,7 +5,9 @@
 modules:
 
   # prober without any auth so that we can reuse the configuration
-  http_probe_anonymous:
+  http_probe:
+    prober: http
+    timeout: 10s
     http: &http_probe_http
       valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
       valid_status_codes: [200, 301, 302]
@@ -34,7 +36,7 @@ modules:
   # This is the definition of the prober
   # Look at blackbox-net and blackbox-org in prometheus configuration
   # to see how it's used on different targets
-  http_probe:
+  http_probe_auth:
     prober: http
     timeout: 10s
     http:
