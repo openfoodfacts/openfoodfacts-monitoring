@@ -1,4 +1,32 @@
 modules:
+
+  # prober without any auth so that we can reuse the configuration
+  http_probe_anonymous:
+    http: &http_probe_http
+      valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+      valid_status_codes: [200, 301, 302]
+      method: GET
+      headers:
+        User-Agent: Blackbox Monitoring - Docker - Version 1.0 - monitoring.openfoodfacts.com
+        Content-Type: application/json
+      follow_redirects: true
+      fail_if_ssl: false
+      fail_if_not_ssl: false
+      fail_if_body_matches_regexp:
+        - "Could not connect to database"
+      # fail_if_header_matches: # Verifies that no cookies are set
+      #   - header: Set-Cookie
+      #     allow_missing: true
+      #     regexp: '.*'
+      # fail_if_header_not_matches:
+      #   - header: Access-Control-Allow-Origin
+      #     regexp: '(\*|example\.com)'
+      tls_config:
+        insecure_skip_verify: false
+      preferred_ip_protocol: "ip4" # defaults to "ip6"
+      ip_protocol_fallback: false  # no fallback to "ip6"
+
+
   # This is the definition of the prober
   # Look at blackbox-net and blackbox-org in prometheus configuration
   # to see how it's used on different targets
@@ -6,31 +34,10 @@ modules:
     prober: http
     timeout: 10s
     http:
-      valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
-      valid_status_codes: [200, 301, 302]
-      method: GET
-      headers:
-        User-Agent: Blackbox Monitoring - Docker - Version 1.0 - monitoring.openfoodfacts.com
-        Content-Type: application/json
+      <<: *http_probe_http
       basic_auth:
         username: "off"
         password: "off"
-      follow_redirects: true
-      fail_if_ssl: false
-      fail_if_not_ssl: false
-      fail_if_body_matches_regexp:
-        - "Could not connect to database"
-      # fail_if_header_matches: # Verifies that no cookies are set
-      #   - header: Set-Cookie
-      #     allow_missing: true
-      #     regexp: '.*'
-      # fail_if_header_not_matches:
-      #   - header: Access-Control-Allow-Origin
-      #     regexp: '(\*|example\.com)'
-      tls_config:
-        insecure_skip_verify: false
-      preferred_ip_protocol: "ip4" # defaults to "ip6"
-      ip_protocol_fallback: false  # no fallback to "ip6"
 
   # Just like http_probe, but setting the basic auth to the
   # user "off" and the password used for monitoring websites.
@@ -38,31 +45,10 @@ modules:
     prober: http
     timeout: 10s
     http:
-      valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
-      valid_status_codes: [200, 301, 302]
-      method: GET
-      headers:
-        User-Agent: Blackbox Monitoring - Docker - Version 1.0 - monitoring.openfoodfacts.com
-        Content-Type: application/json
+      <<: *http_probe_http
       basic_auth:
         username: "off"
         password_file: "/config/monitoring_basic_auth.secret"
-      follow_redirects: true
-      fail_if_ssl: false
-      fail_if_not_ssl: false
-      fail_if_body_matches_regexp:
-        - "Could not connect to database"
-      # fail_if_header_matches: # Verifies that no cookies are set
-      #   - header: Set-Cookie
-      #     allow_missing: true
-      #     regexp: '.*'
-      # fail_if_header_not_matches:
-      #   - header: Access-Control-Allow-Origin
-      #     regexp: '(\*|example\.com)'
-      tls_config:
-        insecure_skip_verify: false
-      preferred_ip_protocol: "ip4" # defaults to "ip6"
-      ip_protocol_fallback: false  # no fallback to "ip6"
 
   # Just like http_probe, but setting the basic auth to the
   # user "off" and the password used for elasticsearch and kibana websites.
@@ -70,54 +56,22 @@ modules:
     prober: http
     timeout: 10s
     http:
-      valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
-      valid_status_codes: [200, 301, 302]
-      method: GET
-      headers:
-        User-Agent: Blackbox Monitoring - Docker - Version 1.0 - monitoring.openfoodfacts.com
-        Content-Type: application/json
+      <<: *http_probe_http
       basic_auth:
         username: "off"
         password_file: "/config/elasticsearch_basic_auth.secret"
-      follow_redirects: true
-      fail_if_ssl: false
-      fail_if_not_ssl: false
-      fail_if_body_matches_regexp:
-        - "Could not connect to database"
-      # fail_if_header_matches: # Verifies that no cookies are set
-      #   - header: Set-Cookie
-      #     allow_missing: true
-      #     regexp: '.*'
-      # fail_if_header_not_matches:
-      #   - header: Access-Control-Allow-Origin
-      #     regexp: '(\*|example\.com)'
-      tls_config:
-        insecure_skip_verify: false
-      preferred_ip_protocol: "ip4" # defaults to "ip6"
-      ip_protocol_fallback: false  # no fallback to "ip6"
 
+  # Prober fetching html content
+  # Some website might not answer to a request asking for JSON
+  # It's the case of odoo for example
   http_probe_html:
     prober: http
     timeout: 10s
     http:
-      valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
-      valid_status_codes: [200, 301, 302]
-      method: GET
+      <<: *http_probe_http
       headers:
         User-Agent: Blackbox Monitoring - Docker - Version 1.0 - monitoring.openfoodfacts.com
         Content-Type: text/html
-      basic_auth:
-        username: "off"
-        password: "off"
-      follow_redirects: true
-      fail_if_ssl: false
-      fail_if_not_ssl: false
-      fail_if_body_matches_regexp:
-        - "Could not connect to database"
-      tls_config:
-        insecure_skip_verify: false
-      preferred_ip_protocol: "ip4" # defaults to "ip6"
-      ip_protocol_fallback: false  # no fallback to "ip6"
 
   icmp:  # aka ping
     prober: icmp
