@@ -53,7 +53,7 @@ scrape_configs:
           base_url: ovh-exporters.openfoodfacts.org:443
           metrics_path: metrics
     relabel_configs: &ovh_exporters_relabel_config
-      # get instance, firts part + second part of target
+      # get instance, first part + second part of target
       - source_labels: [__address__]
         regex: ^([^/]+)/([^/]+)/([^/]+)/(.*)$
         replacement: ovh-${3}-${2}
