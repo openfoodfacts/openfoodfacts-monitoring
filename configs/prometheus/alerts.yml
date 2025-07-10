@@ -2,13 +2,13 @@ groups:
 - name: node-alerts
   rules:
   - alert: VMOutOfMemory
-    expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 25
+    expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10
     for: 15m
     labels:
       severity: warning
       instance: "{{ $labels.instance }}"
     annotations:
-      summary: Less than 25% of memory remaining on {{ $labels.instance }}
+      summary: Less than 10% of memory remaining on {{ $labels.instance }}
       description: Remaining memory usage on VM {{ $labels.instance }} is {{ $value }}%  for more than 15 minutes.
 
   - alert: VMOutOfDiskSpace
