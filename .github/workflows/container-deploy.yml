@@ -87,6 +87,9 @@ jobs:
             echo "COMPOSE_PATH_SEPARATOR=;" >> .env
             echo "COMPOSE_FILE=docker-compose.yml;docker/prod.yml" >> .env
 
+            # Prometheus
+            echo "PROMETHEUS_RETENTION_SIZE=30GB" >> .env
+
             # Grafana
             echo "GF_SERVER_ROUTER_LOGGING=true" >> .env
             echo "GF_SECURITY_ADMIN_USER=off" >> .env
