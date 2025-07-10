@@ -53,10 +53,10 @@ scrape_configs:
           base_url: ovh-exporters.openfoodfacts.org:443
           metrics_path: metrics
     relabel_configs: &ovh_exporters_relabel_config
-     # get instance, firts part + second part of target
+      # get instance, first part + second part of target
       - source_labels: [__address__]
         regex: ^([^/]+)/([^/]+)/([^/]+)/(.*)$
-        replacement: ${1}-${2}-${3}-${4}
+        replacement: ovh-${3}-${2}
         target_label: instance
       # get job name, first part
       - source_labels: [__address__]
@@ -151,11 +151,15 @@ scrape_configs:
           env: prod
           base_url: free-exporters.openfoodfacts.org:443
           metrics_path: metrics
+          instance_prefix: free
     relabel_configs: &proxied_exporters_relabel_config
-      # get instance, firts part + second part of target
+      # get instance, first part of target
       - source_labels: [__address__]
         regex: ^([^/]+)/(.*)$
-        replacement: ${1}-${2}
+        replacement: ${1}
+        target_label: instance
+      - source_labels: [instance_prefix, instance]
+        separator: "-"
         target_label: instance
       # the metrics path is adress + /metrics
       - source_labels: [__address__, metrics_path]
@@ -183,6 +187,7 @@ scrape_configs:
           env: prod
           base_url: ks1.openfoodfacts.org:443
           metrics_path: metrics
+          instance_prefix: ks1
     relabel_configs: *proxied_exporters_relabel_config
 
   #--------#
