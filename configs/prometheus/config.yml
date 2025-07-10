@@ -153,7 +153,7 @@ scrape_configs:
           metrics_path: metrics
           instance_prefix: free
     relabel_configs: &proxied_exporters_relabel_config
-      # get instance, firts part of target
+      # get instance, first part of target
       - source_labels: [__address__]
         regex: ^([^/]+)/(.*)$
         replacement: ${1}
