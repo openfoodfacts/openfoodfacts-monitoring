@@ -2,6 +2,7 @@ apiVersion: 1
 datasources:
   - name: Prometheus
     type: prometheus
+    uid: prom
     access: proxy
     orgId: 1
     url: http://prometheus:9090
@@ -21,6 +22,7 @@ datasources:
 
   - name: ElasticSearch (Logs)
     type: elasticsearch
+    uid: elasticsearch_logs
     access: proxy
     url: http://elasticsearch:9200
     database: "[logs-]YYYY.MM.DD"
@@ -39,3 +41,35 @@ datasources:
     basicAuthUser: ${INFLUXDB_ADMIN_USER}
     secureJsonData:
       basicAuthPassword: ${INFLUXDB_ADMIN_PASSWORD}
+
+  - name: Tempo
+    type: tempo
+    uid: tempo
+    url: http://tempo:3200
+    editable: true
+    jsonData:
+      nodeGraph:
+        enabled: true
+      search:
+        datasourceUid: elasticsearch_logs
+        filters:
+        - id: service-name
+          operator: "="
+          scope: resource
+          tag: service.name
+        - id: span-name
+          operator: "="
+          scope: span
+          tag: name
+        hide: false
+      serviceMap:
+        datasourceUid: prom
+      tracesToLogsV2:
+        customQuery: true
+        datasourceUid: elasticsearch_logs
+        query: '{${__tags}} | trace_id = "${__trace.traceId}"'
+        tags:
+        - key: service.name
+          value: service_name
+      tracesToProfiles:
+        datasourceUid: grafana

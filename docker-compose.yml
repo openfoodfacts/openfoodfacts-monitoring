@@ -18,7 +18,7 @@ services:
 
   grafana:
     restart: ${RESTART_POLICY:-always}
-    image: grafana/grafana:8.1.0
+    image: grafana/grafana:10.4.19-security-01@sha256:5584505cb75be8cb14c19d7473a87e2675c68b34b546bc1923ef74300c337111
     environment:
       - INFLUXDB_DB
       - INFLUXDB_ADMIN_USER
@@ -29,6 +29,8 @@ services:
       - grafana-data:/var/lib/grafana
     networks:
       - monitoring
+    ports:
+      - "${GRAFANA_EXPOSE:-127.0.0.1:3000}:3000"
 
   kibana:
     restart: ${RESTART_POLICY:-always}
@@ -111,6 +113,7 @@ services:
       - '--web.console.templates=/usr/share/prometheus/consoles'
       - '--web.external-url=https://prometheus.openfoodfacts.org/'
       - '--web.enable-admin-api'
+      - '--enable-feature=remote-write-receiver'
     ports:
       - ${PROMETHEUS_EXPOSE:-127.0.0.1:9090}:9090
     networks:
@@ -131,6 +134,21 @@ services:
     networks:
       - monitoring
 
+  tempo:
+    restart: ${RESTART_POLICY:-always}
+    image: grafana/tempo:2.8.1@sha256:bc9245fe3da4e63dc4c6862d9c2dad9bcd8be13d0ba4f7705fa6acda4c904d0e
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - "./configs/tempo/tempo.yaml:/etc/tempo.yaml"
+      - tempo-data:/data/tempo
+    ports:
+      - ${TEMPO_EXPOSE_HTTP:-127.0.0.1:3200}:3200
+      - ${TEMPO_EXPOSE_GRPC:-127.0.0.1:9096}:9096
+      - ${TEMPO_EXPOSE_OTEL_GRPC:-127.0.0.1:4417}:4417
+      - ${TEMPO_EXPOSE_OTEL_HTTP:-127.0.0.1:4418}:4418
+    networks:
+      - monitoring
+
 volumes:
   influxdb-data:
   grafana-data:
@@ -138,6 +156,7 @@ volumes:
   elasticsearch-backup:
   prometheus-data:
   alertmanager-data:
+  tempo-data:
 
 networks:
   monitoring:
