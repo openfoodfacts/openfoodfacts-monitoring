@@ -67,7 +67,7 @@ datasources:
       tracesToLogsV2:
         customQuery: true
         datasourceUid: elasticsearch_logs
-        query: '{${__tags}} | trace_id = "${__trace.traceId}"'
+        query: 'tags | trace_id = "${__trace.traceId}"'
         tags:
         - key: service.name
           value: service_name
