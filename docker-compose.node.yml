@@ -50,7 +50,7 @@ services:
   # local Alloy instance to forward traces to Tempo
   alloy:
     restart: always
-    image: grafana/alloy:v1.10.0@sha256:1bc130e909116a4bf950eb5187a346007d3b796f96832b529acb14a64e41230f
+    image: grafana/alloy:v1.12.2@sha256:f94b1c82957accb77cd11385fd5e3600758ef1b1ab79557c97319ad28590735a
     environment:
       - TEMPO_HOST
       - PROMETHEUS_WRITE_ENDPOINT
