@@ -18,7 +18,7 @@ services:
 
   grafana:
     restart: ${RESTART_POLICY:-always}
-    image: grafana/grafana:12.3.1@sha256:2175aaa91c96733d86d31cf270d5310b278654b03f5718c59de12a865380a31f
+    image: grafana/grafana:10.4.19-security-01@sha256:5584505cb75be8cb14c19d7473a87e2675c68b34b546bc1923ef74300c337111
     environment:
       - INFLUXDB_DB
       - INFLUXDB_ADMIN_USER
