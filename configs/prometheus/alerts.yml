@@ -11,14 +11,15 @@ groups:
       summary: Less than 10% of memory remaining on {{ $labels.instance }}
       description: Remaining memory usage on VM {{ $labels.instance }} is {{ $value }}%  for more than 15 minutes.
 
-  - alert: VMOutOfDiskSpace
-    expr: (node_filesystem_avail_bytes{device="/dev/sda1", mountpoint="/"} * 100) / node_filesystem_size_bytes{device="/dev/sda1", mountpoint="/"} < 20
+  - alert: OutOfDiskSpace
+    expr: >-
+      (node_filesystem_avail_bytes{device!="tmpfs",device!="ramfs"} / node_filesystem_size_bytes) * 100 < 10
     for: 15m
     labels:
       severity: warning
       instance: "{{ $labels.instance }}"
     annotations:
-      summary: Less than 20% of disk space remaining on {{ $labels.instance }}
+      summary: Less than 10% of disk space remaining on {{ $labels.instance }}
       description: Remaining disk space on {{ $labels.instance }} is {{ $value }}% for more than 15 minutes.
 
 
