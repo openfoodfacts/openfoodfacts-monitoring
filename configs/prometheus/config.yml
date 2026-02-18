@@ -98,12 +98,14 @@ scrape_configs:
           app: docker
           env: monitoring
           service: cadvisor
+          instance: monitoring-01
       - targets: ["host.docker.internal:8281"]
         labels:
           job: node-exporter
           app: system
           env: monitoring
           service: vm
+          instance: monitoring-01
 
   # local jobs in the same docker network
   # TODO: use Docker Service Discovery https://prometheus.io/docs/prometheus/latest/configuration/configuration/#docker_sd_config
