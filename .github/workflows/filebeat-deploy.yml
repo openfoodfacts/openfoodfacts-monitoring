@@ -58,7 +58,6 @@ jobs:
         proxy_host: ${{ env.SSH_PROXY_HOST }}
         proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets[matrix.server.ssh_key_name] }}
-        script_stop: false
         script: |
           # Clone Git repository if not already there
           [ ! -d 'filebeat' ] && git clone --depth 1 https://github.com/${{ github.repository }} filebeat --no-single-branch 2>&1
@@ -85,7 +84,6 @@ jobs:
         proxy_host: ${{ env.SSH_PROXY_HOST }}
         proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets[matrix.server.ssh_key_name] }}
-        script_stop: false
         script: |
           # Go to repository directory
           cd filebeat/
@@ -112,7 +110,6 @@ jobs:
         proxy_host: ${{ env.SSH_PROXY_HOST }}
         proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets[matrix.server.ssh_key_name] }}
-        script_stop: false
         script: |
           cd filebeat/
           make down && make up
@@ -127,7 +124,6 @@ jobs:
         proxy_host: ${{ env.SSH_PROXY_HOST }}
         proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets[matrix.server.ssh_key_name] }}
-        script_stop: false
         script: |
           cd filebeat/
           make livecheck
@@ -142,7 +138,6 @@ jobs:
         proxy_host: ${{ env.SSH_PROXY_HOST }}
         proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets[matrix.server.ssh_key_name] }}
-        script_stop: false
         script: |
           cd filebeat/
           make prune
