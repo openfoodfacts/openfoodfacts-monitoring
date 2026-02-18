@@ -20,11 +20,23 @@ jobs:
       fail-fast: false
       matrix:
         server:
-          # staging dockers
+          # scaleway docker prod
+          - host: "10.13.1.200"
+            proxy: scaleway-02.infra.openfoodfacts.org
+            ssh_key_name: "SSH_PRIVATE_KEY_SCALEWAY_DOCKER_PROD"
+          # hetzner docker prod
+          - host: "10.12.1.202"
+            proxy: hetzner-03.infra.openfoodfacts.org
+            ssh_key_name: "SSH_PRIVATE_KEY_HETZNER_DOCKER_PROD"
+          # hetzner docker staging
+          - host: "10.12.1.201"
+            proxy: hetzner-02.infra.openfoodfacts.org
+            ssh_key_name: "SSH_PRIVATE_KEY_HETZNER_DOCKER_STAGING"
+          # staging dockers on OVH
           - host: "10.1.0.200"
             proxy: "ovh1.openfoodfacts.org"
             ssh_key_name: "SSH_PRIVATE_KEY_OVH1"
-          # prod dockers
+          # prod dockers on OVH
           - host: "10.1.0.201"
             proxy: "ovh2.openfoodfacts.org"
             ssh_key_name: "SSH_PRIVATE_KEY_OVH2"
@@ -34,7 +46,7 @@ jobs:
             ssh_key_name: "SSH_PRIVATE_KEY_MONITORING_01"
           # docker2 prod
           - host: "10.3.0.200"
-            proxy: "osm45.openfoodfacts.org"
+            proxy: "45.147.209.254"
             ssh_key_name: "SSH_PRIVATE_KEY_DOCKER_PROD_2"
     steps:
     - name: Set env variables
