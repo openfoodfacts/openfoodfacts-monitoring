@@ -1,0 +1,5 @@
+# Note statsd is used to get stats from gunicorn
+method: http
+http:
+  address: host.docker.internal
+  port: 9102

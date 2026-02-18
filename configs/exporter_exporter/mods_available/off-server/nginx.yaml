@@ -1,0 +1,4 @@
+method: http
+http:
+  address: host.docker.internal
+  port: 9113

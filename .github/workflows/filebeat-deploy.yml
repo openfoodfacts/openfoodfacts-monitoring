@@ -24,30 +24,37 @@ jobs:
           - host: "10.13.1.200"
             proxy: scaleway-02.infra.openfoodfacts.org
             ssh_key_name: "SSH_PRIVATE_KEY_SCALEWAY_DOCKER_PROD"
+            exporter_exporter_config_dir: scaleway-docker-prod
           # hetzner docker prod
           - host: "10.12.1.202"
             proxy: hetzner-03.infra.openfoodfacts.org
             ssh_key_name: "SSH_PRIVATE_KEY_HETZNER_DOCKER_PROD"
+            exporter_exporter_config_dir: hetzner-docker-prod
           # hetzner docker staging
           - host: "10.12.1.201"
             proxy: hetzner-02.infra.openfoodfacts.org
             ssh_key_name: "SSH_PRIVATE_KEY_HETZNER_DOCKER_STAGING"
+            exporter_exporter_config_dir: default
           # staging dockers on OVH
           - host: "10.1.0.200"
             proxy: "ovh1.openfoodfacts.org"
             ssh_key_name: "SSH_PRIVATE_KEY_OVH1"
+            exporter_exporter_config_dir: ovh-docker-staging
           # prod dockers on OVH
           - host: "10.1.0.201"
             proxy: "ovh2.openfoodfacts.org"
             ssh_key_name: "SSH_PRIVATE_KEY_OVH2"
+            exporter_exporter_config_dir: ovh-docker-prod
           # monitoring-01
           - host: "34.1.5.157"
             proxy: "" # no proxy
             ssh_key_name: "SSH_PRIVATE_KEY_MONITORING_01"
+            exporter_exporter_config_dir: monitoring-01
           # docker2 prod
           - host: "10.3.0.200"
             proxy: "45.147.209.254"
             ssh_key_name: "SSH_PRIVATE_KEY_DOCKER_PROD_2"
+            exporter_exporter_config_dir: moji-docker-prod-2
     steps:
     - name: Set env variables
       run: |
@@ -114,6 +121,9 @@ jobs:
           echo "ELASTICSEARCH_HOSTS=${{ env.ELASTICSEARCH_HOSTS }}" >> .env
           echo "ELASTICSEARCH_USERNAME=${{ env.ELASTICSEARCH_USERNAME }}" >> .env
           echo "ELASTICSEARCH_PASSWORD=${{ secrets.ELASTICSEARCH_PASSWORD }}" >> .env
+
+          # exporter exporter config (proxy to other exporters)
+          echo "EXPORTER_EXPORTER_CONFIG_DIR=${{ matrix.server.exporter_exporter_config_dir }}" >> .env
 
     - name: Start services
       uses: appleboy/ssh-action@master
