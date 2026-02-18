@@ -46,7 +46,7 @@ jobs:
             ssh_key_name: "SSH_PRIVATE_KEY_MONITORING_01"
           # docker2 prod
           - host: "10.3.0.200"
-            proxy: "osm45.openfoodfacts.org"
+            proxy: "osm45.infra6.openfoodfacts.org"
             ssh_key_name: "SSH_PRIVATE_KEY_DOCKER_PROD_2"
     steps:
     - name: Set env variables
