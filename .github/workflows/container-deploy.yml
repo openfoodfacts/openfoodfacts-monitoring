@@ -53,7 +53,6 @@ jobs:
           proxy_host: ${{ env.SSH_PROXY_HOST }}
           proxy_username: ${{ env.SSH_USERNAME }}
           proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-          script_stop: false
           script: |
             echo "RESTART_ONLY is ${{ env.RESTART_ONLY }}"
             # Clone Git repository if not already there
@@ -75,7 +74,6 @@ jobs:
           proxy_host: ${{ env.SSH_PROXY_HOST }}
           proxy_username: ${{ env.SSH_USERNAME }}
           proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-          script_stop: false
           script: |
             # Go to repository directory
             cd monitoring/
@@ -120,7 +118,6 @@ jobs:
           proxy_host: ${{ env.SSH_PROXY_HOST }}
           proxy_username: ${{ env.SSH_USERNAME }}
           proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-          script_stop: false
           script: |
             cd monitoring/
             make replace_env
@@ -135,7 +132,6 @@ jobs:
           proxy_host: ${{ env.SSH_PROXY_HOST }}
           proxy_username: ${{ env.SSH_USERNAME }}
           proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-          script_stop: false
           script: |
             cd monitoring/
             make create_external_volumes
@@ -150,7 +146,6 @@ jobs:
           proxy_host: ${{ env.SSH_PROXY_HOST }}
           proxy_username: ${{ env.SSH_USERNAME }}
           proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-          script_stop: false
           script: |
             cd monitoring/
             make create_backups_dir && \
@@ -167,7 +162,6 @@ jobs:
           proxy_host: ${{ env.SSH_PROXY_HOST }}
           proxy_username: ${{ env.SSH_USERNAME }}
           proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-          script_stop: false
           script: |
             cd monitoring/
             make restart
@@ -182,7 +176,6 @@ jobs:
           proxy_host: ${{ env.SSH_PROXY_HOST }}
           proxy_username: ${{ env.SSH_USERNAME }}
           proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-          script_stop: false
           script: |
             cd monitoring/
             make livecheck
@@ -197,7 +190,6 @@ jobs:
           proxy_host: ${{ env.SSH_PROXY_HOST }}
           proxy_username: ${{ env.SSH_USERNAME }}
           proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-          script_stop: false
           script: |
             cd monitoring/
             make prune
