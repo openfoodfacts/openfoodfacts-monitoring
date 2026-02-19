@@ -1,0 +1,5 @@
+method: http
+http:
+  # it's in the same docker network
+  address: node_exporter
+  port: 9100
