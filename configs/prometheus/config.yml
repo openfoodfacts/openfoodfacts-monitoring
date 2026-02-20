@@ -31,7 +31,11 @@ alerting:
 
 scrape_configs:
   - job_name: vm-exporters-exporters
-    # This works with the relabel config below:
+    scheme: https
+    basic_auth:
+      username: prometheus
+      password_file: /etc/prometheus/secrets/scaleway.txt
+  # This works with the relabel config below:
     # - each target must have a base_url label
     # - each targets list can add server, cluster and env label (don't mix envs)
     # - each line defines the module to be called (which will be the exporter) + app and service label, like node|app|service
@@ -40,62 +44,65 @@ scrape_configs:
     # scaleway - docker prod VM
     # modules available: https://scaleway-exporters.openfoodfacts.org/scaleway-docker-prod/
     static_configs:
-    - targets:
-        - cadvisor|docker|cadvisor
-        - node|node|system
-        - mongodb|off|mongodb
-        - postgres|off|postgres
-        - redis|off|redis
-      labels:
-        base_url: https://scaleway-exporters.openfoodfacts.org/scaleway-docker-prod/
-        env: prod
-        cluster: scaleway
-        server: scaleway-docker-prod
-    - targets:
-        - cadvisor|docker|cadvisor
-        - node|node|system
-      labels:
-        base_url: https://hetzner-exporters.openfoodfacts.org/hetzner-docker-prod/
-        env: prod
-        cluster: hetzner
-        server: hetzner-docker-prod
-    - targets:
-        - cadvisor|docker|cadvisor
-        - node|node|system
-      labels:
-        base_url: https://hetzner-exporters.openfoodfacts.org/hetzner-docker-staging/
-        env: staging
-        cluster: hetzner
-        server: hetzner-docker-staging
-    # TODO: https://ovh-exporters.openfoodfacts.org/ovh-docker-prod/ and https://ovh-exporters.openfoodfacts.org/ovh-docker-staging/
+      - targets:
+          - "cadvisor/docker/cadvisor"
+          - "node/node/system"
+          - "mongodb/off/mongodb"
+          - "postgres/off/postgres"
+          - "redis/off/redis"
+        labels:
+          base_url: https://scaleway-exporters.openfoodfacts.org/scaleway-docker-prod/
+          env: prod
+          cluster: scaleway
+          server: scaleway-docker-prod
+      - targets:
+          - "cadvisor/docker/cadvisor"
+          - "node/node/system"
+        labels:
+          base_url: https://hetzner-exporters.openfoodfacts.org/hetzner-docker-prod/
+          env: prod
+          cluster: hetzner
+          server: hetzner-docker-prod
+      - targets:
+          - "cadvisor/docker/cadvisor"
+          - "node/node/system"
+        labels:
+          base_url: https://hetzner-exporters.openfoodfacts.org/hetzner-docker-staging/
+          env: staging
+          cluster: hetzner
+          server: hetzner-docker-staging
+      # TODO: https://ovh-exporters.openfoodfacts.org/ovh-docker-prod/ and https://ovh-exporters.openfoodfacts.org/ovh-docker-staging/
 
     # use configs above to create targets
     relabel_configs: &exporters_exporters_relabel_config
-      # get exporter|app|service labels
+      # get exporter/app/service labels
       - source_labels: [__address__]
-        regex: ^([^|]+)|([^|]+)|([^|]+)$
+        regex: "([^/]+)/([^/]+)/([^/]+)"
         replacement: ${1}
         target_label: exporter
       - source_labels: [__address__]
-        regex: ^([^|]+)|([^|]+)|([^|]+)$
+        regex: "([^/]+)/([^/]+)/([^/]+)"
         replacement: ${2}
         target_label: app
       - source_labels: [__address__]
-        regex: ^([^|]+)|([^|]+)|([^|]+)$
+        regex: "([^/]+)/([^/]+)/([^/]+)"
         replacement: ${3}
         target_label: service
+      # instance
+      - source_labels: [app, service, server, cluster]
+        separator: "-"
+        target_label: instance
       # get the __address__ and __metricts_path__
       - source_labels: [base_url]
-        regex: ^https?://([^/]+)(/.*)$
+        regex: "https?://([^/]+)(/.*)"
         replacement: ${2}proxy
         target_label: __metrics_path__
       - source_labels: [base_url]
-        regex: ^https?://([^/]+)(/.*)$
+        regex: "https?://([^/]+)(/.*)"
         replacement: ${1}
         target_label: __address__
       # add the module parameter
       - source_labels: [exporter]
-        separator: ""
         target_label: __param_module
       # drop labels that where only useful for configuration
       - regex: ^(base_url)$
@@ -174,8 +181,8 @@ scrape_configs:
       - source_labels: [base_url]
         target_label: __address__
       # drop labels that where only useful for configuration
-      - regex: ^(base_url|metrics_path)$
-        action: labeldrop
+      #- regex: ^(base_url|metrics_path)$
+      #  action: labeldrop
 
   # local jobs, on the same host
   - job_name: monitoring-exporters
