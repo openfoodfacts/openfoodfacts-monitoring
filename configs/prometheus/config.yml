@@ -1,3 +1,20 @@
+# Prometheus targets,
+# that is the various points that collects metrics (in pull mode)
+
+# Note on labels:
+# Those are very important
+# - instance: should be something that immediately identify the service / app / env
+#   - for blackbox it can be the crapped url
+# - env: this is the environment, MUST BE org|prod|monitoring or net|test|staging
+# - app: is the application the service is related to
+# - service: is the service (eg. postgresql, gunicorn, nginx) that is part of an app
+# - exporter: the (short) name of the exporter service
+#   it might be the same as the service name
+# - job: is the exporter job (filled by prometheus)
+# - server: should provide the VM / CT / server name
+# - cluster: should provide the cluster name in case it's not on a standalone server
+
+
 # my global config
 global:
   scrape_interval: 15s # By default, scrape targets every 15 seconds.
@@ -13,6 +30,77 @@ alerting:
         - targets: ["alertmanager:9093"]
 
 scrape_configs:
+  - job_name: vm-exporters-exporters
+    # This works with the relabel config below:
+    # - each target must have a base_url label
+    # - each targets list can add server, cluster and env label (don't mix envs)
+    # - each line defines the module to be called (which will be the exporter) + app and service label, like node|app|service
+    # the instance name will be app-service-server-cluster
+
+    # scaleway - docker prod VM
+    # modules available: https://scaleway-exporters.openfoodfacts.org/scaleway-docker-prod/
+    static_configs:
+    - targets:
+        - cadvisor|docker|cadvisor
+        - node|node|system
+        - mongodb|off|mongodb
+        - postgres|off|postgres
+        - redis|off|redis
+      labels:
+        base_url: https://scaleway-exporters.openfoodfacts.org/scaleway-docker-prod/
+        env: prod
+        cluster: scaleway
+        server: scaleway-docker-prod
+    - targets:
+        - cadvisor|docker|cadvisor
+        - node|node|system
+      labels:
+        base_url: https://hetzner-exporters.openfoodfacts.org/hetzner-docker-prod/
+        env: prod
+        cluster: hetzner
+        server: hetzner-docker-prod
+    - targets:
+        - cadvisor|docker|cadvisor
+        - node|node|system
+      labels:
+        base_url: https://hetzner-exporters.openfoodfacts.org/hetzner-docker-staging/
+        env: staging
+        cluster: hetzner
+        server: hetzner-docker-staging
+    # TODO: https://ovh-exporters.openfoodfacts.org/ovh-docker-prod/ and https://ovh-exporters.openfoodfacts.org/ovh-docker-staging/
+
+    # use configs above to create targets
+    relabel_configs: &exporters_exporters_relabel_config
+      # get exporter|app|service labels
+      - source_labels: [__address__]
+        regex: ^([^|]+)|([^|]+)|([^|]+)$
+        replacement: ${1}
+        target_label: exporter
+      - source_labels: [__address__]
+        regex: ^([^|]+)|([^|]+)|([^|]+)$
+        replacement: ${2}
+        target_label: app
+      - source_labels: [__address__]
+        regex: ^([^|]+)|([^|]+)|([^|]+)$
+        replacement: ${3}
+        target_label: service
+      # get the __address__ and __metricts_path__
+      - source_labels: [base_url]
+        regex: ^https?://([^/]+)(/.*)$
+        replacement: ${2}proxy
+        target_label: __metrics_path__
+      - source_labels: [base_url]
+        regex: ^https?://([^/]+)(/.*)$
+        replacement: ${1}
+        target_label: __address__
+      # add the module parameter
+      - source_labels: [exporter]
+        separator: ""
+        target_label: __param_module
+      # drop labels that where only useful for configuration
+      - regex: ^(base_url)$
+        action: labeldrop
+
   # OVH promox cluster exporters
   # They are exposed on the reverse proxy at ovh-exporters.openfoodfacts.org
   # this rule enable to get them
