@@ -104,4 +104,22 @@ groups:
       env: "{{ $labels.env }}"
     annotations:
       summary: "{{ $labels.app }}-{{ $labels.env }} is down"
-      description: Service probe on URL '{{ $labels.instance }}' failed for more than 5 minutes.
+      description: |
+        Service probe on URL '{{ $labels.instance }}' failed for more than 5 minutes.
+
+- name: prometheus-self-monitoring
+  rules:
+  - alert: PrometheusTargetMissing
+    # we exclude blackbox exporter probes as they are covered by ServiceProbeFailed
+    expr: up{job!~"blackbox-exporter.*"} == 0
+    # let time to fail
+    for: 30m
+    labels:
+      severity: warning
+    annotations:
+      summary: Prometheus target missing (instance {{ $labels.instance }})
+      description: |
+        A Prometheus target has disappeared. An exporter might be crashed.
+        VALUE = {{ $value }}
+        LABELS = {{ $labels }}
+        Check it at https://prometheus.openfoodfacts.org/targets
