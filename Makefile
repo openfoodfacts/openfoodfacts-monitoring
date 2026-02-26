@@ -9,6 +9,8 @@ DOCKER_COMPOSE=docker compose --env-file=${ENV_FILE}
 
 # mount point for backup data
 ES_BACKUP_VOLUME_PATH?=/hdd-zfs/monitoring-es-backups/
+# mount point for other data
+DOCKER_DATA_VOLUME_PATH?=/data-zfs/docker-volumes
 
 .DEFAULT_GOAL := dev
 
@@ -64,11 +66,12 @@ log:
 
 # Create all external volumes needed for production. Using external volumes is useful to prevent data loss (as they are not deleted when performing docker down -v)
 create_external_volumes:
-	docker volume create ${COMPOSE_PROJECT_NAME}_influxdb-data
-	docker volume create ${COMPOSE_PROJECT_NAME}_grafana-data
-	docker volume create ${COMPOSE_PROJECT_NAME}_elasticsearch-data
-	docker volume create ${COMPOSE_PROJECT_NAME}_prometheus-data
-	docker volume create ${COMPOSE_PROJECT_NAME}_alertmanager-data
+# most volumes are in ZFS dataset. We can't use ZFS dataset directly for permissions problems, so we create a _data inside the dataset
+	docker volume create --opt type=none --opt o=bind --opt device=${DOCKER_DATA_VOLUME_PATH}/${COMPOSE_PROJECT_NAME}_influxdb-data/_data ${COMPOSE_PROJECT_NAME}_influxdb-data
+	docker volume create --opt type=none --opt o=bind --opt device=${DOCKER_DATA_VOLUME_PATH}/${COMPOSE_PROJECT_NAME}_grafana-data/_data ${COMPOSE_PROJECT_NAME}_grafana-data
+	docker volume create --opt type=none --opt o=bind --opt device=${DOCKER_DATA_VOLUME_PATH}/${COMPOSE_PROJECT_NAME}_elasticsearch-data/_data ${COMPOSE_PROJECT_NAME}_elasticsearch-data
+	docker volume create --opt type=none --opt o=bind --opt device=${DOCKER_DATA_VOLUME_PATH}/${COMPOSE_PROJECT_NAME}_prometheus-data/_data ${COMPOSE_PROJECT_NAME}_prometheus-data
+	docker volume create --opt type=none --opt o=bind --opt device=${DOCKER_DATA_VOLUME_PATH}/${COMPOSE_PROJECT_NAME}_alertmanager-data/_data ${COMPOSE_PROJECT_NAME}_alertmanager-data
 	docker volume create --opt type=none --opt o=bind --opt device=${ES_BACKUP_VOLUME_PATH} ${COMPOSE_PROJECT_NAME}_elasticsearch-backup
 
 replace_env:
