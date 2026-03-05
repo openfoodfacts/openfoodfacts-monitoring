@@ -34,16 +34,19 @@ groups:
       description: Number of messages for queue {{ $labels.queue }} of {{ $labels.app }} ({{ $labels.instance }}) is {{ $value }} for more than 1h.
 
   - alert: Postfix - too few message sent
-    # sent message per seconds on last 24h is less than 1/2 of the average sent messages per seconds on previous 240h
-    expr: rate(postfix_smtpd_messages_processed_total[24h]) < (0.5 * rate(postfix_smtpd_messages_processed_total[240h] offset 24h))
+    # (first try) sent message per seconds on last 24h is less than 1/2 of the average sent messages per seconds on previous 240h
+    # expr: rate(postfix_smtpd_messages_processed_total[24h]) < (0.5 * rate(postfix_smtpd_messages_processed_total[240h] offset 24h))
+    # (second try)
+    # median of sent message per hour on last 24h < a third of median of sent message per hour on the previous 10 days
+    expr: quantile_over_time(0.5, delta(postfix_smtpd_messages_processed_total[1h])[24h:1h]) < (0.3 * quantile_over_time(0.5, delta(postfix_smtpd_messages_processed_total[1h])[240h:1h] offset 24h))
     for: 1h
     labels:
       severity: warning
       instance: "{{ $labels.instance }}"
     annotations:
       summary: Significant drop of sent messages on last 24h {{ $labels.app }} ({{ $labels.instance }})
-      description: Number of messages sent per hour on last 24h (1 day) is less than half of the rate on previous 240h (10 day) for {{ $labels.app }} ({{ $labels.instance }}).
-
+      # (first try) description: Number of messages sent per hour on last 24h (1 day) is less than half of the rate on previous 240h (10 day) for {{ $labels.app }} ({{ $labels.instance }}).
+      description: Median of number of messages sent per hour on last 24h (1 day) is less than a third of the median on previous 10 days for {{ $labels.app }} ({{ $labels.instance }}).
 
 # TODO: Revisit, too noisy
 # - name: docker-alerts
