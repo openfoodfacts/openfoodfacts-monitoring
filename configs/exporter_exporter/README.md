@@ -14,3 +14,6 @@ in the form: `../mods_available/<module_name.yaml>`
 
 If you module is specific in any way (eg. a hard-coded ip address),
 just put the file directly in the specific folder.
+
+IMPORTANT: if you add or remove exporters,
+don't forget to add/remove corresponding targets in prometheus config !

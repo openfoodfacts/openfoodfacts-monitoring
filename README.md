@@ -20,6 +20,7 @@ It also contains exporters that should be deployed on each nodes (see `docker-co
 * **filebeat** [^filebeat] gather logs and send them to **Elasticsearch**
 * **cadvisor** [^cadvisor] gather docker metrics
 * **node_exporter** [^node_exporter] gather host metrics
+* **exporter_exporter** proxy to other exporters
 
 PS: if you modify this, please keep [corresponding page in infrastructure](https://github.com/openfoodfacts/openfoodfacts-infrastructure/blob/develop/docs/observability.md) up to date
 
@@ -31,6 +32,9 @@ PS: if you modify this, please keep [corresponding page in infrastructure](https
 
 * [Alerts](https://github.com/openfoodfacts/openfoodfacts-monitoring/blob/main/configs/prometheus/alerts.yml)
 * [Prometheus Scrape targets](https://github.com/openfoodfacts/openfoodfacts-monitoring/blob/main/configs/prometheus/config.yml)
+
+   Please read the comment on top of file to understand the various labels.
+
 * [Grafana Dashboards](https://github.com/openfoodfacts/openfoodfacts-monitoring/tree/main/configs/grafana/dashboards)
 * [Grafana Datasources](https://github.com/openfoodfacts/openfoodfacts-monitoring/blob/main/configs/grafana/datasources/config.yml)
 * [HTTP Probe Config](https://github.com/openfoodfacts/openfoodfacts-monitoring/blob/main/configs/blackbox_exporter/config.yml)

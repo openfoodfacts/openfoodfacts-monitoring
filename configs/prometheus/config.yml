@@ -1,3 +1,20 @@
+# Prometheus targets,
+# that is the various points that collects metrics (in pull mode)
+
+# Note on labels:
+# Those are very important
+# - instance: should be something that immediately identify the service / app / env
+#   - for blackbox it can be the crapped url
+# - env: this is the environment, MUST BE org|prod|monitoring or net|test|staging
+# - app: is the application the service is related to
+# - service: is the service (eg. postgresql, gunicorn, nginx) that is part of an app
+# - exporter: the (short) name of the exporter service
+#   it might be the same as the service name
+# - job: is the exporter job (filled by prometheus)
+# - server: should provide the VM / CT / server name
+# - cluster: should provide the cluster name in case it's not on a standalone server
+
+
 # my global config
 global:
   scrape_interval: 15s # By default, scrape targets every 15 seconds.
@@ -13,81 +30,122 @@ alerting:
         - targets: ["alertmanager:9093"]
 
 scrape_configs:
-  # OVH promox cluster exporters
-  # They are exposed on the reverse proxy at ovh-exporters.openfoodfacts.org
-  # this rule enable to get them
-  - job_name: ovh-exporters
+  - job_name: scaleway-exporters-exporters
+    scheme: https
+    basic_auth:
+      username: prometheus
+      password_file: /etc/prometheus/secrets/scaleway-exporters.txt
+    # This works with the relabel config below:
+    static_configs:
+      - targets:
+          - cadvisor/infra/cadvisor
+          - node/infra/system
+          - mongodb/shared/mongodb
+          - postgres/shared/postgres
+          - redis/shared/redis
+        labels:
+          base_url: https://scaleway-exporters.openfoodfacts.org/scaleway-docker-prod/
+          env: prod
+          cluster: scaleway
+          server: scaleway-docker-prod
+
+    # use configs above to create targets
+    # - each target must have a base_url label
+    # - each targets list can add server, cluster and env label (don't mix envs)
+    # - each line defines the module to be called (which will be the exporter) + app and service label, like node/app/service
+    # the instance name will be app-service-server-cluster
+    # too view existing targets, just open the base_ùrl in a browser
+    relabel_configs: &exporters_exporters_relabel_config
+      # get exporter/app/service labels
+      - source_labels: [__address__]
+        regex: "([^/]+)/([^/]+)/([^/]+)"
+        replacement: ${1}
+        target_label: exporter
+      - source_labels: [__address__]
+        regex: "([^/]+)/([^/]+)/([^/]+)"
+        replacement: ${2}
+        target_label: app
+      - source_labels: [__address__]
+        regex: "([^/]+)/([^/]+)/([^/]+)"
+        replacement: ${3}
+        target_label: service
+      # instance
+      - source_labels: [app, service, server, cluster]
+        separator: "-"
+        target_label: instance
+      # get the __address__ and __metricts_path__
+      - source_labels: [base_url]
+        regex: "https?://([^/]+)(/.*)"
+        replacement: ${2}proxy
+        target_label: __metrics_path__
+      - source_labels: [base_url]
+        regex: "https?://([^/]+)(/.*)"
+        replacement: ${1}
+        target_label: __address__
+      # add the module parameter
+      - source_labels: [exporter]
+        target_label: __param_module
+      # drop labels that where only useful for configuration
+      - regex: ^(base_url)$
+        action: labeldrop
+
+  - job_name: hetzner-exporters-exporters
+    scheme: https
+    basic_auth:
+      username: prometheus
+      password_file: /etc/prometheus/secrets/hetzner-exporters.txt
+    relabel_configs: *exporters_exporters_relabel_config
+    static_configs: # see scaleway-exporters-exporters on how it works
+      - targets:
+          - cadvisor/infra/cadvisor
+          - node/infra/system
+        labels:
+          base_url: https://hetzner-exporters.openfoodfacts.org/hetzner-docker-prod/
+          env: prod
+          cluster: hetzner
+          server: hetzner-docker-prod
+      - targets:
+          - cadvisor/infra/cadvisor
+          - node/infra/system
+        labels:
+          base_url: https://hetzner-exporters.openfoodfacts.org/hetzner-docker-staging/
+          env: staging
+          cluster: hetzner
+          server: hetzner-docker-staging
+
+  - job_name: ovh-exporters-exporters
     scheme: https
     basic_auth:
       username: prometheus
       password_file: /etc/prometheus/secrets/ovh.txt
-    static_configs:
+    relabel_configs: *exporters_exporters_relabel_config
+    static_configs: # see scaleway-exporters-exporters on how it works
       - targets:
-          # those must follow job/env/app/service
-          # corresponding url is https://ovh-exporters.openfoodfacts.org/job/env/app/service/metrics
-        - "docker-cadvisor/net/docker/cadvisor"
-        - "docker-prod/org/docker/cadvisor"
-          # node exporter
-        - "node-exporter/net/system/vm"
-        - "node-exporter/org/system/vm"
-          # docker nginx
-        - "docker-nginx/net/off/frontend"
-          # docker apache
-        - "docker-apache/net/off/backend"
-          # docker-statsd (for robotoff gunicorn)
-        - "docker-statsd/net/robotoff/api"
-          # moved to moji "docker-statsd/org/robotoff/api" 10.1.0.201:9102;
-          # docker-postgres
-        - "docker-postgres/net/robotoff/postgres"
-          # moved to moji - "docker-postgres/org/robotoff/postgres" 10.1.0.201:9187;
-          # Proxmox gateway postfix
-        - "pmg-postfix/prod/pmg/postfix"
-          # docker-elasticsearch
-        - "docker-elasticsearch/net/search-a-licious/elasticsearch"
-        - "docker-elasticsearch/org/search-a-licious/elasticsearch"
-          # matomo mysqld
-        - "mysqld/prod/matomo/mysqld"
-          # matomo nginx
-        - "mysqld/prod/matomo/nginx"
+          - cadvisor/infra/cadvisor
+          - node/infra/system
+          - searchalicious_elasticsearch/searchalicious/elasticsearch
         labels:
-          base_url: ovh-exporters.openfoodfacts.org:443
-          metrics_path: metrics
-    relabel_configs: &ovh_exporters_relabel_config
-      # get instance, first part + second part of target
-      - source_labels: [__address__]
-        regex: ^([^/]+)/([^/]+)/([^/]+)/(.*)$
-        replacement: ovh-${3}-${2}
-        target_label: instance
-      # get job name, first part
-      - source_labels: [__address__]
-        regex: ^([^/]+)/.*$
-        replacement: ${1}
-        target_label: job
-      # get env, second part
-      - source_labels: [__address__]
-        regex: ^[^/]+/([^/]+)/.*$
-        replacement: ${1}
-        target_label: env
-      # get app, third part
-      - source_labels: [__address__]
-        regex: ^[^/]+/[^/]+/([^/]+)/.*$
-        replacement: ${1}
-        target_label: app
-      # get service, fourth part
-      - source_labels: [__address__]
-        regex: ^[^/]+/[^/]+/[^/]+/([^/]+)$
-        replacement: ${1}
-        target_label: service
-      # the metrics path is adress + /metrics
-      - source_labels: [__address__, metrics_path]
-        separator: /
-        target_label: __metrics_path__
-      # put base url as address, as it is the same for all
-      - source_labels: [base_url]
-        target_label: __address__
-      # drop labels that where only useful for configuration
-      - regex: ^(base_url|metrics_path)$
-        action: labeldrop
+          base_url: https://ovh-exporters.openfoodfacts.org/ovh-docker-staging/
+          env: staging
+          cluster: ovh
+          server: ovh-docker-staging
+      - targets:
+          - cadvisor/infra/cadvisor
+          - node/infra/system
+          - off-server_apache/off/apache
+          - off-server_nginx/off/nginx
+          - robotoff_postgres/robotoff/postgres
+          - robotoff_statsd/robotoff/gunicorn
+          - searchalicious_elasticsearch/searchalicious/elasticsearch
+          - shared-services_mongodb/shared/mongodb
+          - shared-services_postgres/shared/postgres
+          - shared-services_redis/shared/redis
+        labels:
+          base_url: https://ovh-exporters.openfoodfacts.org/ovh-docker-prod/
+          env: prod
+          cluster: ovh
+          server: ovh-docker-prod
+          # TODO:  and https://ovh-exporters.openfoodfacts.org/ovh-docker-staging/
 
   # local jobs, on the same host
   - job_name: monitoring-exporters
@@ -133,6 +191,7 @@ scrape_configs:
   # Free promox cluster Exporters
   # NGINX is proxying the exporters of servers at free
   # this rule enable to get them
+  # TODO: install exporter_exporter and use same config as above + do the same for each proxmox node
   - job_name: free-exporters
     scheme: https
     basic_auth:
