@@ -20,13 +20,14 @@ It also contains exporters that should be deployed on each nodes (see `docker-co
 * **filebeat** [^filebeat] gather logs and send them to **Elasticsearch**
 * **cadvisor** [^cadvisor] gather docker metrics
 * **node_exporter** [^node_exporter] gather host metrics
-* **exporter_exporter** proxy to other exporters
+* **exporter_exporter** [^exporter_exporter] consolidates Prometheus metrics from services running on this node, exposing them on a single, secure endpoint.
 
 PS: if you modify this, please keep [corresponding page in infrastructure](https://github.com/openfoodfacts/openfoodfacts-infrastructure/blob/develop/docs/observability.md) up to date
 
 [^cadvisor]: https://prometheus.io/docs/guides/cadvisor/
 [^filebeat]: https://www.elastic.co/fr/beats/filebeat
 [^node_exporter]: https://prometheus.io/docs/guides/node-exporter/
+[^exporter_exporter]: https://github.com/tcolgate/exporter_exporter
 
 ## Configs
 
