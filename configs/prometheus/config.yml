@@ -39,7 +39,7 @@ scrape_configs:
     static_configs:
       - targets:
           - cadvisor/infra/cadvisor
-          - auth/keycloak
+          - keycloak/auth/keycloak
           - node/infra/system
           - mongodb/shared/mongodb
           - postgres/shared/postgres
@@ -123,7 +123,7 @@ scrape_configs:
     static_configs: # see scaleway-exporters-exporters on how it works
       - targets:
           - cadvisor/infra/cadvisor
-          - auth/keycloak
+          - keycloak/auth/keycloak
           - node/infra/system
           - searchalicious_elasticsearch/searchalicious/elasticsearch
         labels:
