@@ -6,3 +6,6 @@ configs/alertmanager/config.yml
 
 # editors
 .vscode/
+
+# Local python environment
+.venv

@@ -1,0 +1,128 @@
+groups:
+- name: node-alerts
+  rules:
+  - alert: VMOutOfMemory
+    expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10
+    for: 15m
+    labels:
+      severity: warning
+      instance: "{{ $labels.instance }}"
+    annotations:
+      summary: Less than 10% of memory remaining on {{ $labels.instance }}
+      description: Remaining memory usage on VM {{ $labels.instance }} is {{ $value }}%  for more than 15 minutes.
+
+  - alert: OutOfDiskSpace
+    expr: >-
+      (node_filesystem_avail_bytes{device!="tmpfs",device!="ramfs"} / node_filesystem_size_bytes) * 100 < 10
+    for: 15m
+    labels:
+      severity: warning
+      instance: "{{ $labels.instance }}"
+    annotations:
+      summary: Less than 10% of disk space remaining on {{ $labels.instance }}
+      description: Remaining disk space on {{ $labels.instance }} is {{ $value }}% for more than 15 minutes.
+
+
+  - alert: Postfix mail messages queue is high
+    expr: postfix_showq_message_age_seconds_count > 20
+    for: 1h
+    labels:
+      severity: warning
+      instance: "{{ $labels.instance }}"
+    annotations:
+      summary: stalled messages in queue {{ $labels.queue }} of {{ $labels.app }} ({{ $labels.instance }})
+      description: Number of messages for queue {{ $labels.queue }} of {{ $labels.app }} ({{ $labels.instance }}) is {{ $value }} for more than 1h.
+
+  - alert: Postfix - too few message sent
+    # (first try) sent message per seconds on last 24h is less than 1/2 of the average sent messages per seconds on previous 240h
+    # expr: rate(postfix_smtpd_messages_processed_total[24h]) < (0.5 * rate(postfix_smtpd_messages_processed_total[240h] offset 24h))
+    # (second try)
+    # median of sent message per hour on last 24h < a third of median of sent message per hour on the previous 10 days
+    expr: quantile_over_time(0.5, delta(postfix_smtpd_messages_processed_total[1h])[24h:1h]) < (0.3 * quantile_over_time(0.5, delta(postfix_smtpd_messages_processed_total[1h])[240h:1h] offset 24h))
+    for: 1h
+    labels:
+      severity: warning
+      instance: "{{ $labels.instance }}"
+    annotations:
+      summary: Significant drop of sent messages on last 24h {{ $labels.app }} ({{ $labels.instance }})
+      # (first try) description: Number of messages sent per hour on last 24h (1 day) is less than half of the rate on previous 240h (10 day) for {{ $labels.app }} ({{ $labels.instance }}).
+      description: Median of number of messages sent per hour on last 24h (1 day) is less than a third of the median on previous 10 days for {{ $labels.app }} ({{ $labels.instance }}).
+
+# TODO: Revisit, too noisy
+# - name: docker-alerts
+#   rules:
+  # - alert: DockerContainerHighMemoryUsage
+  #   expr: (sum(container_memory_working_set_bytes{name!=""}) by (container_label_com_docker_compose_project, container_label_com_docker_compose_service, container_label_org_opencontainers_image_revision, container_label_org_opencontainers_image_version, env) / sum(container_spec_memory_limit_bytes{name!=""} > 0) by (container_label_com_docker_compose_project, container_label_com_docker_compose_service, container_label_org_opencontainers_image_revision, container_label_org_opencontainers_image_version, env) * 100) > 80
+  #   for: 15m
+  #   labels:
+  #     severity: warning
+  #     app: "{{ $labels.container_label_com_docker_compose_project }}"
+  #     service: "{{ $labels.container_label_com_docker_compose_service }}"
+  #     env: "{{ $labels.env }}"
+  #     instance: "{{ $labels.instance }}"
+  #     image_revision: "{{ $labels.container_label_org_opencontainers_image_revision }}"
+  #     image_version: "{{ $labels.container_label_org_opencontainers_image_version }}"
+  #   annotations:
+  #     summary: More than 80% of maximum memory used on container '{{ $labels.name }}'
+  #     description: Container '{{ $labels.name }}' memory usage is at {{ $value }}% of maximum memory usage for more than 15 minutes.
+
+  # - alert: DockerContainerHighCpuUsage
+  #   expr: (sum(rate(container_cpu_usage_seconds_total{name!=""}[5m])) by (container_label_com_docker_compose_project, container_label_com_docker_compose_service, container_label_org_opencontainers_image_revision, container_label_org_opencontainers_image_version, env) * 100) > 80
+  #   for: 15m
+  #   labels:
+  #     severity: warning
+  #     app: "{{ $labels.container_label_com_docker_compose_project }}"
+  #     service: "{{ $labels.container_label_com_docker_compose_service }}"
+  #     env: "{{ $labels.env }}"
+  #     instance: "{{ $labels.instance }}"
+  #     image_revision: "{{ $labels.container_label_org_opencontainers_image_revision }}"
+  #     image_version: "{{ $labels.container_label_org_opencontainers_image_version }}"
+  #   annotations:
+  #     summary: More than 80% of CPU used on container '{{ $labels.name }}'
+  #     description: Container '{{ $labels.name }}' CPU usage is at {{ $value }}% for more than 15 minutes.
+
+- name: service-slos
+  rules:
+  - alert: APIHighRequestErrors
+    expr: sum by(app, service, env)(gunicorn_request_status{status=~"(2..|3..|4..)"}) / sum by(app, service, env)(gunicorn_request_status) * 100 < 99
+    for: 5m
+    labels:
+      severity: page
+      app: robotoff
+      service: "{{ $labels.service }}"
+      env: "{{ $labels.env }}"
+    annotations:
+      summary: Too many 5xx in Robotoff HTTP responses
+      description: "Availability SLO is at {{ $value }}% (target=99.99%) for more than 5 minutes."
+
+- name: service-probes
+  rules:
+  - alert: ServiceProbeFailed
+    expr: probe_success != 1
+    for: 5m
+    labels:
+      severity: page
+      app: "{{ $labels.app }}"
+      service: "{{ $labels.service }}"
+      env: "{{ $labels.env }}"
+    annotations:
+      summary: "{{ $labels.app }}-{{ $labels.env }} is down"
+      description: |
+        Service probe on URL '{{ $labels.instance }}' failed for more than 5 minutes.
+
+- name: prometheus-self-monitoring
+  rules:
+  - alert: PrometheusTargetMissing
+    # we exclude blackbox exporter probes as they are covered by ServiceProbeFailed
+    expr: up{job!~"blackbox-exporter.*"} == 0
+    # let time to fail
+    for: 30m
+    labels:
+      severity: warning
+    annotations:
+      summary: Prometheus target missing (instance {{ $labels.instance }})
+      description: |
+        A Prometheus target has disappeared. An exporter might be crashed.
+        VALUE = {{ $value }}
+        LABELS = {{ $labels }}
+        Check it at https://prometheus.openfoodfacts.org/targets
