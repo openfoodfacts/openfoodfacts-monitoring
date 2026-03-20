@@ -1,0 +1,11 @@
+services:
+  grafana:
+    ports:
+      - 3000:3000
+  kibana:
+    ports:
+      - 5601:5601
+  filebeat:
+    networks:
+      - monitoring
+

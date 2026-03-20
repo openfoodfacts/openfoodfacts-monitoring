@@ -1,0 +1,266 @@
+# Prometheus targets,
+# that is the various points that collects metrics (in pull mode)
+
+# Note on labels:
+# Those are very important
+# - instance: should be something that immediately identify the service / app / env
+#   - for blackbox it can be the crapped url
+# - env: this is the environment, MUST BE org|prod|monitoring or net|test|staging
+# - app: is the application the service is related to
+# - service: is the service (eg. postgresql, gunicorn, nginx) that is part of an app
+# - exporter: the (short) name of the exporter service
+#   it might be the same as the service name
+# - job: is the exporter job (filled by prometheus)
+# - server: should provide the VM / CT / server name
+# - cluster: should provide the cluster name in case it's not on a standalone server
+
+
+# my global config
+global:
+  scrape_interval: 15s # By default, scrape targets every 15 seconds.
+  evaluation_interval: 15s # By default, scrape targets every 15 seconds.
+
+rule_files:
+  - alerts.yml
+
+alerting:
+  alertmanagers:
+    - scheme: http
+      static_configs:
+        - targets: [alertmanager:9093]
+
+scrape_configs:
+  - job_name: scaleway-exporters-exporters
+    static_configs:
+      - targets:
+          - cadvisor/infra/cadvisor
+          - node/infra/system
+          - mongodb/shared/mongodb
+          - postgres/shared/postgres
+          - redis/shared/redis
+        labels:
+          base_url: http://host.docker.internal:8202
+          env: prod
+          cluster: scaleway
+          server: scaleway-docker-prod
+
+    # use configs above to create targets
+    # - each target must have a base_url label
+    # - each targets list can add server, cluster and env label (don't mix envs)
+    # - each line defines the module to be called (which will be the exporter) + app and service label, like node/app/service
+    # the instance name will be app-service-server-cluster
+    # too view existing targets, just open the base_ùrl in a browser
+    relabel_configs: &exporters_exporters_relabel_config
+      # get exporter/app/service labels
+      - source_labels: [__address__]
+        regex: ([^/]+)/([^/]+)/([^/]+)
+        replacement: ${1}
+        target_label: exporter
+      - source_labels: [__address__]
+        regex: ([^/]+)/([^/]+)/([^/]+)
+        replacement: ${2}
+        target_label: app
+      - source_labels: [__address__]
+        regex: ([^/]+)/([^/]+)/([^/]+)
+        replacement: ${3}
+        target_label: service
+      # instance
+      - source_labels: [app, service, server, cluster]
+        separator: '-'
+        target_label: instance
+      # get the __address__ and __metricts_path__
+      - source_labels: [base_url]
+        regex: https?://([^/]+)(/.*)
+        replacement: ${2}proxy
+        target_label: __metrics_path__
+      - source_labels: [base_url]
+        regex: https?://([^/]+)(/.*)
+        replacement: ${1}
+        target_label: __address__
+      # add the module parameter
+      - source_labels: [exporter]
+        target_label: __param_module
+      # drop labels that where only useful for configuration
+      - regex: ^(base_url)$
+        action: labeldrop
+
+  - job_name: hetzner-exporters-exporters
+    relabel_configs: *exporters_exporters_relabel_config
+    static_configs: # see scaleway-exporters-exporters on how it works
+      - targets:
+          - cadvisor/infra/cadvisor
+          - node/infra/system
+        labels:
+          base_url: http://host.docker.internal:8202
+          env: prod
+          cluster: hetzner
+          server: hetzner-docker-prod
+  - job_name: ovh-exporters-exporters
+    relabel_configs: *exporters_exporters_relabel_config
+    static_configs: # see scaleway-exporters-exporters on how it works
+      - targets:
+          - cadvisor/infra/cadvisor
+          - node/infra/system
+          - off-server_apache/off/apache
+          - off-server_nginx/off/nginx
+          - robotoff_postgres/robotoff/postgres
+          - robotoff_statsd/robotoff/gunicorn
+          - searchalicious_elasticsearch/searchalicious/elasticsearch
+          - shared-services_mongodb/shared/mongodb
+          - shared-services_postgres/shared/postgres
+          - shared-services_redis/shared/redis
+        labels:
+          base_url: http://host.docker.internal:8202
+          env: prod
+          cluster: ovh
+          server: ovh-docker-prod
+          # TODO:  and https://ovh-exporters.openfoodfacts.org/ovh-docker-staging/
+
+  # local jobs, on the same host
+  - job_name: monitoring-exporters
+    static_configs:
+      - targets: [host.docker.internal:8280]
+        labels:
+          job: docker-cadvisor
+          app: docker
+          env: monitoring
+          service: cadvisor
+          instance: monitoring-01
+      - targets: [host.docker.internal:8281]
+        labels:
+          job: node-exporter
+          app: system
+          env: monitoring
+          service: vm
+          instance: monitoring-01
+
+  # local jobs in the same docker network
+  # TODO: use Docker Service Discovery https://prometheus.io/docs/prometheus/latest/configuration/configuration/#docker_sd_config
+  - job_name: docker-containers
+    sample_limit: 50000
+    static_configs:
+      - targets: [prometheus:9090]
+        labels:
+          app: prometheus
+      - targets: [grafana:3000]
+        labels:
+          app: grafana
+      - targets: [alertmanager:9093]
+        labels:
+          app: alertmanager
+      - targets: [elasticsearch_exporter:9114]
+        labels:
+          app: elasticsearch_exporter
+          env: org
+      - targets: [blackbox_exporter:9115]
+        labels:
+          app: blackbox_exporter
+          env: org
+
+  # Free promox cluster Exporters
+  # NGINX is proxying the exporters of servers at free
+  # this rule enable to get them
+  # TODO: install exporter_exporter and use same config as above + do the same for each proxmox node
+
+  #--------#
+  # PROBES #
+  #--------#
+  - job_name: blackbox-exporter
+    metrics_path: /probe
+    scrape_interval: 60s
+    relabel_configs:
+      - source_labels: [probe_module]
+        target_label: __param_module
+      - source_labels: [__address__]
+        regex: ^([^|]+)\|(.+)$ # splits target by | and uses 2nd token as target for blackbox_exporter
+        replacement: ${2}
+        target_label: __param_target
+      - source_labels: [__address__]
+        regex: (.+)\|(.+) # splits target by | and uses 1st token as 'app' label
+        replacement: ${1}
+        target_label: app
+      - source_labels: [__param_target]
+        target_label: instance
+      - replacement: blackbox_exporter:9115
+        target_label: __address__
+    static_configs:
+      - targets:
+          - off|https://world.openfoodfacts.net
+          - off-web|https://world.openfoodfacts.net/images/products/376/002/924/8001/1.100.jpg
+          - off-product|https://world.openfoodfacts.net/product/3017620422003/nutella-ferrero
+          - robotoff|https://robotoff.openfoodfacts.net/api/v1/health
+          - off-query|https://query.openfoodfacts.net/health
+          - off-search|https://search.openfoodfacts.net/
+          - off-facets-kp|https://facets-kp.openfoodfacts.net/
+          - prices-api|https://prices.openfoodfacts.net/api/v1/status
+          - prices-app|https://prices.openfoodfacts.net/
+        labels:
+          env: net
+          probe_module: http_probe_auth
+      - targets:
+          # Open Food Facts app (apache)
+          - off|https://world.openfoodfacts.org
+          # Product page
+          - off-product|https://world.openfoodfacts.org/product/3017620422003/nutella-ferrero
+          # Open Food Facts static resources
+          - off-static|https://static.openfoodfacts.org/images/logos/off-logo-horizontal-light.svg
+          # Open Food Facts images
+          - off-images|https://images.openfoodfacts.org/images/products/376/002/924/8001/1.100.jpg
+          # other flavors
+          - obf|https://world.openbeautyfacts.org
+          - opff|https://world.openpetfoodfacts.org
+          - opf|https://world.openproductsfacts.org
+          - off-pro|https://world.pro.openfoodfacts.org
+          # important services
+          - keycloak|https://auth.openfoodfacts.org/realms/openfoodfacts/
+          - robotoff|https://robotoff.openfoodfacts.org/api/v1/health
+          - off-query|https://query.openfoodfacts.org/health
+          - off-search|https://search.openfoodfacts.org/
+          - off-facets-kp|https://facets-kp.openfoodfacts.org/
+          - folksonomy|https://api.folksonomy.openfoodfacts.org/
+          - prices-api|https://prices.openfoodfacts.org/api/v1/status
+          - prices-app|https://prices.openfoodfacts.org/
+          # tools
+          - blog|https://blog.openfoodfacts.org/
+          - wiki|https://wiki.openfoodfacts.org/
+          - forum|https://forum.openfoodfacts.org/
+          # technical tools
+          - grafana|https://grafana.openfoodfacts.org/api/health
+          # matomo, see https://matomo.org/faq/how-to/faq_20278/
+          - matomo-interface|https://analytics.openfoodfacts.org/index.php?module=Login
+          - matomo-tracker|https://analytics.openfoodfacts.org/matomo.php
+        labels:
+          env: org
+          probe_module: http_probe
+      - targets:
+          - prometheus|https://prometheus.openfoodfacts.org/-/healthy
+          - alertmanager|https://alertmanager.openfoodfacts.org/-/healthy
+        labels:
+          env: org
+          probe_module: http_probe_auth_monitoring
+      - targets:
+          # technical tools
+          - kibana|https://kibana.openfoodfacts.org/status
+          - elasticsearch|https://elasticsearch.openfoodfacts.org/_cluster/health?wait_for_status=yellow&timeout=50s
+        labels:
+          env: org
+          probe_module: http_probe_auth_elasticsearch
+      # prober for target that only support html as content-type (not json)
+      - targets:
+          - connect|https://connect.openfoodfacts.org/
+        labels:
+          env: org
+          probe_module: http_probe_auth_html
+        # pinging
+      - targets:
+          - ovh1|ovh1.openfoodfacts.org
+          - proxy1_ovh|proxy1.openfoodfacts.org
+          - proxy2_free|proxy2.openfoodfacts.org
+          - ovh2|ovh2.openfoodfacts.org
+          - ovh3|ovh3.openfoodfacts.org
+          - off1|off1.openfoodfacts.org
+          - off2|off2.openfoodfacts.org
+        labels:
+          env: org
+          probe_module: icmp
+

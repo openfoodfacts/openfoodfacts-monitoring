@@ -68,7 +68,7 @@ services:
     mem_limit: 9g
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
-      - elasticsearch-backup:/opt/elasticsearch
+      - elasticsearch-backup:/opt/elasticsearch/backups
     ports:
       - ${ES_API_EXPOSE:-127.0.0.1:9200}:9200
       - ${ES_NODE_COMMUNICATION_EXPOSE:-127.0.0.1:9300}:9300
