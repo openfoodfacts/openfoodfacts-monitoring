@@ -20,22 +20,41 @@ jobs:
       fail-fast: false
       matrix:
         server:
-          # staging dockers
+          # scaleway docker prod
+          - host: "10.13.1.200"
+            proxy: scaleway-02.infra.openfoodfacts.org
+            ssh_key_name: "SSH_PRIVATE_KEY_SCALEWAY_DOCKER_PROD"
+            exporter_exporter_config_dir: scaleway-docker-prod
+          # hetzner docker prod
+          - host: "10.12.1.202"
+            proxy: hetzner-03.infra.openfoodfacts.org
+            ssh_key_name: "SSH_PRIVATE_KEY_HETZNER_DOCKER_PROD"
+            exporter_exporter_config_dir: hetzner-docker-prod
+          # hetzner docker staging
+          - host: "10.12.1.201"
+            proxy: hetzner-02.infra.openfoodfacts.org
+            ssh_key_name: "SSH_PRIVATE_KEY_HETZNER_DOCKER_STAGING"
+            exporter_exporter_config_dir: default
+          # staging dockers on OVH
           - host: "10.1.0.200"
             proxy: "ovh1.openfoodfacts.org"
             ssh_key_name: "SSH_PRIVATE_KEY_OVH1"
-          # prod dockers
+            exporter_exporter_config_dir: ovh-docker-staging
+          # prod dockers on OVH
           - host: "10.1.0.201"
             proxy: "ovh2.openfoodfacts.org"
             ssh_key_name: "SSH_PRIVATE_KEY_OVH2"
+            exporter_exporter_config_dir: ovh-docker-prod
           # monitoring-01
           - host: "34.1.5.157"
             proxy: "" # no proxy
             ssh_key_name: "SSH_PRIVATE_KEY_MONITORING_01"
+            exporter_exporter_config_dir: monitoring-01
           # docker2 prod
           - host: "10.3.0.200"
-            proxy: "osm45.openfoodfacts.org"
+            proxy: "45.147.209.254"
             ssh_key_name: "SSH_PRIVATE_KEY_DOCKER_PROD_2"
+            exporter_exporter_config_dir: moji-docker-prod-2
     steps:
     - name: Set env variables
       run: |
@@ -58,7 +77,6 @@ jobs:
         proxy_host: ${{ env.SSH_PROXY_HOST }}
         proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets[matrix.server.ssh_key_name] }}
-        script_stop: false
         script: |
           # Clone Git repository if not already there
           [ ! -d 'filebeat' ] && git clone --depth 1 https://github.com/${{ github.repository }} filebeat --no-single-branch 2>&1
@@ -85,7 +103,6 @@ jobs:
         proxy_host: ${{ env.SSH_PROXY_HOST }}
         proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets[matrix.server.ssh_key_name] }}
-        script_stop: false
         script: |
           # Go to repository directory
           cd filebeat/
@@ -103,6 +120,9 @@ jobs:
           echo "ELASTICSEARCH_USERNAME=${{ env.ELASTICSEARCH_USERNAME }}" >> .env
           echo "ELASTICSEARCH_PASSWORD=${{ secrets.ELASTICSEARCH_PASSWORD }}" >> .env
 
+          # exporter exporter config (proxy to other exporters)
+          echo "EXPORTER_EXPORTER_CONFIG_DIR=${{ matrix.server.exporter_exporter_config_dir }}" >> .env
+
     - name: Start services
       uses: appleboy/ssh-action@master
       with:
@@ -112,7 +132,6 @@ jobs:
         proxy_host: ${{ env.SSH_PROXY_HOST }}
         proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets[matrix.server.ssh_key_name] }}
-        script_stop: false
         script: |
           cd filebeat/
           make down && make up
@@ -127,7 +146,6 @@ jobs:
         proxy_host: ${{ env.SSH_PROXY_HOST }}
         proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets[matrix.server.ssh_key_name] }}
-        script_stop: false
         script: |
           cd filebeat/
           make livecheck
@@ -142,7 +160,6 @@ jobs:
         proxy_host: ${{ env.SSH_PROXY_HOST }}
         proxy_username: ${{ env.SSH_USERNAME }}
         proxy_key: ${{ secrets[matrix.server.ssh_key_name] }}
-        script_stop: false
         script: |
           cd filebeat/
           make prune

@@ -53,7 +53,6 @@ jobs:
           proxy_host: ${{ env.SSH_PROXY_HOST }}
           proxy_username: ${{ env.SSH_USERNAME }}
           proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-          script_stop: false
           script: |
             echo "RESTART_ONLY is ${{ env.RESTART_ONLY }}"
             # Clone Git repository if not already there
@@ -75,7 +74,6 @@ jobs:
           proxy_host: ${{ env.SSH_PROXY_HOST }}
           proxy_username: ${{ env.SSH_USERNAME }}
           proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-          script_stop: false
           script: |
             # Go to repository directory
             cd monitoring/
@@ -86,6 +84,9 @@ jobs:
             echo "COMPOSE_PROJECT_NAME=monitoring" >> .env
             echo "COMPOSE_PATH_SEPARATOR=;" >> .env
             echo "COMPOSE_FILE=docker-compose.yml;docker/prod.yml" >> .env
+
+            # Prometheus
+            echo "PROMETHEUS_RETENTION_SIZE=30GB" >> .env
 
             # Grafana
             echo "GF_SERVER_ROUTER_LOGGING=true" >> .env
@@ -120,7 +121,6 @@ jobs:
           proxy_host: ${{ env.SSH_PROXY_HOST }}
           proxy_username: ${{ env.SSH_USERNAME }}
           proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-          script_stop: false
           script: |
             cd monitoring/
             make replace_env
@@ -135,7 +135,6 @@ jobs:
           proxy_host: ${{ env.SSH_PROXY_HOST }}
           proxy_username: ${{ env.SSH_USERNAME }}
           proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-          script_stop: false
           script: |
             cd monitoring/
             make create_external_volumes
@@ -150,7 +149,6 @@ jobs:
           proxy_host: ${{ env.SSH_PROXY_HOST }}
           proxy_username: ${{ env.SSH_USERNAME }}
           proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-          script_stop: false
           script: |
             cd monitoring/
             make create_backups_dir && \
@@ -167,7 +165,6 @@ jobs:
           proxy_host: ${{ env.SSH_PROXY_HOST }}
           proxy_username: ${{ env.SSH_USERNAME }}
           proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-          script_stop: false
           script: |
             cd monitoring/
             make restart
@@ -182,7 +179,6 @@ jobs:
           proxy_host: ${{ env.SSH_PROXY_HOST }}
           proxy_username: ${{ env.SSH_USERNAME }}
           proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-          script_stop: false
           script: |
             cd monitoring/
             make livecheck
@@ -197,7 +193,6 @@ jobs:
           proxy_host: ${{ env.SSH_PROXY_HOST }}
           proxy_username: ${{ env.SSH_USERNAME }}
           proxy_key: ${{ secrets.SSH_PRIVATE_KEY_MONITORING_01 }}
-          script_stop: false
           script: |
             cd monitoring/
             make prune

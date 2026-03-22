@@ -3,7 +3,7 @@
 services:
   filebeat:
     # filebeat pushes logs to elasticsearch monitoring
-    restart: always
+    restart: ${RESTART_POLICY:-always}
     image: elastic/filebeat:7.17.9
     user: "root"
     privileged: true
@@ -18,9 +18,28 @@ services:
       - ./configs/filebeat/ilm-config.json:/usr/share/filebeat/ilm-config.json:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock
+  # this is a proxy that can be used to reach other exporters
+  # for example exporters from dockers running within this VM
+  # Note that this exporter must be however behind a reverse proxy
+  # to use basic auth and https
+  exporter_exporter:
+    restart: ${RESTART_POLICY:-always}
+    image: ghcr.io/tcolgate/exporter_exporter:0.6.1
+    # the idea is that specific config dir will symlink files from mods_available
+    # which is also mounted in the container
+    volumes:
+      - ./configs/exporter_exporter/mods_available:/etc/exporter_exporter/mods_available
+      - ./configs/exporter_exporter/${EXPORTER_EXPORTER_CONFIG_DIR:-default}:/etc/exporter_exporter/mods_enabled
+    command: ["-config.file", "", "-config.dirs", "/etc/exporter_exporter/mods_enabled"]
+    ports:
+      - 8202:9999
+    # enable accessing internal host ip
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
   # this monitors the linux host itself
   node_exporter:
-    restart: always
+    restart: ${RESTART_POLICY:-always}
     image: prom/node-exporter:v1.2.2
     volumes:
       - /proc:/host/proc:ro
@@ -35,7 +54,7 @@ services:
       - 8281:9100
   # this monitors docker on the host
   cadvisor:
-    restart: always
+    restart: ${RESTART_POLICY:-always}
     image: gcr.io/cadvisor/cadvisor:v0.40.0
     privileged: true
     devices:
