@@ -135,18 +135,35 @@ services:
     networks:
       - monitoring
 
-  tempo:
+  jaeger:
     restart: ${RESTART_POLICY:-always}
-    image: grafana/tempo:2.9.0@sha256:65a5789759435f1ef696f1953258b9bbdb18eb571d5ce711ff812d2e128288a4
-    command: [ "-config.file=/etc/tempo.yaml" ]
-    volumes:
-      - "./configs/tempo/tempo.yaml:/etc/tempo.yaml"
-      - tempo-data:/data/tempo
+    image: docker.io/jaegertracing/jaeger:2.16.0@sha256:bf7f805da4c2bc8d58a6c81ee650fdb6b8e4287698f95fbe231c09c865bc397f
+    environment:
+      - COLLECTOR_ZIPKIN_HTTP_PORT=9411
     ports:
-      - ${TEMPO_EXPOSE_HTTP:-127.0.0.1:3200}:3200
-      - ${TEMPO_EXPOSE_GRPC:-127.0.0.1:9096}:9096
-      - ${TEMPO_EXPOSE_OTEL_GRPC:-127.0.0.1:4417}:4417
-      - ${TEMPO_EXPOSE_OTEL_HTTP:-127.0.0.1:4418}:4418
+      - ${JAEGER_UI_EXPOSE:-127.0.0.1:16686}:16686
+      - ${JAEGER_THRIFT_EXPOSE:-127.0.0.1:6831}:6831/udp
+      - ${JAEGER_OTLP_GRPC_EXPOSE:-127.0.0.1:14250}:14250
+    networks:
+      - monitoring
+
+  otelcol:
+    restart: ${RESTART_POLICY:-always}
+    image: docker.io/otel/opentelemetry-collector-contrib:0.148.0@sha256:8164eab2e6bca9c9b0837a8d2f118a6618489008a839db7f9d6510e66be3923c
+    volumes:
+      - ./configs/otelcol/config.yaml:/etc/otelcol/config.yaml:ro
+    command: ["--config", "/etc/otelcol/config.yaml"]
+    environment:
+      - SENTRY_URL
+      - SENTRY_ORG_SLUG
+      - SENTRY_AUTH_TOKEN
+      - ELASTICSEARCH_HOSTS
+      - ELASTICSEARCH_USERNAME
+      - ELASTICSEARCH_PASSWORD
+      - OTEL_PROBABILISTIC_SAMPLING_PERCENTAGE
+    ports:
+      - ${OTELCOL_OTLP_GRPC_EXPOSE:-127.0.0.1:14317}:4317
+      - ${OTELCOL_OTLP_HTTP_EXPOSE:-127.0.0.1:14318}:4318
     networks:
       - monitoring
 
@@ -157,7 +174,6 @@ volumes:
   elasticsearch-backup:
   prometheus-data:
   alertmanager-data:
-  tempo-data:
 
 networks:
   monitoring:

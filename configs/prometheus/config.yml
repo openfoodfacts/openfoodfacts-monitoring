@@ -250,6 +250,14 @@ scrape_configs:
           instance_prefix: ks1
     relabel_configs: *proxied_exporters_relabel_config
 
+  - job_name: otel-collector
+    static_configs:
+      - targets: ["otelcol:8889"]
+        labels:
+          app: otel-collector
+          env: monitoring
+          instance: otelcol
+
   #--------#
   # PROBES #
   #--------#

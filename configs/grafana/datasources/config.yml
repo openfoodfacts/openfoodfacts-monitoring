@@ -42,34 +42,12 @@ datasources:
     secureJsonData:
       basicAuthPassword: ${INFLUXDB_ADMIN_PASSWORD}
 
-  - name: Tempo
-    type: tempo
-    uid: tempo
-    url: http://tempo:3200
+  - name: Jaeger
+    type: jaeger
+    uid: jaeger
+    access: proxy
+    orgId: 1
+    url: http://jaeger:16686
+    isDefault: false
+    version: 1
     editable: true
-    jsonData:
-      nodeGraph:
-        enabled: true
-      search:
-        datasourceUid: elasticsearch_logs
-        filters:
-        - id: service-name
-          operator: "="
-          scope: resource
-          tag: service.name
-        - id: span-name
-          operator: "="
-          scope: span
-          tag: name
-        hide: false
-      serviceMap:
-        datasourceUid: prom
-      tracesToLogsV2:
-        customQuery: true
-        datasourceUid: elasticsearch_logs
-        query: 'tags | trace_id = "${__trace.traceId}"'
-        tags:
-        - key: service.name
-          value: service_name
-      tracesToProfiles:
-        datasourceUid: grafana

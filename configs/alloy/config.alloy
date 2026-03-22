@@ -16,27 +16,19 @@ otelcol.receiver.otlp "default" {
 
 otelcol.processor.batch "default" {
   output {
-    metrics = [otelcol.exporter.prometheus.default.input]
-    logs    = [otelcol.exporter.otlp.tempo.input]
-    traces  = [otelcol.exporter.otlp.tempo.input]
+    # send metrics, logs, and traces to central OTEL collector aggregator (centralized scraping/storage)
+    metrics = [otelcol.exporter.otlp.aggregator.input]
+    logs    = [otelcol.exporter.otlp.aggregator.input]
+    traces  = [otelcol.exporter.otlp.aggregator.input]
   }
 }
 
-otelcol.exporter.otlp "tempo" {
-	client {
-		endpoint = coalesce(sys.env("TEMPO_HOST"), "tempo:4417")
+// exporter to forward to central otelcol aggregator
+otelcol.exporter.otlp "aggregator" {
+  client {
+    endpoint = coalesce(sys.env("OTELCOL_HOST"), "otelcol:4317")
     tls {
       insecure = true
     }
-	}
-}
-
-otelcol.exporter.prometheus "default" {
-  forward_to = [prometheus.remote_write.default.receiver]
-}
-
-prometheus.remote_write "default" {
-  endpoint {
-    url = coalesce(sys.env("PROMETHEUS_WRITE_ENDPOINT"), "http://prometheus:9090/api/v1/write")
   }
 }

@@ -1,0 +1,75 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch: {}
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 1024
+    spike_limit_mib: 128
+  # Tail sampling: keep ERROR traces and apply probabilistic policy inside
+  # the tail_sampling processor (preferred when using tail sampling).
+  tail_sampling:
+    decision_wait: 15s
+    num_traces: 10000
+    policies:
+      - name: keep_error_traces
+        type: status_code
+        status_code:
+          status_codes: [ERROR]
+      - name: probabilistic_policy
+        type: probabilistic
+        probabilistic:
+          sampling_percentage: ${OTEL_PROBABILISTIC_SAMPLING_PERCENTAGE}
+
+exporters:
+  prometheus:
+    endpoint: 0.0.0.0:8889
+
+  # Export traces to Jaeger using OTLP/gRPC (preferred). Sends OTLP to Jaeger's
+  # OTLP receiver (adjust port if your Jaeger is configured differently).
+  otlp_grpc/jaeger:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+
+  # Elasticsearch exporter configured using supported keys from the
+  # elasticsearchexporter README: use `endpoint(s)` and `user`/`password`.
+  elasticsearch:
+    endpoints: ["${ELASTICSEARCH_HOSTS}"]
+    user: ${ELASTICSEARCH_USERNAME}
+    password: ${ELASTICSEARCH_PASSWORD}
+    # Optional advanced configs (mapping/mode, ingest pipeline, sending_queue)
+    # mapping:
+    #   mode: otel
+
+  # Keep the `debug` exporter available for local debugging.
+  debug: {}
+
+  # sentry exporter removed for smoke test (set SENTRY_* envs and re-add if needed)
+
+  # sentry exporter removed for smoke test (set SENTRY_* envs and re-add if needed)
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, tail_sampling, batch]
+      exporters: [otlp_grpc/jaeger]
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [debug]
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [prometheus]
+
+  telemetry:
+    logs:
+      level: "info"
