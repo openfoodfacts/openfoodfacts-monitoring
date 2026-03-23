@@ -125,10 +125,10 @@ scrape_configs:
           - node/infra/system
           - searchalicious_elasticsearch/searchalicious/elasticsearch
         labels:
-          base_url: https://ovh-exporters.openfoodfacts.org/ovh-docker-staging/
-          env: staging
+          base_url: https://ovh-exporters.openfoodfacts.org/ovh-docker-prod/
+          env: prod
           cluster: ovh
-          server: ovh-docker-staging
+          server: ovh-docker-prod
       - targets:
           - cadvisor/infra/cadvisor
           - node/infra/system
@@ -141,11 +141,10 @@ scrape_configs:
           - shared-services_postgres/shared/postgres
           - shared-services_redis/shared/redis
         labels:
-          base_url: https://ovh-exporters.openfoodfacts.org/ovh-docker-prod/
-          env: prod
+          base_url: https://ovh-exporters.openfoodfacts.org/ovh-docker-staging/
+          env: staging
           cluster: ovh
-          server: ovh-docker-prod
-          # TODO:  and https://ovh-exporters.openfoodfacts.org/ovh-docker-staging/
+          server: ovh-docker-staging
 
   # local jobs, on the same host
   - job_name: monitoring-exporters
