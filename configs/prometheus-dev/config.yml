@@ -101,22 +101,12 @@ scrape_configs:
       - targets:
           - cadvisor/infra/cadvisor
           - node/infra/system
-          - off-server_apache/off/apache
-          - off-server_nginx/off/nginx
-          - robotoff_postgres/robotoff/postgres
-          - robotoff_statsd/robotoff/gunicorn
           - searchalicious_elasticsearch/searchalicious/elasticsearch
-          - shared-services_mongodb/shared/mongodb
-          - shared-services_postgres/shared/postgres
-          - shared-services_redis/shared/redis
         labels:
           base_url: http://host.docker.internal:8202/
           env: prod
           cluster: ovh
           server: ovh-docker-prod
-          # TODO:  and https://ovh-exporters.openfoodfacts.org/ovh-docker-staging/
-
-  # local jobs, on the same host
   - job_name: monitoring-exporters
     static_configs:
       - targets: [host.docker.internal:8280]
