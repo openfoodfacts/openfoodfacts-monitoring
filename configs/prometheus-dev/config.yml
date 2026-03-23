@@ -240,7 +240,7 @@ scrape_configs:
           - connect|https://connect.openfoodfacts.org/
         labels:
           env: org
-          probe_module: http_probe_auth_html
+          probe_module: http_probe_html
         # pinging
       - targets:
           - ovh1|ovh1.openfoodfacts.org
