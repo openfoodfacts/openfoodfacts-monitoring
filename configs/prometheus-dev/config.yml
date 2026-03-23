@@ -39,7 +39,7 @@ scrape_configs:
           - postgres/shared/postgres
           - redis/shared/redis
         labels:
-          base_url: http://host.docker.internal:8202
+          base_url: http://host.docker.internal:8202/
           env: prod
           cluster: scaleway
           server: scaleway-docker-prod
@@ -91,7 +91,7 @@ scrape_configs:
           - cadvisor/infra/cadvisor
           - node/infra/system
         labels:
-          base_url: http://host.docker.internal:8202
+          base_url: http://host.docker.internal:8202/
           env: prod
           cluster: hetzner
           server: hetzner-docker-prod
@@ -110,7 +110,7 @@ scrape_configs:
           - shared-services_postgres/shared/postgres
           - shared-services_redis/shared/redis
         labels:
-          base_url: http://host.docker.internal:8202
+          base_url: http://host.docker.internal:8202/
           env: prod
           cluster: ovh
           server: ovh-docker-prod

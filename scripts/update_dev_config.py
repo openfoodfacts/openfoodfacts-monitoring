@@ -16,10 +16,16 @@ uv run scripts/update_dev_config.py
 # ]
 # ///
 
+import os
+import sys
+
 from ruyaml import YAML
 import shutil
+import pathlib
 
-shutil.copytree("configs/prometheus", "configs-dev/prometheus", dirs_exist_ok=True)
+pathlib.Path('configs/exporter_exporter/dev').mkdir(parents=True, exist_ok=True) 
+shutil.copytree("configs/prometheus", "configs/prometheus-dev", dirs_exist_ok=True)
+
 # Note that comments aren't always removed cleanly as they can sometimes get attached
 # to the wrong node. Could use typ="safe" here to not load any comments 
 # but it makes the resulting output quite difficult to read
@@ -46,10 +52,17 @@ for key, value in prometheus_config.items():
                     if labels["env"] == "staging":
                         static_configs.pop(s)
                     else:
-                        # TODO copy exporter_export config for the server
-                        labels["base_url"] = "http://host.docker.internal:8202"
+                        server_name = labels["server"]
+                        for target in server["targets"]:
+                            config_name = f"configs/exporter_exporter/{server_name}/{target.split('/')[0]}.yaml"
+                            if os.path.exists(config_name):
+                                shutil.copy(config_name, "configs/exporter_exporter/dev")
+                            else:
+                                print(f"*** exporter_exporter config not found for {server_name}: {target}", file=sys.stderr)
+                            
+                        labels["base_url"] = "http://host.docker.internal:8202/"
                         # Not sure whether to do this as may affect dashboards
                         # labels["env"] = "localhost"
     
-with open("configs-dev/prometheus/config.yml", "w", encoding="utf-8") as f:
+with open("configs/prometheus-dev/config.yml", "w", encoding="utf-8") as f:
     yaml.dump(prometheus_config, f)
