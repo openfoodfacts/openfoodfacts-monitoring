@@ -41,6 +41,12 @@ PS: if you modify this, please keep [corresponding page in infrastructure](https
 * [HTTP Probe Config](https://github.com/openfoodfacts/openfoodfacts-monitoring/blob/main/configs/blackbox_exporter/config.yml)
 * [Filebeat Config](https://github.com/openfoodfacts/openfoodfacts-monitoring/blob/main/configs/filebeat/config.yml)
 
+## Local Development
+
+When running locally different configs with a `-dev` suffix are used. These are generated from the production configs using the `update_dev_config.py` script. This script runs automatically as part of `make dev` and can be run manually with `make update_dev_config` (note that [uv](https://docs.astral.sh/uv/getting-started/installation/) needs to be installed locally to run this python script).
+
+The script uses live probes where these are possible from outside of the production network. Internal probes, such as the `exporter_exporter`, are directed locally and track the metrics of any services that are running locally. Local equivalents are only created for production (`.org`) services. The original server name is retained for grouping.
+
 ### Testing blackbox exporter config locally
 
 You can first start the blackbox exporter service:
