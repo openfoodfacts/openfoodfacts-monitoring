@@ -66,3 +66,23 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:rw
     ports:
       - 8280:8080
+  # local Alloy instance to forward traces to Tempo
+  alloy:
+    restart: ${RESTART_POLICY:-always}
+    image: docker.io/grafana/alloy:v1.14.1@sha256:8f5666aebb871ba43ee2d65159c5d1c26c903720efafaf2d9ed4e237afc3bc88
+    environment:
+      - OTELCOL_HOST
+    command:
+      - run
+      - /etc/alloy/config.alloy
+      - --storage.path=/var/lib/alloy/data
+      - --server.http.listen-addr=0.0.0.0:12345
+    volumes:
+      - ./configs/alloy:/etc/alloy:ro
+      - alloy-data:/var/lib/alloy/data
+    ports:
+      - 127.0.0.1:4317:4317
+      - 127.0.0.1:4318:4318
+      - ${ALLOY_EXPOSE_UI:-127.0.0.1:12345}:12345
+volumes:
+  alloy-data:

@@ -18,7 +18,7 @@ services:
 
   grafana:
     restart: ${RESTART_POLICY:-always}
-    image: grafana/grafana:8.1.0
+    image: grafana/grafana:10.4.19-security-01@sha256:5584505cb75be8cb14c19d7473a87e2675c68b34b546bc1923ef74300c337111
     environment:
       - INFLUXDB_DB
       - INFLUXDB_ADMIN_USER
@@ -29,6 +29,8 @@ services:
       - grafana-data:/var/lib/grafana
     networks:
       - monitoring
+    ports:
+      - "${GRAFANA_EXPOSE:-127.0.0.1:3000}:3000"
 
   kibana:
     restart: ${RESTART_POLICY:-always}
@@ -112,6 +114,7 @@ services:
       - '--web.console.templates=/usr/share/prometheus/consoles'
       - '--web.external-url=https://prometheus.openfoodfacts.org/'
       - '--web.enable-admin-api'
+      - '--enable-feature=remote-write-receiver'
     ports:
       - ${PROMETHEUS_EXPOSE:-127.0.0.1:9090}:9090
     networks:
@@ -129,6 +132,38 @@ services:
       - "./configs/blackbox_exporter:/config"
     ports:
       - ${BLACKBOX_EXPORTER_EXPOSE:-127.0.0.1:9115}:9115
+    networks:
+      - monitoring
+
+  jaeger:
+    restart: ${RESTART_POLICY:-always}
+    image: docker.io/jaegertracing/jaeger:2.16.0@sha256:bf7f805da4c2bc8d58a6c81ee650fdb6b8e4287698f95fbe231c09c865bc397f
+    environment:
+      - COLLECTOR_ZIPKIN_HTTP_PORT=9411
+    ports:
+      - ${JAEGER_UI_EXPOSE:-127.0.0.1:16686}:16686
+      - ${JAEGER_THRIFT_EXPOSE:-127.0.0.1:6831}:6831/udp
+      - ${JAEGER_OTLP_GRPC_EXPOSE:-127.0.0.1:14250}:14250
+    networks:
+      - monitoring
+
+  otelcol:
+    restart: ${RESTART_POLICY:-always}
+    image: docker.io/otel/opentelemetry-collector-contrib:0.148.0@sha256:8164eab2e6bca9c9b0837a8d2f118a6618489008a839db7f9d6510e66be3923c
+    volumes:
+      - ./configs/otelcol/config.yaml:/etc/otelcol/config.yaml:ro
+    command: ["--config", "/etc/otelcol/config.yaml"]
+    environment:
+      - SENTRY_URL
+      - SENTRY_ORG_SLUG
+      - SENTRY_AUTH_TOKEN
+      - ELASTICSEARCH_HOSTS
+      - ELASTICSEARCH_USERNAME
+      - ELASTICSEARCH_PASSWORD
+      - OTEL_PROBABILISTIC_SAMPLING_PERCENTAGE
+    ports:
+      - ${OTELCOL_OTLP_GRPC_EXPOSE:-127.0.0.1:14317}:4317
+      - ${OTELCOL_OTLP_HTTP_EXPOSE:-127.0.0.1:14318}:4318
     networks:
       - monitoring
 
