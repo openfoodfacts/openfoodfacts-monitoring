@@ -1,3 +1,6 @@
+# THIS FILE WAS GENERATED FROM PROD CONFIG USING update_dev_config.py
+# Update it the same way
+
 # Prometheus targets,
 # that is the various points that collects metrics (in pull mode)
 
