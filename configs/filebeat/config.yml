@@ -31,18 +31,18 @@ output.elasticsearch:
 
 setup.ilm:
   enabled: true
-  policy_name: "logs"
-  rollover_alias: "logs-current"
-  pattern: "logs-{now/d}-000001"
+  policy_name: "off-logs"
+  rollover_alias: "off-logs-current"
+  pattern: "off-logs-{now/d}-000001"
   policy_file: ilm-config.json
   # use this if you need to re-create ILM policy
   # overwrite: true
 
 
-setup.template.name: logs
-
-
-
+setup.template.json.enabled: true
+setup.template.json.path: off-logs-template.json
+setup.template.name: off-logs
+setup.template.json.data_stream: true
 
 filebeat.config.modules.path: /usr/share/filebeat/modules.d/*.yml
 
