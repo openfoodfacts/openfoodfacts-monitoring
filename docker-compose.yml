@@ -68,7 +68,7 @@ services:
     mem_limit: 9g
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
-      - elasticsearch-backup:/opt/elasticsearch
+      - elasticsearch-backup:/opt/elasticsearch/backups
     ports:
       - ${ES_API_EXPOSE:-127.0.0.1:9200}:9200
       - ${ES_NODE_COMMUNICATION_EXPOSE:-127.0.0.1:9300}:9300
@@ -102,7 +102,7 @@ services:
     restart: ${RESTART_POLICY:-always}
     image: prom/prometheus:v2.30.0
     volumes:
-      - ./configs/prometheus/:/etc/prometheus/
+      - ./configs/${PROMETHEUS_CONFIG_DIR:-prometheus}/:/etc/prometheus/
       - prometheus-data:/prometheus
     command:
       - '--config.file=/etc/prometheus/config.yml'

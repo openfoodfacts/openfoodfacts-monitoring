@@ -1,3 +1,6 @@
+# THIS FILE WAS GENERATED FROM PROD CONFIG USING update_dev_config.py
+# Update it the same way
+
 # Prometheus targets,
 # that is the various points that collects metrics (in pull mode)
 
@@ -21,31 +24,25 @@ global:
   evaluation_interval: 15s # By default, scrape targets every 15 seconds.
 
 rule_files:
-  - "alerts.yml"
+  - alerts.yml
 
 alerting:
   alertmanagers:
     - scheme: http
       static_configs:
-        - targets: ["alertmanager:9093"]
+        - targets: [alertmanager:9093]
 
 scrape_configs:
   - job_name: scaleway-exporters-exporters
-    scheme: https
-    basic_auth:
-      username: prometheus
-      password_file: /etc/prometheus/secrets/scaleway-exporters.txt
-    # This works with the relabel config below:
     static_configs:
       - targets:
           - cadvisor/infra/cadvisor
-          - keycloak/auth/keycloak
           - node/infra/system
           - mongodb/shared/mongodb
           - postgres/shared/postgres
           - redis/shared/redis
         labels:
-          base_url: https://scaleway-exporters.openfoodfacts.org/scaleway-docker-prod/
+          base_url: http://host.docker.internal:8202/
           env: prod
           cluster: scaleway
           server: scaleway-docker-prod
@@ -59,28 +56,28 @@ scrape_configs:
     relabel_configs: &exporters_exporters_relabel_config
       # get exporter/app/service labels
       - source_labels: [__address__]
-        regex: "([^/]+)/([^/]+)/([^/]+)"
+        regex: ([^/]+)/([^/]+)/([^/]+)
         replacement: ${1}
         target_label: exporter
       - source_labels: [__address__]
-        regex: "([^/]+)/([^/]+)/([^/]+)"
+        regex: ([^/]+)/([^/]+)/([^/]+)
         replacement: ${2}
         target_label: app
       - source_labels: [__address__]
-        regex: "([^/]+)/([^/]+)/([^/]+)"
+        regex: ([^/]+)/([^/]+)/([^/]+)
         replacement: ${3}
         target_label: service
       # instance
       - source_labels: [app, service, server, cluster]
-        separator: "-"
+        separator: '-'
         target_label: instance
       # get the __address__ and __metricts_path__
       - source_labels: [base_url]
-        regex: "https?://([^/]+)(/.*)"
+        regex: https?://([^/]+)(/.*)
         replacement: ${2}proxy
         target_label: __metrics_path__
       - source_labels: [base_url]
-        regex: "https?://([^/]+)(/.*)"
+        regex: https?://([^/]+)(/.*)
         replacement: ${1}
         target_label: __address__
       # add the module parameter
@@ -91,74 +88,38 @@ scrape_configs:
         action: labeldrop
 
   - job_name: hetzner-exporters-exporters
-    scheme: https
-    basic_auth:
-      username: prometheus
-      password_file: /etc/prometheus/secrets/hetzner-exporters.txt
     relabel_configs: *exporters_exporters_relabel_config
     static_configs: # see scaleway-exporters-exporters on how it works
       - targets:
           - cadvisor/infra/cadvisor
           - node/infra/system
         labels:
-          base_url: https://hetzner-exporters.openfoodfacts.org/hetzner-docker-prod/
+          base_url: http://host.docker.internal:8202/
           env: prod
           cluster: hetzner
           server: hetzner-docker-prod
-      - targets:
-          - cadvisor/infra/cadvisor
-          - node/infra/system
-        labels:
-          base_url: https://hetzner-exporters.openfoodfacts.org/hetzner-docker-staging/
-          env: staging
-          cluster: hetzner
-          server: hetzner-docker-staging
-
   - job_name: ovh-exporters-exporters
-    scheme: https
-    basic_auth:
-      username: prometheus
-      password_file: /etc/prometheus/secrets/ovh.txt
     relabel_configs: *exporters_exporters_relabel_config
     static_configs: # see scaleway-exporters-exporters on how it works
       - targets:
           - cadvisor/infra/cadvisor
-          - keycloak/auth/keycloak
           - node/infra/system
           - searchalicious_elasticsearch/searchalicious/elasticsearch
         labels:
-          base_url: https://ovh-exporters.openfoodfacts.org/ovh-docker-prod/
+          base_url: http://host.docker.internal:8202/
           env: prod
           cluster: ovh
           server: ovh-docker-prod
-      - targets:
-          - cadvisor/infra/cadvisor
-          - node/infra/system
-          - off-server_apache/off/apache
-          - off-server_nginx/off/nginx
-          - robotoff_postgres/robotoff/postgres
-          - robotoff_statsd/robotoff/gunicorn
-          - searchalicious_elasticsearch/searchalicious/elasticsearch
-          - shared-services_mongodb/shared/mongodb
-          - shared-services_postgres/shared/postgres
-          - shared-services_redis/shared/redis
-        labels:
-          base_url: https://ovh-exporters.openfoodfacts.org/ovh-docker-staging/
-          env: staging
-          cluster: ovh
-          server: ovh-docker-staging
-
-  # local jobs, on the same host
   - job_name: monitoring-exporters
     static_configs:
-      - targets: ["host.docker.internal:8280"]
+      - targets: [host.docker.internal:8280]
         labels:
           job: docker-cadvisor
           app: docker
           env: monitoring
           service: cadvisor
           instance: monitoring-01
-      - targets: ["host.docker.internal:8281"]
+      - targets: [host.docker.internal:8281]
         labels:
           job: node-exporter
           app: system
@@ -171,20 +132,20 @@ scrape_configs:
   - job_name: docker-containers
     sample_limit: 50000
     static_configs:
-      - targets: ["prometheus:9090"]
+      - targets: [prometheus:9090]
         labels:
           app: prometheus
-      - targets: ["grafana:3000"]
+      - targets: [grafana:3000]
         labels:
           app: grafana
-      - targets: ["alertmanager:9093"]
+      - targets: [alertmanager:9093]
         labels:
           app: alertmanager
-      - targets: ["elasticsearch_exporter:9114"]
+      - targets: [elasticsearch_exporter:9114]
         labels:
           app: elasticsearch_exporter
           env: org
-      - targets: ["blackbox_exporter:9115"]
+      - targets: [blackbox_exporter:9115]
         labels:
           app: blackbox_exporter
           env: org
@@ -193,64 +154,6 @@ scrape_configs:
   # NGINX is proxying the exporters of servers at free
   # this rule enable to get them
   # TODO: install exporter_exporter and use same config as above + do the same for each proxmox node
-  - job_name: free-exporters
-    scheme: https
-    basic_auth:
-      username: prometheus
-      password_file: /etc/prometheus/secrets/free-exporters.txt
-    static_configs:
-      - targets:
-        # those must follow <container>/<service>
-        # corresponding url is https://free-exporters.openfoodfacts.org/<target>/metrics
-        - proxy/nginx
-        - off/nginx
-        - off/apache
-        - off/apache-priority
-        # moved to scaleway: - mongo/mongodb
-        # stopped: - off1-proxy/nginx
-        labels:
-          app: off
-          env: prod
-          base_url: free-exporters.openfoodfacts.org:443
-          metrics_path: metrics
-          instance_prefix: free
-    relabel_configs: &proxied_exporters_relabel_config
-      # get instance, first part of target
-      - source_labels: [__address__]
-        regex: ^([^/]+)/(.*)$
-        replacement: ${1}
-        target_label: instance
-      - source_labels: [instance_prefix, instance]
-        separator: "-"
-        target_label: instance
-      # the metrics path is adress + /metrics
-      - source_labels: [__address__, metrics_path]
-        separator: /
-        target_label: __metrics_path__
-      # put base url as address, as it is the same for all
-      - source_labels: [base_url]
-        target_label: __address__
-      # drop labels that where only useful for configuration
-      - regex: ^(base_url|metrics_path)$
-        action: labeldrop
-
-  - job_name: ks1-exporters
-    scheme: https
-    basic_auth:
-      username: prometheus
-      password_file: /etc/prometheus/secrets/ks1.txt
-    static_configs:
-      - targets:
-        # those must follow <container>/<service>
-        # corresponding url is https://ks1.openfoodfacts.org/<target>/metrics
-        - images-ks1/nginx
-        labels:
-          app: off
-          env: prod
-          base_url: ks1.openfoodfacts.org:443
-          metrics_path: metrics
-          instance_prefix: ks1
-    relabel_configs: *proxied_exporters_relabel_config
 
   #--------#
   # PROBES #

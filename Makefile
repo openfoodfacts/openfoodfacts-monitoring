@@ -17,7 +17,7 @@ DOCKER_DATA_VOLUME_PATH?=/data-zfs/docker-volumes
 #----------------#
 # Docker Compose #
 #----------------#
-dev: replace_env build up
+dev: replace_env build update_dev_config up
 
 build:
 	@echo "🥫 Building containers …"
@@ -26,6 +26,9 @@ build:
 up:
 	@echo "🥫 Starting containers …"
 	${DOCKER_COMPOSE} up -d 2>&1
+
+update_dev_config:
+	uv run scripts/update_dev_config.py
 
 create_backups_dir:
 	@echo "🥫 Ensure backups dir for elasticsearch"

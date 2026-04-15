@@ -17,8 +17,8 @@ processors:
 - add_host_metadata:
     netinfo.enabled: true
 
-logging.tostderr: true
-logging.level: error
+logging.to_stderr: true
+logging.level: warning
 
 
 output.elasticsearch:
