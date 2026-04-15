@@ -123,7 +123,6 @@ scrape_configs:
     static_configs: # see scaleway-exporters-exporters on how it works
       - targets:
           - cadvisor/infra/cadvisor
-          - keycloak/auth/keycloak
           - node/infra/system
           - searchalicious_elasticsearch/searchalicious/elasticsearch
         labels:
@@ -134,6 +133,7 @@ scrape_configs:
       - targets:
           - cadvisor/infra/cadvisor
           - node/infra/system
+          - keycloak/auth/keycloak
           - off-server_apache/off/apache
           - off-server_nginx/off/nginx
           - robotoff_postgres/robotoff/postgres
