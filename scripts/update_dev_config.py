@@ -77,4 +77,5 @@ for key, value in prometheus_config.items():
                         # labels["env"] = "localhost"
     
 with open(f"{PROMETHEUS_DEV_CONFIG}/config.yml", "w", encoding="utf-8") as f:
+    f.write("# THIS FILE WAS GENERATED FROM PROD CONFIG USING update_dev_config.py\n# Update it the same way\n\n")
     yaml.dump(prometheus_config, f)
