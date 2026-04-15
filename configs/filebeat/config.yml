@@ -38,11 +38,10 @@ setup.ilm:
   # use this if you need to re-create ILM policy
   # overwrite: true
 
-
 setup.template.json.enabled: true
-setup.template.json.path: off-logs-template.json
-setup.template.name: off-logs
+setup.template.name: filebeat
 setup.template.json.data_stream: true
+setup.template.overwrite: false
 
 filebeat.config.modules.path: /usr/share/filebeat/modules.d/*.yml
 
