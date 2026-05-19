@@ -190,49 +190,47 @@ scrape_configs:
           env: org
 
   # Free promox cluster Exporters
-  # NGINX is proxying the exporters of servers at free
-  # this rule enable to get them
-  # TODO: install exporter_exporter and use same config as above + do the same for each proxmox node
-  - job_name: free-exporters
-    scheme: https
-    basic_auth:
-      username: prometheus
-      password_file: /etc/prometheus/secrets/free-exporters.txt
-    static_configs:
-      - targets:
-        # those must follow <container>/<service>
-        # corresponding url is https://free-exporters.openfoodfacts.org/<target>/metrics
-        - proxy/nginx
-        - off/nginx
-        - off/apache
-        - off/apache-priority
-        # moved to scaleway: - mongo/mongodb
-        # stopped: - off1-proxy/nginx
-        labels:
-          app: off
-          env: prod
-          base_url: free-exporters.openfoodfacts.org:443
-          metrics_path: metrics
-          instance_prefix: free
-    relabel_configs: &proxied_exporters_relabel_config
-      # get instance, first part of target
-      - source_labels: [__address__]
-        regex: ^([^/]+)/(.*)$
-        replacement: ${1}
-        target_label: instance
-      - source_labels: [instance_prefix, instance]
-        separator: "-"
-        target_label: instance
-      # the metrics path is adress + /metrics
-      - source_labels: [__address__, metrics_path]
-        separator: /
-        target_label: __metrics_path__
-      # put base url as address, as it is the same for all
-      - source_labels: [base_url]
-        target_label: __address__
-      # drop labels that where only useful for configuration
-      - regex: ^(base_url|metrics_path)$
-        action: labeldrop
+  # TODO: move to scaleway, using exporter exporter pattern instead of nginx complex config
+  #- job_name: free-exporters
+  #  scheme: https
+  #  basic_auth:
+  #    username: prometheus
+  #    password_file: /etc/prometheus/secrets/free-exporters.txt
+  #  static_configs:
+  #    - targets:
+  #      # those must follow <container>/<service>
+  #      # corresponding url is https://free-exporters.openfoodfacts.org/<target>/metrics
+  #      - proxy/nginx
+  #      - off/nginx
+  #      - off/apache
+  #      - off/apache-priority
+  #      # moved to scaleway: - mongo/mongodb
+  #      # stopped: - off1-proxy/nginx
+  #      labels:
+  #        app: off
+  #        env: prod
+  #        base_url: free-exporters.openfoodfacts.org:443
+  #        metrics_path: metrics
+  #        instance_prefix: free
+  #  relabel_configs: &proxied_exporters_relabel_config
+  #    # get instance, first part of target
+  #    - source_labels: [__address__]
+  #      regex: ^([^/]+)/(.*)$
+  #      replacement: ${1}
+  #      target_label: instance
+  #    - source_labels: [instance_prefix, instance]
+  #      separator: "-"
+  #      target_label: instance
+  #    # the metrics path is adress + /metrics
+  #    - source_labels: [__address__, metrics_path]
+  #      separator: /
+  #      target_label: __metrics_path__
+  #    # put base url as address, as it is the same for all
+  #    - source_labels: [base_url]
+  #      target_label: __address__
+  #    # drop labels that where only useful for configuration
+  #    - regex: ^(base_url|metrics_path)$
+  #      action: labeldrop
 
   - job_name: ks1-exporters
     scheme: https
