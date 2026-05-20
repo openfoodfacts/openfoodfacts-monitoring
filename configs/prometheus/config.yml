@@ -212,26 +212,7 @@ scrape_configs:
   #        base_url: free-exporters.openfoodfacts.org:443
   #        metrics_path: metrics
   #        instance_prefix: free
-  #  relabel_configs: &proxied_exporters_relabel_config
-  #    # get instance, first part of target
-  #    - source_labels: [__address__]
-  #      regex: ^([^/]+)/(.*)$
-  #      replacement: ${1}
-  #      target_label: instance
-  #    - source_labels: [instance_prefix, instance]
-  #      separator: "-"
-  #      target_label: instance
-  #    # the metrics path is adress + /metrics
-  #    - source_labels: [__address__, metrics_path]
-  #      separator: /
-  #      target_label: __metrics_path__
-  #    # put base url as address, as it is the same for all
-  #    - source_labels: [base_url]
-  #      target_label: __address__
-  #    # drop labels that where only useful for configuration
-  #    - regex: ^(base_url|metrics_path)$
-  #      action: labeldrop
-
+  #      relabel_configs: *proxied_exporters_relabel_config
   - job_name: ks1-exporters
     scheme: https
     basic_auth:
@@ -248,7 +229,26 @@ scrape_configs:
           base_url: ks1.openfoodfacts.org:443
           metrics_path: metrics
           instance_prefix: ks1
-    relabel_configs: *proxied_exporters_relabel_config
+    relabel_configs: &proxied_exporters_relabel_config
+      # get instance, first part of target
+      - source_labels: [__address__]
+        regex: ^([^/]+)/(.*)$
+        replacement: ${1}
+        target_label: instance
+      - source_labels: [instance_prefix, instance]
+        separator: "-"
+        target_label: instance
+      # the metrics path is adress + /metrics
+      - source_labels: [__address__, metrics_path]
+        separator: /
+        target_label: __metrics_path__
+      # put base url as address, as it is the same for all
+      - source_labels: [base_url]
+        target_label: __address__
+      # drop labels that where only useful for configuration
+      - regex: ^(base_url|metrics_path)$
+        action: labeldrop
+
 
   #--------#
   # PROBES #
