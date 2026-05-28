@@ -282,6 +282,7 @@ scrape_configs:
           - off-facets-kp|https://facets-kp.openfoodfacts.net/
           - prices-api|https://prices.openfoodfacts.net/api/v1/status
           - prices-app|https://prices.openfoodfacts.net/
+          - recipe-estimator|https://recipe-estimator.openfoodfacts.net/static/
         labels:
           env: net
           probe_module: http_probe_auth
@@ -308,6 +309,7 @@ scrape_configs:
           - folksonomy|https://api.folksonomy.openfoodfacts.org/
           - prices-api|https://prices.openfoodfacts.org/api/v1/status
           - prices-app|https://prices.openfoodfacts.org/
+          - recipe-estimator|https://recipe-estimator.openfoodfacts.org/static/
           # tools
           - blog|https://blog.openfoodfacts.org/
           - wiki|https://wiki.openfoodfacts.org/
