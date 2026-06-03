@@ -112,6 +112,13 @@ jobs:
             echo "${{ secrets.MONITORING_BASIC_AUTH_PASSWORD }}" > configs/blackbox_exporter/secrets/monitoring_basic_auth.secret
             echo "${{ secrets.ELASTICSEARCH_BASIC_AUTH_PASSWORD }}" > configs/blackbox_exporter/secrets/elasticsearch_basic_auth.secret
 
+            # PgHero config. Note that underscores need to be url-encoded in the connection string
+            echo "databases:" > configs/pghero/pghero.yml
+            echo "  off-query:" >> configs/pghero/pghero.yml
+            echo "    url: ${{ secrets.OFF_QUERY_CONNECTION_STRING }}" >> configs/pghero/pghero.yml
+            echo "  shared-services:" >> configs/pghero/pghero.yml
+            echo "    url: ${{ secrets.SHARED_SERVICES_CONNECTION_STRING }}" >> configs/pghero/pghero.yml
+
       - name: Run envsubst on Prometheus configs
         uses: appleboy/ssh-action@master
         with:
