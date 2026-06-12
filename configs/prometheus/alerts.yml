@@ -48,6 +48,24 @@ groups:
       # (first try) description: Number of messages sent per hour on last 24h (1 day) is less than half of the rate on previous 240h (10 day) for {{ $labels.app }} ({{ $labels.instance }}).
       description: Median of number of messages sent per hour on last 24h (1 day) is less than a third of the median on previous 10 days for {{ $labels.app }} ({{ $labels.instance }}).
 
+- name: cert-expiry
+  rules:
+  - alert: SSLCertificateExpiringSoon
+    expr: probe_ssl_earliest_cert_expiry < time() + 5 * 24 * 3600
+    for: 0m
+    labels:
+      severity: warning
+    annotations:
+      summary: "SSL certificate expires soon for {{ $labels.instance }}"
+      description: "Certificate for {{ $labels.instance }} expires in less than 5 days (expiry timestamp: {{ $value }})"
+  - alert: SSLCertificateExpired
+    expr: probe_ssl_earliest_cert_expiry < time()
+    for: 0m
+    labels:
+      severity: error
+    annotations:
+      summary: "SSL certificate has expired for {{ $labels.instance }}"
+      description: "Certificate for {{ $labels.instance }} expired (expiry timestamp: {{ $value }})"
 # TODO: Revisit, too noisy
 # - name: docker-alerts
 #   rules:
