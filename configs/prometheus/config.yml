@@ -348,8 +348,14 @@ scrape_configs:
           - proxy2_free|proxy2.openfoodfacts.org
           - ovh2|ovh2.openfoodfacts.org
           - ovh3|ovh3.openfoodfacts.org
-          - off1|off1.openfoodfacts.org
-          - off2|off2.openfoodfacts.org
+          - scaleway-01|scaleway-01.infra.openfoodfacts.org
+          - scaleway-02|scaleway-02.infra.openfoodfacts.org
+          - scaleway-03|scaleway-03.infra.openfoodfacts.org
+          - scaleway-proxy|scaleway-proxy.openfoodfacts.org
+          - hetzner-01|hetzner-01.infra.openfoodfacts.org
+          - hetzner-02|hetzner-02.infra.openfoodfacts.org
+          - hetzner-03|hetzner-03.infra.openfoodfacts.org
+          - hetzner-proxy|hetzner-proxy.openfoodfacts.org
         labels:
           env: org
           probe_module: icmp
