@@ -132,6 +132,22 @@ services:
     networks:
       - monitoring
 
+  # a stunnel to reach services on other servers
+  stunnel:
+    restart: ${RESTART_POLICY:-always}
+    image:   cleanstart/stunnel:latest
+    volumes:
+      - "./configs/stunnel/${STUNNEL_ENV:-dev}.conf:/etc/stunnel/stunnel.conf:ro"
+      - "./configs/stunnel/secrets:/etc/stunnel/secrets:ro"
+    # security hardening
+    security_opt:
+      - "no-new-privileges"
+    read_only: true
+    user: clnstrt
+    command:
+      - /etc/stunnel/stunnel.conf
+    # important: NEVER EVER expose this service…
+
 volumes:
   influxdb-data:
   grafana-data:
