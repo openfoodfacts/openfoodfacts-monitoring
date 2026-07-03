@@ -345,7 +345,6 @@ scrape_configs:
       - targets:
           - ovh1|ovh1.openfoodfacts.org
           - proxy1_ovh|proxy1.openfoodfacts.org
-          - proxy2_free|proxy2.openfoodfacts.org
           - ovh2|ovh2.openfoodfacts.org
           - ovh3|ovh3.openfoodfacts.org
           - scaleway-01|scaleway-01.infra.openfoodfacts.org
