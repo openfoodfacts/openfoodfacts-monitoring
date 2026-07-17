@@ -1,8 +1,1 @@
-# Note: we are abusing the exporter_exporter of docker-prod
-# It should normally be served by an exporter_exporter on proxmox host
-# But for now we don't have it…
-method: http
-http:
-  # Odoo container on ovh2
-  address: 10.1.0.110
-  port: 9187
+../mods_available/crm/crm_postgresql.yaml
