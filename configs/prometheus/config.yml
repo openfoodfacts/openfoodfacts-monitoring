@@ -125,6 +125,7 @@ scrape_configs:
           - cadvisor/infra/cadvisor
           - node/infra/system
           - searchalicious_elasticsearch/searchalicious/elasticsearch
+          - crm_postgresql/crm/postgresql
         labels:
           base_url: https://ovh-exporters.openfoodfacts.org/ovh-docker-prod/
           env: prod
