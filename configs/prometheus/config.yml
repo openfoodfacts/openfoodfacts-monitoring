@@ -277,6 +277,7 @@ scrape_configs:
           - off|https://world.openfoodfacts.net
           - off-web|https://world.openfoodfacts.net/images/products/376/002/924/8001/1.100.jpg
           - off-product|https://world.openfoodfacts.net/product/3017620422003/nutella-ferrero
+          - off-explorer|https://beta.openfoodfacts.net/health
           - robotoff|https://robotoff.openfoodfacts.net/api/v1/health
           - off-query|https://query.openfoodfacts.net/health
           - off-search|https://search.openfoodfacts.net/
