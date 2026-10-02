@@ -316,6 +316,7 @@ scrape_configs:
           - blog|https://blog.openfoodfacts.org/
           - wiki|https://wiki.openfoodfacts.org/
           - forum|https://forum.openfoodfacts.org/
+          - superset|https://sql.openfoodfacts.org/health
           # technical tools
           - grafana|https://grafana.openfoodfacts.org/api/health
           # matomo, see https://matomo.org/faq/how-to/faq_20278/
