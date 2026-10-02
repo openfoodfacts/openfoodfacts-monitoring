@@ -356,7 +356,6 @@ scrape_configs:
           - scaleway-proxy|scaleway-proxy.openfoodfacts.org
           - hetzner-01|hetzner-01.infra.openfoodfacts.org
           - hetzner-02|hetzner-02.infra.openfoodfacts.org
-          - hetzner-03|hetzner-03.infra.openfoodfacts.org
           - hetzner-proxy|hetzner-proxy.openfoodfacts.org
         labels:
           env: org
