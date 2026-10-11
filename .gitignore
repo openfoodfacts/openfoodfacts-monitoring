@@ -3,6 +3,7 @@ secrets/
 
 .DS_Store
 configs/alertmanager/config.yml
+configs/pghero/pghero.yml
 
 # editors
 .vscode/

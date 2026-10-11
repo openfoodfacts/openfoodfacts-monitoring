@@ -132,6 +132,15 @@ services:
     networks:
       - monitoring
 
+  pghero:
+    image: ankane/pghero
+    volumes:
+      - "${PGHERO_CONFIG:-./configs/pghero/pghero.yml}:/app/config/pghero.yml:ro"
+    ports:
+      - "8203:8080"
+    networks:
+      - monitoring
+
 volumes:
   influxdb-data:
   grafana-data:

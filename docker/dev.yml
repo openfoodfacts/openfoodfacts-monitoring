@@ -8,4 +8,12 @@ services:
   filebeat:
     networks:
       - monitoring
+  pghero:
+    networks:
+      - common_net
 
+
+networks:
+  common_net:
+    name: ${COMMON_NET_NAME}
+    external: true
