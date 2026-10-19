@@ -16,6 +16,12 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # never run two deployments on the same host at the same time
+    # (eg. a "make prune" here would remove images while the container deployment recreates its services)
+    # the group is shared with container-deploy.yml
+    concurrency:
+      group: deploy-host-${{ matrix.server.host }}
+      cancel-in-progress: false
     strategy:
       fail-fast: false
       matrix:

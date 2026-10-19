@@ -10,6 +10,11 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # never run two deployments on the same host at the same time
+    # the group is shared with filebeat-deploy.yml (monitoring-01 host)
+    concurrency:
+      group: deploy-host-34.1.5.157
+      cancel-in-progress: false
     steps:
       - name: checkout repo on current branch
         uses: actions/checkout@v3
