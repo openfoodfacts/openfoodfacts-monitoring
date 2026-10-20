@@ -55,7 +55,7 @@ jobs:
             proxy: "45.147.209.254"
             ssh_key_name: "SSH_PRIVATE_KEY_DOCKER_PROD_2"
             exporter_exporter_config_dir: moji-docker-prod-2
-    concurrency: filebeat-deployment-ci-{{ matrix.server.host }}
+    concurrency: filebeat-deployment-ci-${{ matrix.server.host }}
     steps:
     - name: Set env variables
       run: |
