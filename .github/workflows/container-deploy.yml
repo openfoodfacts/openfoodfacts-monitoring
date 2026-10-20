@@ -10,6 +10,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    concurrency: docker-compose-deployment-ci
     steps:
       - name: checkout repo on current branch
         uses: actions/checkout@v3
