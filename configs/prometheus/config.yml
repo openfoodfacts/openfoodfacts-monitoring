@@ -264,7 +264,7 @@ scrape_configs:
           - off-explorer|https://beta.openfoodfacts.net/health
           - robotoff|https://robotoff.openfoodfacts.net/api/v1/health
           - off-query|https://query.openfoodfacts.net/health
-          - off-search|https://search.openfoodfacts.net/
+          - off-search|https://search.openfoodfacts.net/health
           - off-facets-kp|https://facets-kp.openfoodfacts.net/
           - prices-api|https://prices.openfoodfacts.net/api/v1/status
           - prices-app|https://prices.openfoodfacts.net/
@@ -290,7 +290,7 @@ scrape_configs:
           - keycloak|https://auth.openfoodfacts.org/realms/openfoodfacts/
           - robotoff|https://robotoff.openfoodfacts.org/api/v1/health
           - off-query|https://query.openfoodfacts.org/health
-          - off-search|https://search.openfoodfacts.org/
+          - off-search|https://search.openfoodfacts.org/health
           - off-facets-kp|https://facets-kp.openfoodfacts.org/
           - folksonomy|https://api.folksonomy.openfoodfacts.org/
           - prices-api|https://prices.openfoodfacts.org/api/v1/status
