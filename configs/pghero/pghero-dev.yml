@@ -1,0 +1,5 @@
+databases:
+  off-query:
+    url: postgres://productopener:productopener@query%5fpostgres%5fprimary:5432/query
+  shared-services:
+    url: postgres://postgres:SuperSecret123!@postgresql:5432/postgres
